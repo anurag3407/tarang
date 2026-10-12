@@ -7,6 +7,7 @@ import { FEST } from "@/lib/data";
 import { createClient } from "@/lib/supabase/browser";
 import type { User } from "@supabase/supabase-js";
 import ThemeToggle from "@/components/theme/ThemeToggle";
+import TarangWordmark from "@/components/tarang/Wordmark";
 
 const PRIMARY_LINKS = [
   { href: "/events", label: "Events" },
@@ -31,11 +32,7 @@ const MORE_LINKS = [
 ];
 
 function Wordmark() {
-  return (
-    <span className="t-display text-[1.6rem] leading-none tracking-tight text-bone">
-      Tarang<span className="ml-0.5 align-top text-[0.55em] italic text-brass">’{FEST.year.slice(2)}</span>
-    </span>
-  );
+  return <TarangWordmark eager label={FEST.short} className="h-6 w-auto md:h-7" sizes="40px" />;
 }
 
 export default function Navbar() {

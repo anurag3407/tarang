@@ -1,4 +1,7 @@
-import HeroStudio from "@/components/tarang/HeroStudio";
+import Preloader from "@/components/tarang/Preloader";
+import Cursor from "@/components/tarang/Cursor";
+import Hero from "@/components/tarang/Hero";
+import MuteMundane from "@/components/tarang/MuteMundane";
 import Marquee from "@/components/tarang/Marquee";
 import Manifesto from "@/components/tarang/Manifesto";
 import Lineup, { type LineupArtist } from "@/components/tarang/Lineup";
@@ -91,8 +94,14 @@ export default async function Home() {
 
   return (
     <div className="tarang t-grain">
+      <noscript>
+        <style>{`.t-preloader{display:none}[data-in] .t-enter-down,[data-in] .t-enter-up,[data-in] .t-enter-letter,[data-in] .t-enter-wipe,[data-in] .t-enter-fade{opacity:1!important;transform:none!important;clip-path:none!important}.t-reveal{opacity:1!important;transform:none!important;clip-path:none!important}`}</style>
+      </noscript>
       <SmoothScroll />
-      <HeroStudio />
+      <Preloader />
+      <Cursor />
+      <Hero />
+      <MuteMundane />
       <Marquee />
       <Manifesto />
       <Lineup artists={nights.length > 0 ? nights : FALLBACK_NIGHTS} />

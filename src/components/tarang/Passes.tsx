@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, type CSSProperties, type PointerEvent } from "react";
 import { SectionHead } from "./SectionHead";
 import { Reveal } from "./Reveal";
+import { CircleText } from "./Icons";
 
 export type PassTier = {
   id: string;
@@ -67,16 +68,13 @@ function Ticket({ pass }: { pass: PassTier }) {
         style={{ "--tear": `calc(100% - ${STUB})`, ...notch } as CSSProperties}
       >
         <div
-          className={`relative flex h-full flex-col overflow-hidden rounded-[14px] ${
-            featured ? "text-ink" : "text-bone"
+          className={`relative flex h-full flex-col overflow-hidden rounded-[14px] border-[3px] ${
+            featured ? "t-halftone border-bone text-bone" : "border-ink bg-bone text-ink"
           }`}
           style={{
-            background: featured
-              ? "linear-gradient(140deg, #e9d3a6 0%, #c9a46a 38%, #9c7a43 62%, #d8bd88 100%)"
-              : "linear-gradient(160deg, #1d1a17 0%, #12100e 100%)",
             boxShadow: featured
-              ? "0 40px 80px -30px rgba(201,164,106,0.45)"
-              : "inset 0 0 0 1px rgba(238,232,221,0.12), 0 40px 80px -40px rgba(0,0,0,0.8)",
+              ? "0 40px 90px -30px rgba(163,16,13,0.6)"
+              : "0 40px 80px -40px rgba(0,0,0,0.8)",
           }}
         >
           {/* foil sheen follows the cursor */}
@@ -85,9 +83,9 @@ function Ticket({ pass }: { pass: PassTier }) {
             className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
             style={{
               background: featured
-                ? "radial-gradient(40% 35% at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.55), transparent 70%)"
-                : "radial-gradient(40% 35% at var(--mx,50%) var(--my,50%), rgba(201,164,106,0.18), transparent 70%)",
-              mixBlendMode: featured ? "soft-light" : "normal",
+                ? "radial-gradient(40% 35% at var(--mx,50%) var(--my,50%), rgba(255,210,170,0.5), transparent 70%)"
+                : "radial-gradient(40% 35% at var(--mx,50%) var(--my,50%), rgba(163,16,13,0.16), transparent 70%)",
+              mixBlendMode: featured ? "soft-light" : "multiply",
             }}
           />
           {/* guilloche lines */}
@@ -106,22 +104,22 @@ function Ticket({ pass }: { pass: PassTier }) {
           <div className="relative flex flex-1 flex-col p-7 md:p-9" style={{ minHeight: "30rem" }}>
             <div className="flex items-start justify-between">
               <span className="t-label">Tarang ’26</span>
-              <span className={`t-label ${featured ? "text-ink/60" : "text-bone/50"}`}>{pass.serial}</span>
+              <span className={`t-label ${featured ? "text-bone/70" : "text-ink/55"}`}>{pass.serial}</span>
             </div>
 
             <div className="mt-14">
-              <p className={`t-label ${featured ? "text-ink/60" : "text-brass"}`}>{pass.tier}</p>
-              <h3 className="t-display mt-3 text-[clamp(3.5rem,6vw,5.5rem)] italic">{pass.title}</h3>
-              <p className={`mt-3 text-sm ${featured ? "text-ink/70" : "text-bone/60"}`}>{pass.subtitle}</p>
+              <p className={`t-label ${featured ? "text-bone/75" : "text-blood"}`}>{pass.tier}</p>
+              <h3 className={`t-display mt-4 text-[clamp(2.8rem,5vw,4.6rem)] ${featured ? "t-cut" : ""}`}>{pass.title}</h3>
+              <p className={`mt-4 text-sm ${featured ? "text-bone/80" : "text-ink/70"}`}>{pass.subtitle}</p>
             </div>
 
             <ul className="mt-10">
               {pass.perks.map((perk) => (
                 <li
                   key={perk}
-                  className={`flex gap-4 border-t py-3 text-[0.92rem] leading-snug ${featured ? "border-ink/15" : "border-bone/10"}`}
+                  className={`flex gap-4 border-t py-3 text-[0.92rem] leading-snug ${featured ? "border-bone/20" : "border-ink/15"}`}
                 >
-                  <span className={`t-label mt-[0.2rem] text-[0.6rem] ${featured ? "text-ink/50" : "text-brass"}`}>✦</span>
+                  <span className={`t-label mt-[0.2rem] text-[0.6rem] ${featured ? "text-bone" : "text-blood"}`}>●</span>
                   {perk}
                 </li>
               ))}
@@ -129,18 +127,25 @@ function Ticket({ pass }: { pass: PassTier }) {
 
           </div>
 
+          {featured && (
+            <div aria-hidden className="pointer-events-none absolute right-5 top-14 hidden h-28 w-28 rotate-12 sm:block md:right-7 md:h-32 md:w-32">
+              <CircleText id={`stamp-${pass.id}`} text="Admit one · All access · " className="absolute inset-0 animate-[t-spin_16s_linear_infinite] text-bone" />
+              <span className="t-display absolute inset-0 grid place-items-center text-2xl text-bone">’26</span>
+            </div>
+          )}
+
           {/* stub — torn along the dashed line */}
           <div
-            className={`relative flex items-end justify-between gap-6 border-t border-dashed px-7 pb-7 md:px-9 md:pb-8 ${featured ? "border-ink/30" : "border-bone/20"}`}
+            className={`relative flex items-end justify-between gap-6 border-t border-dashed px-7 pb-7 md:px-9 md:pb-8 ${featured ? "border-bone/40" : "border-ink/30"}`}
             style={{ height: STUB }}
           >
             <div>
-              <p className={`t-label ${featured ? "text-ink/60" : "text-bone/50"}`}>Admit one · 5 days</p>
+              <p className={`t-label ${featured ? "text-bone/70" : "text-ink/55"}`}>Admit one · 5 days</p>
               <p className="t-display mt-2 text-5xl">{pass.price}</p>
             </div>
             <div className="flex h-12 items-stretch gap-[2px]" aria-hidden>
               {bars(pass.serial).map((w, i) => (
-                <span key={i} className={featured ? "bg-ink/80" : "bg-bone/70"} style={{ width: w, opacity: i % 5 === 0 ? 0.4 : 1 }} />
+                <span key={i} className={featured ? "bg-bone/85" : "bg-ink/80"} style={{ width: w, opacity: i % 5 === 0 ? 0.4 : 1 }} />
               ))}
             </div>
           </div>
@@ -149,7 +154,7 @@ function Ticket({ pass }: { pass: PassTier }) {
 
       <Link
         href={pass.href}
-        className={`t-btn mt-6 justify-between ${featured ? "t-btn-solid" : "t-btn-ghost"}`}
+        className={`t-btn mt-7 justify-between ${featured ? "t-btn-solid" : "t-btn-ghost"}`}
       >
         {pass.cta} <span className="t-btn-arrow">→</span>
       </Link>
@@ -159,14 +164,15 @@ function Ticket({ pass }: { pass: PassTier }) {
 
 export default function Passes({ passes }: { passes: PassTier[] }) {
   return (
-    <section id="passes" className="relative px-6 py-32 md:px-12 md:py-48">
+    <section id="passes" className="relative px-6 py-32 md:px-12 md:py-44" aria-labelledby="passes-title">
       <div className="mx-auto max-w-[1400px]">
         <SectionHead
-          index="06"
+          index="04"
           label="Passes"
+          id="passes-title"
           title={
             <>
-              Choose your <em className="text-brass">access.</em>
+              Pick your <span className="t-cut-red">access.</span>
             </>
           }
           aside="Taking a Delegate Card? You don’t need a BR Card — it already covers everything the BR Card does, and every headline night."
@@ -174,14 +180,14 @@ export default function Passes({ passes }: { passes: PassTier[] }) {
 
         <div className="mx-auto mt-20 grid max-w-5xl gap-10 md:mt-28 md:grid-cols-2 md:gap-12">
           {passes.map((p, i) => (
-            <Reveal key={p.id} delay={i * 140} className="h-full">
+            <Reveal key={p.id} delay={i * 160} variant="stamp" rotate={i === 0 ? -1.5 : 1.5} className="h-full">
               <Ticket pass={p} />
             </Reveal>
           ))}
         </div>
 
         <Reveal className="mt-16 text-center">
-          <p className="t-label text-bone/45">
+          <p className="t-label leading-loose text-bone/45">
             Digital QR issued instantly · Collect wristbands at the CR Desk ·{" "}
             <Link href="/faqs" className="t-link text-bone/70">
               Pass FAQs

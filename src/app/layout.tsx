@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Space_Grotesk, Instrument_Serif, Inter_Tight, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, Bungee, Yatra_One, Inter_Tight, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -19,11 +19,19 @@ const grotesk = Space_Grotesk({
   display: "swap",
 });
 
-const display = Instrument_Serif({
+// Blocky cut-out display face — closest match to the poster lettering.
+const display = Bungee({
   subsets: ["latin"],
   weight: "400",
-  style: ["normal", "italic"],
   variable: "--nf-display",
+  display: "swap",
+});
+
+// Devanagari accents (तरंग) on the landing page.
+const deva = Yatra_One({
+  subsets: ["devanagari"],
+  weight: "400",
+  variable: "--nf-deva",
   display: "swap",
 });
 
@@ -132,7 +140,7 @@ const THEME_SCRIPT = `
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${grotesk.variable} ${display.variable} ${body.variable} ${mono.variable} h-full`}>
+    <html lang="en" suppressHydrationWarning className={`${grotesk.variable} ${display.variable} ${deva.variable} ${body.variable} ${mono.variable} h-full`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <FestivalEventJsonLd baseUrl={baseUrl} />

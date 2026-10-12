@@ -476,29 +476,36 @@ body {
 }
 
 /* ------------------------------------------------------------------
-   TARANG ’26 — studio design system
-   Ink, bone and brass. Used by the landing page, navbar and footer.
+   TARANG ’26 — “Mute the Mundane”
+   Lifted straight off the poster: oxblood field, crimson halftone,
+   ink-black cut-outs with a cream keyline. Used by the landing page,
+   navbar and footer.
    ------------------------------------------------------------------ */
 
 @theme {
-  --color-ink: #0b0a09;
-  --color-ink-2: #12100e;
-  --color-ink-3: #1b1815;
-  --color-bone: #eee8dd;
-  --color-brass: #c9a46a;
-  --color-ember: #e0603f;
+  --color-ink: #141310;
+  --color-ink-2: #1b1c17;
+  --color-ink-3: #27261f;
+  --color-bone: #f4eac8;
+  --color-blood: #6e0001;
+  --color-blood-deep: #3a0102;
+  --color-crimson: #a3100d;
+  --color-signal: #ff3b1f;
 }
 
 @theme inline {
-  --font-display: var(--nf-display), "Times New Roman", serif;
+  --font-display: var(--nf-display), Impact, "Arial Black", sans-serif;
+  --font-deva: var(--nf-deva), "Devanagari Sangam MN", serif;
   --font-body: var(--nf-body), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--nf-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
+@layer components {
 .tarang {
-  --t-line: rgba(238, 232, 221, 0.12);
-  --t-dim: rgba(238, 232, 221, 0.56);
-  --t-faint: rgba(238, 232, 221, 0.32);
+  --t-line: rgba(244, 234, 200, 0.14);
+  --t-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-snap: cubic-bezier(0.7, 0, 0.2, 1);
+  --t-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
   background: var(--color-ink);
   color: var(--color-bone);
   font-family: var(--font-body);
@@ -508,18 +515,18 @@ body {
 }
 
 .tarang ::selection {
-  background: var(--color-brass);
+  background: var(--color-signal);
   color: var(--color-ink);
 }
 
-/* Film grain — sits above everything, never intercepts input. */
+/* Film grain — the poster’s speckle. Sits above everything, never intercepts input. */
 .t-grain::after {
   content: "";
   position: fixed;
   inset: -50%;
   z-index: 60;
   pointer-events: none;
-  opacity: 0.06;
+  opacity: 0.07;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   animation: t-grain 1.2s steps(6) infinite;
 }
@@ -533,11 +540,37 @@ body {
   100% { transform: translate(0, 0); }
 }
 
+/* ---- Type ---------------------------------------------------------- */
+
 .t-display {
   font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 0.92;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+/* Ink letters with the poster’s cream keyline. */
+.t-cut {
+  color: var(--color-ink);
+  -webkit-text-stroke: 0.16em var(--color-bone);
+  paint-order: stroke fill;
+}
+.t-cut-red {
+  color: var(--color-blood);
+  -webkit-text-stroke: 0.16em var(--color-bone);
+  paint-order: stroke fill;
+}
+/* Keyline only — for words that have been “muted”. */
+.t-hollow {
+  color: transparent;
+  -webkit-text-stroke: 1.5px currentColor;
+}
+
+.t-deva {
+  font-family: var(--font-deva);
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 .t-label {
@@ -552,13 +585,51 @@ body {
   border-color: var(--t-line);
 }
 
+/* ---- Surfaces ------------------------------------------------------ */
+
+/* Oxblood field with two drifting layers of crimson halftone. */
+.t-halftone {
+  isolation: isolate;
+  background:
+    radial-gradient(90% 70% at 50% 45%, #8a0306 0%, var(--color-blood) 45%, var(--color-blood-deep) 100%);
+}
+.t-halftone::before,
+.t-halftone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.t-halftone::before {
+  background-image: radial-gradient(circle, rgba(196, 24, 18, 0.85) 0 36%, transparent 38%);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(60% 55% at 72% 30%, #000 0%, transparent 75%),
+    radial-gradient(50% 45% at 20% 78%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(60% 55% at 72% 30%, #000 0%, transparent 75%),
+    radial-gradient(50% 45% at 20% 78%, #000 0%, transparent 70%);
+  animation: t-drift 40s linear infinite;
+}
+.t-halftone::after {
+  background-image: radial-gradient(circle, rgba(160, 14, 12, 0.6) 0 22%, transparent 24%);
+  background-size: 14px 14px;
+  background-position: 7px 7px;
+  -webkit-mask-image: linear-gradient(160deg, #000 0%, transparent 55%, #000 100%);
+  mask-image: linear-gradient(160deg, #000 0%, transparent 55%, #000 100%);
+}
+@keyframes t-drift {
+  to { background-position: 260px 130px; }
+}
+
+/* ---- Reveals ------------------------------------------------------- */
+
 /* Fade-up reveal driven by <Reveal>. */
 .t-reveal {
   opacity: 0;
-  transform: translate3d(0, 28px, 0);
+  transform: translate3d(0, 36px, 0);
   transition:
-    opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 1.1s var(--t-ease),
+    transform 1.1s var(--t-ease);
   transition-delay: var(--t-delay, 0ms);
 }
 .t-reveal[data-shown="true"] {
@@ -566,7 +637,37 @@ body {
   transform: none;
 }
 
-/* Per-letter mask reveal used by the lineup. */
+/* Curtain wipe — content is uncovered bottom-up, like a shutter lifting. */
+.t-reveal.t-wipe {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1.2s var(--t-snap);
+  transition-delay: var(--t-delay, 0ms);
+}
+.t-reveal.t-wipe[data-shown="true"] {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Mask — the wrapper stays put; nested .t-mask words do the moving. */
+.t-reveal.t-masked {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stamp — drops in oversized and lands with a thud. */
+.t-reveal.t-stamp {
+  transform: scale(1.6) rotate(-8deg);
+  transition:
+    opacity 0.35s ease,
+    transform 0.7s var(--t-pop);
+  transition-delay: var(--t-delay, 0ms);
+}
+.t-reveal.t-stamp[data-shown="true"] {
+  transform: rotate(var(--t-rot, -6deg));
+}
+
+/* Per-letter mask reveal. */
 .t-mask {
   display: inline-block;
   overflow: hidden;
@@ -576,55 +677,67 @@ body {
 }
 .t-mask > span {
   display: inline-block;
-  opacity: 0;
-  transform: translate3d(0, 130%, 0);
-  transition:
-    transform 0.9s cubic-bezier(0.7, 0, 0.2, 1),
-    opacity 0.9s cubic-bezier(0.7, 0, 0.2, 1);
+  transform: translate3d(0, 115%, 0) rotate(8deg);
+  transition: transform 0.9s var(--t-snap);
   transition-delay: var(--t-delay, 0ms);
 }
+[data-shown="true"] .t-mask > span,
 .t-mask[data-on="true"] > span {
-  opacity: 1;
   transform: none;
 }
-.t-mask[data-out="true"] > span {
-  opacity: 0;
-  transform: translate3d(0, -130%, 0);
-  transition-duration: 0.6s;
-}
 
-/* Pill buttons */
+/* ---- Controls ------------------------------------------------------ */
+
+/* Sticker buttons: a cut-out that sits proud of the page on a hard shadow. */
 .t-btn {
+  --t-shadow: var(--color-signal);
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  border: 2px solid currentColor;
   border-radius: 999px;
-  padding: 0.95rem 1.5rem;
+  padding: 0.9rem 1.5rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  box-shadow: 4px 4px 0 0 var(--t-shadow);
   transition:
-    background-color 0.4s ease,
-    color 0.4s ease,
-    border-color 0.4s ease;
+    transform 0.25s var(--t-ease),
+    box-shadow 0.25s var(--t-ease),
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+.t-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 0 var(--t-shadow);
+}
+.t-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 0 var(--t-shadow);
+}
+.t-btn:focus-visible {
+  outline: 2px solid var(--color-bone);
+  outline-offset: 4px;
 }
 .t-btn-solid {
   background: var(--color-bone);
+  border-color: var(--color-bone);
   color: var(--color-ink);
 }
-.t-btn-solid:hover {
-  background: var(--color-brass);
-}
 .t-btn-ghost {
-  border: 1px solid var(--t-line, rgba(238, 232, 221, 0.18));
   color: var(--color-bone);
+  --t-shadow: rgba(244, 234, 200, 0.22);
 }
-.t-btn-ghost:hover {
-  border-color: var(--color-bone);
+.t-btn-ink {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bone);
+  --t-shadow: var(--color-bone);
 }
 .t-btn .t-btn-arrow {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s var(--t-ease);
 }
 .t-btn:hover .t-btn-arrow {
   transform: translateX(4px);
@@ -636,11 +749,13 @@ body {
   background-size: 0% 1px;
   background-position: 0 100%;
   background-repeat: no-repeat;
-  transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-size 0.5s var(--t-ease);
 }
 .t-link:hover {
   background-size: 100% 1px;
 }
+
+/* ---- Loops --------------------------------------------------------- */
 
 @keyframes t-marquee {
   from { transform: translate3d(0, 0, 0); }
@@ -654,18 +769,151 @@ body {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@keyframes t-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0.15; }
+}
+@keyframes t-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes t-scrollhint {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+@keyframes t-eq {
+  0%, 100% { transform: scaleY(0.25); }
+  30% { transform: scaleY(1); }
+  60% { transform: scaleY(0.5); }
+}
+
+/* ---- Preloader ----------------------------------------------------- */
+
+.t-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: auto;
+}
+.t-preloader[data-done="true"] {
+  pointer-events: none;
+}
+.t-preloader-half {
+  position: absolute;
+  inset-inline: 0;
+  height: 50.5%;
+  overflow: hidden;
+  transition: transform 1.15s var(--t-snap);
+}
+.t-preloader-half[data-half="top"] { top: 0; }
+.t-preloader-half[data-half="bottom"] { bottom: 0; }
+.t-preloader[data-done="true"] .t-preloader-half[data-half="top"] { transform: translate3d(0, -101%, 0); }
+.t-preloader[data-done="true"] .t-preloader-half[data-half="bottom"] { transform: translate3d(0, 101%, 0); }
+
+/* ---- Cursor -------------------------------------------------------- */
+
+/* A keyline ring that trails the pointer; desktop pointers only. */
+.t-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 70;
+  display: none;
+  pointer-events: none;
+}
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .t-cursor {
+    display: block;
+  }
+}
+.t-cursor > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  translate: -50% -50%;
+  border: 1.5px solid var(--color-bone);
+  border-radius: 999px;
+  transition:
+    width 0.45s var(--t-ease),
+    height 0.45s var(--t-ease),
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    opacity 0.3s ease;
+}
+.t-cursor > span::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  translate: -50% -50%;
+  border-radius: 999px;
+  background: var(--color-signal);
+}
+.t-cursor[data-hover="true"] > span {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-color: var(--color-signal);
+  background: rgba(255, 59, 31, 0.12);
+}
+.t-cursor[data-hidden="true"] > span {
+  opacity: 0;
+}
+
+/* Hero entrance — held until the preloader lifts. */
+[data-in="false"] .t-enter-down { transform: translate3d(0, -115%, 0); }
+[data-in="false"] .t-enter-up { transform: translate3d(0, 115%, 0); }
+[data-in="false"] .t-enter-letter { transform: translate3d(0, -160%, 0) rotate(calc((var(--i) - 2.5) * 9deg)); opacity: 0; }
+[data-in="false"] .t-enter-wipe { clip-path: inset(0 100% 0 0); }
+[data-in="false"] .t-enter-fade { opacity: 0; }
+.t-enter-down,
+.t-enter-up {
+  transition: transform 1.6s cubic-bezier(0.22, 1.25, 0.36, 1);
+}
+.t-enter-letter {
+  transition:
+    transform 0.95s var(--t-pop),
+    opacity 0.3s ease;
+  transition-delay: calc(380ms + var(--i) * 75ms);
+}
+.t-enter-wipe {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1s var(--t-snap);
+}
+.t-enter-fade {
+  transition: opacity 1.2s ease;
+}
+
+/* ---- Reduced motion ------------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
   .t-grain::after,
-  .t-marquee {
+  .t-marquee,
+  .t-halftone::before {
     animation: none;
   }
   .t-reveal,
+  .t-reveal.t-wipe,
+  .t-reveal.t-stamp,
   .t-mask > span {
     transition: none;
     opacity: 1;
     transform: none;
+    clip-path: none;
   }
+  .t-preloader-half,
+  .t-enter-down,
+  .t-enter-up,
+  .t-enter-letter,
+  .t-enter-wipe,
+  .t-enter-fade {
+    transition-duration: 0.01s;
+    transition-delay: 0s;
+  }
+}
 }
 
 /* Lenis */
@@ -678,9 +926,4 @@ html.lenis body {
 }
 .lenis.lenis-stopped {
   overflow: hidden;
-}
-
-@keyframes t-scrollhint {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(200%); }
 }

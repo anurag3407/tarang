@@ -1,31 +1,36 @@
 import type { ReactNode } from "react";
 import { Reveal } from "./Reveal";
 
-/** Numbered editorial header shared by every landing section. */
+/** Numbered header shared by the landing sections: a slugline, then a shutter-wiped title. */
 export function SectionHead({
   index,
   label,
   title,
   aside,
+  id,
 }: {
   index: string;
   label: string;
   title: ReactNode;
   aside?: ReactNode;
+  id?: string;
 }) {
   return (
-    <div className="grid gap-10 border-t border-bone/12 pt-6 md:grid-cols-12 md:gap-6">
-      <Reveal className="md:col-span-3">
+    <div className="grid gap-10 md:grid-cols-12 md:gap-6">
+      <div className="flex items-start justify-between gap-6 border-t border-bone/15 pt-5 md:col-span-12">
         <p className="t-label text-bone/50">
           ({index}) — {label}
         </p>
-      </Reveal>
-      <Reveal delay={80} className="md:col-span-6">
-        <h2 className="t-display text-[clamp(2.6rem,5.6vw,5.5rem)]">{title}</h2>
+        <p className="t-label text-bone/30">Tarang ’26</p>
+      </div>
+      <Reveal variant="wipe" delay={60} className="md:col-span-8">
+        <h2 id={id} className="t-display text-[clamp(2.9rem,7.2vw,7rem)] leading-[0.88]">
+          {title}
+        </h2>
       </Reveal>
       {aside && (
-        <Reveal delay={160} className="md:col-span-3 md:pt-3">
-          <div className="max-w-xs text-[0.95rem] leading-relaxed text-bone/60">{aside}</div>
+        <Reveal delay={200} className="md:col-span-4 md:self-end">
+          <div className="max-w-sm text-[0.98rem] leading-relaxed text-bone/60 md:ml-auto">{aside}</div>
         </Reveal>
       )}
     </div>

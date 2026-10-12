@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Wordmark from "@/components/tarang/Wordmark";
 import { FEST } from "@/lib/data";
 import { ClickTracker } from "@/components/analytics/ClickTracker";
 
@@ -53,10 +54,10 @@ export default function Footer() {
       <div className="mx-auto max-w-[1600px] px-6 pt-20 md:px-12 md:pt-28">
         <div className="grid gap-14 md:grid-cols-12">
           <div className="md:col-span-4">
-            <p className="t-display text-4xl leading-[1.05] md:text-5xl">
-              {FEST.tagline.split(". ")[0]}.
+            <p className="t-display text-4xl leading-[0.95] md:text-5xl">
+              Mute the
               <br />
-              <em className="text-brass">{FEST.tagline.split(". ")[1]}</em>
+              <span className="t-cut-red">mundane.</span>
             </p>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-bone/55">
               The annual cultural festival of {FEST.college}. {FEST.dates}.
@@ -114,10 +115,8 @@ export default function Footer() {
       </div>
 
       {/* Oversized wordmark, cropped by the page edge */}
-      <div aria-hidden className="pointer-events-none select-none px-4">
-        <p className="t-display -mb-[0.2em] whitespace-nowrap text-center text-[25vw] leading-[0.8] text-bone/[0.06]">
-          Tarang<em className="text-[0.4em] align-top">’26</em>
-        </p>
+      <div aria-hidden className="pointer-events-none -mb-[3vw] select-none px-4 opacity-[0.09] md:px-12">
+        <Wordmark className="w-full" sizes="16vw" />
       </div>
     </footer>
   );
