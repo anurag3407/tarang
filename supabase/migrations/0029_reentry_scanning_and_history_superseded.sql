@@ -1,0 +1,25 @@
+-- 0029_reentry_scanning_and_history_superseded.sql
+-- G6: supersede `0018_reentry_scanning_and_history.sql`.
+--
+-- The original file was created with the same version prefix (0018) as
+-- `0018_payment_reconciliation_hardening.sql`. Duplicate versions:
+--   * break Supabase CLI migrations entirely (duplicate migration version),
+--   * make scripts/apply-sql.ts record version 18 for whichever file sorts
+--     first and SILENTLY SKIP the other (`on conflict (version) do nothing`),
+--     so the reentry migration was never applied on apply-sql environments.
+--
+-- Everything the original contained is now superseded, which is why this
+-- replacement is intentionally a no-op:
+--   * its `record_scan` redefinition (text `p_credential_jti`, gate fallback,
+--     row-type null checks) was replaced by 0019_unified_pass_scan_history and
+--     corrected by 0022/0023/0028; re-creating it here would install a broken
+--     text overload AFTER the fixed uuid signature.
+--   * its blanket `update gates set admission_policy = 'REENTRY_ALLOWED'`
+--     was a one-time data migration; default gates now seed as
+--     REENTRY_ALLOWED and admins intentionally use ONE_PER_DAY for
+--     one-entry gates, so a blanket re-flip would be destructive.
+--
+-- Environments that already applied the original file under version 18 keep
+-- its effects (superseded by later migrations); environments that skipped it
+-- lose nothing. This file exists so the version is recorded exactly once and
+-- every tool (CLI + apply-sql) sees a unique, ordered migration history.

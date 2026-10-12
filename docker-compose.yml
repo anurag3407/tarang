@@ -1,0 +1,90 @@
+# PULSE 2026 — production compose (plan §15.2, §15.3).
+#
+# One immutable image, blue/green web services + background worker:
+#   web-blue  — Next.js standalone slot A (127.0.0.1:3001) behind Nginx
+#   web-green — Next.js standalone slot B (127.0.0.1:3002) behind Nginx
+#   worker    — background loop (hold reaper, outbox, email, reconcile, exports)
+#
+# Note on multi-origin scaling:
+# Duplicate workers are safe (DB leases). For multi-origin deployments,
+# `exports-data` must be backed by shared storage (NFS/EFS or Supabase Storage)
+# so that CSV downloads created on one origin can be downloaded from another.
+# Secrets come from the environment / .env file — never bake them into the image.
+
+x-web-service: &web-service
+  image: ${PULSE_IMAGE:?set PULSE_IMAGE to the promoted image digest}
+  restart: unless-stopped
+  command: ["node", "server.js"]
+  env_file:
+    - .env
+  environment:
+    NODE_ENV: production
+    PORT: 3000
+    HOSTNAME: 0.0.0.0
+    DEPLOYMENT_ID: ${DEPLOYMENT_ID:-}
+  deploy:
+    resources:
+      limits:
+        memory: 2g
+  stop_grace_period: 30s
+  read_only: true
+  tmpfs:
+    - /tmp
+  volumes:
+    - exports-data:/app/.exports
+    - uploads-data:/app/public/uploads
+    # Next writes ISR/prerender/image cache entries at runtime. Keep the
+    # container root read-only and provide only this dedicated writable path.
+    - next-cache:/app/.next/cache
+  healthcheck:
+    test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health/live"]
+    interval: 15s
+    timeout: 3s
+    retries: 3
+    start_period: 15s
+  logging:
+    driver: json-file
+    options:
+      max-size: "20m"
+      max-file: "5"
+
+services:
+  web-blue:
+    <<: *web-service
+    ports:
+      - "127.0.0.1:3001:3000"
+
+  web-green:
+    <<: *web-service
+    ports:
+      - "127.0.0.1:3002:3000"
+
+  worker:
+    image: ${PULSE_IMAGE:?set PULSE_IMAGE to the promoted image digest}
+    restart: unless-stopped
+    command: ["node", "dist/worker.cjs"]
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      EXPORT_DIR: /app/.exports
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    stop_grace_period: 30s
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - exports-data:/app/.exports
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+volumes:
+  exports-data:
+  uploads-data:
+  next-cache:

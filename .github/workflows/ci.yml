@@ -1,0 +1,106 @@
+# PULSE — Automated CI/CD Pipeline (GitHub Actions -> Hostinger VPS)
+#
+# Pipeline:
+#   1. Quality Gates (Lint, Typecheck, Typegen) on GitHub Runners
+#   2. Continuous Deployment to Hostinger VPS on push to `main` (Zero-downtime blue/green cutover)
+#   3. Manual trigger support (workflow_dispatch)
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production_deploy
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify & Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate route types
+        run: pnpm typegen
+
+      - name: Run linter
+        run: pnpm lint
+
+      - name: Run typecheck
+        run: pnpm typecheck
+
+  deploy:
+    name: Deploy to Hostinger VPS
+    needs: verify
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH to Hostinger VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH || '/opt/pulse' }}
+        run: |
+          if [ -z "$VPS_HOST" ] || [ -z "$VPS_USER" ] || [ -z "$VPS_SSH_KEY" ]; then
+            echo "::error::Missing required GitHub Secrets: VPS_HOST, VPS_USER, and VPS_SSH_KEY must be set in Repository Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" | tr -d '\r' > ~/.ssh/id_vps
+          chmod 600 ~/.ssh/id_vps
+
+          echo "==> Verifying private key structure..."
+          if ! ssh-keygen -l -f ~/.ssh/id_vps >/dev/null 2>&1; then
+            echo "::error::The secret VPS_SSH_KEY is not a valid OpenSSH/RSA/ED25519 private key. Ensure it begins with '-----BEGIN ... PRIVATE KEY-----' and ends with '-----END ... PRIVATE KEY-----'."
+            exit 1
+          fi
+
+          echo "==> Connecting to Hostinger VPS ($VPS_USER@$VPS_HOST:$VPS_SSH_PORT)..."
+          ssh -i ~/.ssh/id_vps -p "$VPS_SSH_PORT" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30 "$VPS_USER@$VPS_HOST" "bash -s" << 'EOF'
+            set -euo pipefail
+            
+            APP_DIR="${DEPLOY_PATH:-/opt/pulse}"
+            echo "==> Navigating to application directory: $APP_DIR"
+            cd "$APP_DIR"
+
+            if [ ! -f ".env" ]; then
+              echo "!! Missing .env file in $APP_DIR. Deployment aborted." >&2
+              exit 1
+            fi
+
+            echo "==> Fetching latest changes from git..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "==> Ensuring helper scripts are executable..."
+            chmod +x infra/scripts/*.sh
+
+            echo "==> Executing zero-downtime deployment..."
+            ALLOW_DIRTY=1 ./infra/scripts/deploy-local.sh
+          EOF
+
+          echo "==> Deployment to Hostinger VPS completed successfully!"

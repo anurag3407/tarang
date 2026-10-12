@@ -1,0 +1,8 @@
+[Unit]
+Description=Update Cloudflare trusted CIDRs for Nginx real_ip
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/pulse/infra/scripts/update-cloudflare-cidrs.sh

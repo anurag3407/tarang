@@ -1,0 +1,476 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+/* ------------------------------------------------------------------
+   PULSE — Neo-brutalism design tokens (Tailwind v4 CSS-first config)
+   ------------------------------------------------------------------ */
+
+@theme {
+  /* Dynamic Neo-Brutalism Palette via CSS Variables */
+  --color-neo-cream: var(--neo-cream);
+  --color-neo-accent: var(--neo-accent);
+  --color-neo-secondary: var(--neo-secondary);
+  --color-neo-muted: var(--neo-muted);
+  --color-neo-surface: var(--neo-surface);
+  --color-neo-card: var(--neo-card);
+
+  /* Hard offset shadows — zero blur, zero spread */
+  --shadow-neo-xs: var(--shadow-neo-xs);
+  --shadow-neo-sm: var(--shadow-neo-sm);
+  --shadow-neo-md: var(--shadow-neo-md);
+  --shadow-neo: var(--shadow-neo);
+  --shadow-neo-lg: var(--shadow-neo-lg);
+  --shadow-neo-xl: var(--shadow-neo-xl);
+  --shadow-neo-white: 8px 8px 0 0 #fff;
+
+  /* Motion */
+  --animate-spin-slow: spin-slow 10s linear infinite;
+  --animate-marquee: marquee 28s linear infinite;
+  --animate-marquee-fast: marquee 18s linear infinite;
+  --animate-wiggle: wiggle 2.4s ease-in-out infinite;
+  --animate-scan-sweep: scan-sweep 2s ease-in-out infinite;
+
+  @keyframes scan-sweep {
+    0% {
+      top: 5%;
+      opacity: 0.8;
+    }
+    50% {
+      top: 90%;
+      opacity: 1;
+    }
+    100% {
+      top: 5%;
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(-3deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+  }
+}
+
+/* Font variable is injected on <html> by next/font — bridge it here. */
+@theme inline {
+  --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------
+   Light Mode Design Tokens (Default)
+   ------------------------------------------------------------------ */
+:root {
+  --neo-cream: #fffdf5;
+  --neo-accent: #ff6b6b;
+  --neo-secondary: #ffd93d;
+  --neo-muted: #c4b5fd;
+  --neo-surface: #ffffff;
+  --neo-card: #ffffff;
+  --neo-text: #000000;
+  --neo-border: #000000;
+
+  --shadow-neo-xs: 2px 2px 0 0 #000;
+  --shadow-neo-sm: 4px 4px 0 0 #000;
+  --shadow-neo-md: 6px 6px 0 0 #000;
+  --shadow-neo: 8px 8px 0 0 #000;
+  --shadow-neo-lg: 12px 12px 0 0 #000;
+  --shadow-neo-xl: 16px 16px 0 0 #000;
+}
+
+/* ------------------------------------------------------------------
+   Dark Mode Design Tokens (Cyber Obsidian / Jet Black Neo-Brutalism)
+   High-contrast neon colors on ultra-premium pure obsidian black
+   ------------------------------------------------------------------ */
+.dark {
+  --neo-cream: #000000;
+  --neo-accent: #ff5470;
+  --neo-secondary: #8a6a0c;
+  --neo-muted: #9d82f7;
+  --neo-surface: #0c0c0e;
+  --neo-card: #121214;
+  --neo-text: #f4f4f6;
+  --neo-border: #26262b;
+
+  --shadow-neo-xs: 2px 2px 0 0 rgba(0, 0, 0, 0.95);
+  --shadow-neo-sm: 4px 4px 0 0 rgba(0, 0, 0, 0.95);
+  --shadow-neo-md: 6px 6px 0 0 rgba(0, 0, 0, 0.95);
+  --shadow-neo: 8px 8px 0 0 rgba(0, 0, 0, 0.95);
+  --shadow-neo-lg: 12px 12px 0 0 rgba(0, 0, 0, 0.95);
+  --shadow-neo-xl: 16px 16px 0 0 rgba(0, 0, 0, 0.95);
+}
+
+/* ------------------------------------------------------------------
+   Base Styles
+   ------------------------------------------------------------------ */
+
+body {
+  background-color: var(--neo-cream);
+  color: var(--neo-text);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+::selection {
+  background: var(--neo-secondary);
+  color: #000000;
+}
+
+/* ------------------------------------------------------------------
+   Textures & Patterns
+   ------------------------------------------------------------------ */
+
+.bg-halftone {
+  background-image: radial-gradient(#000 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+.dark .bg-halftone {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1.25px, transparent 1.25px);
+  background-size: 20px 20px;
+}
+
+.bg-halftone-white {
+  background-image: radial-gradient(#fff 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+.bg-grid-neo {
+  background-size: 40px 40px;
+  background-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+}
+
+.dark .bg-grid-neo {
+  background-size: 40px 40px;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.18) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+}
+
+.bg-grid-white {
+  background-size: 40px 40px;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.18) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+}
+
+.bg-dots-lg {
+  background-image: radial-gradient(circle, #000 2px, transparent 2.5px);
+  background-size: 30px 30px;
+}
+
+.dark .bg-dots-lg {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.18) 1.75px, transparent 2.25px);
+}
+
+/* ------------------------------------------------------------------
+   Typography Effects
+   ------------------------------------------------------------------ */
+
+/* Hollow outlined display text */
+.text-stroke {
+  -webkit-text-stroke: 2px #000;
+  color: transparent;
+}
+
+.dark .text-stroke {
+  -webkit-text-stroke: 2px #ffffff;
+  color: transparent;
+}
+
+.text-stroke-white {
+  -webkit-text-stroke: 2px #fff;
+  color: transparent;
+}
+
+.text-stroke-thin {
+  -webkit-text-stroke: 1px #000;
+  color: transparent;
+}
+
+.dark .text-stroke-thin {
+  -webkit-text-stroke: 1px #ffffff;
+  color: transparent;
+}
+
+.text-shadow-neo {
+  text-shadow: 4px 4px 0 #000;
+}
+
+.dark .text-shadow-neo {
+  text-shadow: 4px 4px 0 #000;
+}
+
+.text-shadow-neo-lg {
+  text-shadow: 6px 6px 0 #000;
+}
+
+.dark .text-shadow-neo-lg {
+  text-shadow: 6px 6px 0 #000;
+}
+
+/* ------------------------------------------------------------------
+   Dark Mode Component & Surface Styles
+   ------------------------------------------------------------------ */
+
+/* Cards and white surfaces in dark mode */
+.dark .bg-white:not(.keep-white) {
+  background-color: var(--neo-card);
+  color: var(--neo-text);
+}
+
+/* Dark mode text colors on dark surfaces */
+.dark .text-black:not(.dark\:text-black) {
+  color: var(--neo-text);
+}
+
+.dark .text-black\/90,
+.dark .text-black\/85,
+.dark .text-black\/80,
+.dark .text-black\/75,
+.dark .text-black\/70 {
+  color: #d4d4d8;
+}
+
+.dark .text-black\/60,
+.dark .text-black\/50,
+.dark .text-black\/40 {
+  color: #a1a1aa;
+}
+
+.dark .text-black\/30,
+.dark .text-black\/20,
+.dark .text-black\/10 {
+  color: #71717a;
+}
+
+.dark .text-zinc-600,
+.dark .text-zinc-500,
+.dark .text-zinc-400 {
+  color: #a1a1aa;
+}
+
+/* Explicit high-contrast utilities in dark mode */
+.dark .dark\:text-white,
+.dark .text-white {
+  color: #ffffff !important;
+}
+
+.dark .dark\:text-black {
+  color: #000000 !important;
+}
+
+.dark .dark\:bg-neo-secondary {
+  background-color: var(--neo-secondary) !important;
+}
+
+.dark .dark\:bg-neo-accent {
+  background-color: var(--neo-accent) !important;
+}
+
+.dark .dark\:bg-neo-muted {
+  background-color: var(--neo-muted) !important;
+}
+
+/* Dark mode border colors */
+.dark .border-black:not(.keep-border-black) {
+  border-color: #26262b;
+}
+
+.dark .border-black\/40,
+.dark .border-black\/30,
+.dark .border-black\/20,
+.dark .border-black\/15,
+.dark .border-black\/10 {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dark .divide-black\/30 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-black\/20 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-black\/15 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-black\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Dark CTA buttons & dark container elements */
+.dark .bg-black {
+  background-color: #0c0c0e;
+  color: #ffffff;
+  border-color: #26262b;
+}
+
+/* Prevent text turning black on hover in dark mode */
+.dark .hover\:text-black:hover {
+  color: #ffffff;
+}
+
+.dark .hover\:text-black\/70:hover {
+  color: #cbd5e1;
+}
+
+.dark .group:hover .group-hover\:text-black {
+  color: #ffffff;
+}
+
+/* Status Badges & Alert Tints in Dark Mode */
+.dark .bg-green-50,
+.dark .bg-green-100,
+.dark .bg-green-200 {
+  background-color: rgba(34, 197, 94, 0.15) !important;
+  border-color: rgba(34, 197, 94, 0.35) !important;
+  color: #86efac !important;
+}
+
+.dark .bg-green-50 *,
+.dark .bg-green-100 *,
+.dark .bg-green-200 * {
+  color: #86efac !important;
+}
+
+.dark .bg-amber-100,
+.dark .bg-amber-200 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  color: #fde68a !important;
+}
+
+.dark .bg-amber-100 *,
+.dark .bg-amber-200 * {
+  color: #fde68a !important;
+}
+
+.dark .bg-red-100,
+.dark .bg-red-200 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+}
+
+.dark .bg-red-100 *,
+.dark .bg-red-200 * {
+  color: #fca5a5 !important;
+}
+
+.dark .bg-zinc-100 {
+  background-color: #18181b !important;
+  border-color: #27272a !important;
+  color: #d4d4d8 !important;
+}
+
+.dark .bg-zinc-100 * {
+  color: #d4d4d8 !important;
+}
+
+.dark .text-green-600,
+.dark .text-green-700,
+.dark .text-green-800,
+.dark .text-green-900,
+.dark .text-green-950 {
+  color: #86efac !important;
+}
+
+.dark .text-amber-600,
+.dark .text-amber-700,
+.dark .text-amber-800,
+.dark .text-amber-900,
+.dark .text-amber-950 {
+  color: #fde68a !important;
+}
+
+.dark .text-red-600,
+.dark .text-red-700,
+.dark .text-red-800,
+.dark .text-red-900,
+.dark .text-red-950 {
+  color: #fca5a5 !important;
+}
+
+/* Form inputs & controls in dark mode */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: #09090b !important;
+  color: #f4f4f6 !important;
+  border-color: #26262b !important;
+}
+
+.dark option {
+  background-color: #121214 !important;
+  color: #f4f4f6 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717a !important;
+}
+
+/* ------------------------------------------------------------------
+   Marquee
+   ------------------------------------------------------------------ */
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: var(--animate-marquee);
+}
+
+.marquee-track-fast {
+  display: flex;
+  width: max-content;
+  animation: var(--animate-marquee-fast);
+}
+
+.marquee-paused:hover .marquee-track,
+.marquee-paused:hover .marquee-track-fast {
+  animation-play-state: paused;
+}
+
+/* ------------------------------------------------------------------
+   Accessibility — kill motion when requested
+   ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .marquee-track-fast,
+  .animate-spin-slow,
+  .animate-wiggle,
+  .animate-bounce,
+  .animate-pulse {
+    animation: none !important;
+  }
+}

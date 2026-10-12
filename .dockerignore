@@ -1,0 +1,21 @@
+# Keep the build context small and secrets out of the image (plan §15.3).
+node_modules
+.next
+dist
+.git
+.github
+infra
+load
+supabase/tests
+*.md
+!README.md
+.env*
+!.env.example
+Dockerfile
+docker-compose.yml
+.dockerignore
+coverage
+.vscode
+.idea
+*.log
+.exports

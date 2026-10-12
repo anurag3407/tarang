@@ -1,0 +1,30 @@
+# pulse-compose.service — supervise docker compose on the VPS (plan §15.2).
+#
+# Docker is the primary supervisor; this unit only ensures the compose stack
+# comes up at boot and restarts if the whole stack dies. Individual container
+# restart policy is `unless-stopped` in docker-compose.yml.
+#
+# Install:
+#   sudo cp infra/systemd/pulse-compose.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now pulse-compose
+
+[Unit]
+Description=PULSE 2026 docker compose stack (web + worker)
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/pulse
+# The local-build path records the exact image in /var/lib/pulse/current-image.
+# Docker compose parses /opt/pulse/.env internally; we avoid EnvironmentFile
+# here so database/gateway secrets are not exposed to world-readable systemctl show.
+ExecStart=/bin/sh -c 'IMAGE="$${PULSE_IMAGE:-}"; if [ -z "$${IMAGE}" ] && [ -f /var/lib/pulse/current-image ]; then IMAGE=$$(cat /var/lib/pulse/current-image); fi; test -n "$${IMAGE}"; SLOT="blue"; if [ -f /var/lib/pulse/active-slot ]; then SLOT=$$(cat /var/lib/pulse/active-slot); fi; PULSE_IMAGE="$${IMAGE}" /usr/bin/docker compose -f /opt/pulse/docker-compose.yml up -d --remove-orphans "web-$${SLOT}" worker'
+ExecStop=/bin/sh -c '/usr/bin/docker compose -f /opt/pulse/docker-compose.yml stop'
+# Give containers their stop_grace_period before force-killing.
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target
