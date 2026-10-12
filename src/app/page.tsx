@@ -5,7 +5,7 @@ import MuteMundane from "@/components/tarang/MuteMundane";
 import Marquee from "@/components/tarang/Marquee";
 import Manifesto from "@/components/tarang/Manifesto";
 import Lineup, { type LineupArtist } from "@/components/tarang/Lineup";
-import Passes, { type PassTier } from "@/components/tarang/Passes";
+import Passes from "@/components/tarang/Passes";
 import Arenas, { type Arena } from "@/components/tarang/Arenas";
 import Journey from "@/components/tarang/Journey";
 import Finale from "@/components/tarang/Finale";
@@ -44,46 +44,9 @@ export default async function Home() {
       image: e.imageUrl,
     }));
 
-  const base = passProducts.find((p) => p.isBasePass);
-  const delegate = passProducts.find((p) => !p.isBasePass);
-
-  const passes: PassTier[] = [
-    {
-      id: "delegate",
-      tier: "All access",
-      title: "Delegate",
-      subtitle: "Every competition, every headline night.",
-      price: delegate ? formatPaise(delegate.amountPaise) : "₹2,000",
-      serial: "No. 0026—DLG",
-      perks: [
-        "All five Prime Star Nights at the Quadrangle",
-        "Front-arena concert access",
-        "Fast-track gate entry",
-        "Everything included with the BR Card",
-        "Digital QR pass on your dashboard",
-      ],
-      href: "/delegate-card",
-      cta: "Get Delegate Card",
-      featured: true,
-    },
-    {
-      id: "br",
-      tier: "Participant",
-      title: "BR Card",
-      subtitle: "The key to campus and 250+ competitions.",
-      price: base ? formatPaise(base.amountPaise) : "₹200",
-      serial: "No. 0026—BRC",
-      perks: [
-        "Campus access across all five days",
-        "Register for any competition",
-        "Battle of Bands, Open Mic, Movie Nighters & more",
-        "Free entry to informals — Cupid Waltz, Mr. & Miss Tarang",
-        "Collect at the CR Desk with your QR",
-      ],
-      href: "/basic-card",
-      cta: "Get BR Card",
-    },
-  ];
+  // A single pass is on sale: the base pass product, sold as the Pronite Pass.
+  const pass = passProducts.find((p) => p.isBasePass) ?? passProducts[0];
+  const passPrice = pass ? formatPaise(pass.amountPaise) : "—";
 
   const counts = new Map<string, number>();
   for (const e of events) counts.set(e.category.slug, (counts.get(e.category.slug) ?? 0) + 1);
@@ -105,7 +68,7 @@ export default async function Home() {
       <Marquee />
       <Manifesto />
       <Lineup artists={nights.length > 0 ? nights : FALLBACK_NIGHTS} />
-      <Passes passes={passes} />
+      <Passes price={passPrice} />
       <Arenas arenas={arenas} total={events.length} />
       <Journey />
       <Finale />

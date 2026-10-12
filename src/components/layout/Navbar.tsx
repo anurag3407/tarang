@@ -6,20 +6,18 @@ import { useEffect, useRef, useState } from "react";
 import { FEST } from "@/lib/data";
 import { createClient } from "@/lib/supabase/browser";
 import type { User } from "@supabase/supabase-js";
-import TarangWordmark from "@/components/tarang/Wordmark";
 
 const PRIMARY_LINKS = [
   { href: "/events", label: "Events" },
   { href: "/schedule", label: "Schedule" },
   { href: "/#lineup", label: "Lineup" },
-  { href: "/delegate-card", label: "Passes" },
+  { href: "/pronite-pass", label: "Pass" },
   { href: "/merchandise", label: "Merch" },
   { href: "/about", label: "About" },
 ];
 
 const MORE_LINKS = [
-  { href: "/basic-card", label: "BR Card" },
-  { href: "/delegate-card", label: "Delegate Card" },
+  { href: "/pronite-pass", label: "Pronite Pass" },
   { href: "/sponsors", label: "Sponsors & Partners" },
   { href: "/gallery", label: "Gallery" },
   { href: "/notices", label: "Notices & Updates" },
@@ -31,7 +29,11 @@ const MORE_LINKS = [
 ];
 
 function Wordmark() {
-  return <TarangWordmark eager label={FEST.short} className="h-6 w-auto md:h-7" sizes="40px" />;
+  return (
+    <span aria-label={FEST.short} className="t-display t-cut text-[1.75rem] leading-none md:text-[2rem]">
+      Tarang
+    </span>
+  );
 }
 
 export default function Navbar() {
@@ -177,7 +179,7 @@ export default function Navbar() {
               Sign in
             </Link>
           )}
-          <Link href={isHome ? "#passes" : "/delegate-card"} className="t-btn t-btn-solid !py-2.5 !px-5">
+          <Link href={isHome ? "#passes" : "/pronite-pass"} className="t-btn t-btn-solid !py-2.5 !px-5">
             Get passes
           </Link>
         </div>
@@ -232,7 +234,7 @@ export default function Navbar() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3">
-          <Link href="/delegate-card" onClick={() => setOpen(false)} className="t-btn t-btn-solid justify-between">
+          <Link href="/pronite-pass" onClick={() => setOpen(false)} className="t-btn t-btn-solid justify-between">
             Get passes <span>→</span>
           </Link>
           {user ? (

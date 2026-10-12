@@ -4,12 +4,12 @@ import { Marquee } from "@/components/ui/Marquee";
 import { ButtonLink } from "@/components/ui/Button";
 import { FEST } from "@/lib/data";
 import { loadPublicContent } from "@/lib/content-loader";
-import { Sparkles, Mail, Phone, Award, ExternalLink } from "lucide-react";
+import { Sparkles, Mail, Award, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Sponsors & Partners — TARANG 2026",
+  title: "Sponsors & Partners",
   description:
-    "Meet our title partners, category associates, audio pioneers, and media partners powering TARANG 2026 at AIIMS New Delhi.",
+    "Meet the partners powering TARANG 2026 at NIT Patna — and how to become one.",
 };
 
 export const dynamic = "force-dynamic";
@@ -36,11 +36,10 @@ export default async function SponsorsPage() {
       ? sponsors.map((s) => s.name)
       : [
           "TARANG 2026",
-          "AIIMS NEW DELHI",
+          "NIT PATNA",
           "SEPTEMBER 17–21",
-          "FEEL THE BEAT",
-          "LIVE THE WAVE",
-          "INDIA'S LARGEST MED FEST",
+          "MUTE THE MUNDANE",
+          "FIVE PRONITES",
         ];
 
   return (
@@ -49,7 +48,7 @@ export default async function SponsorsPage() {
         kicker="Powering the Beat"
         title="Our"
         accent="Sponsors"
-        description="The brands, medical pioneers, audio innovators, and media partners making TARANG 2026 possible."
+        description="The brands, studios and media partners making TARANG 2026 possible."
       />
 
       <section className="bg-neo-cream py-16 sm:py-20">
@@ -132,7 +131,7 @@ export default async function SponsorsPage() {
                       </a>
                     )}
                     <div className="border-2 border-white/40 bg-zinc-900 px-4 py-2 text-xs font-black uppercase tracking-wider text-neo-secondary">
-                      5-Day Headline Partner · AIIMS New Delhi
+                      5-Day Headline Partner · NIT Patna
                     </div>
                   </div>
                 </div>
@@ -224,7 +223,7 @@ export default async function SponsorsPage() {
                           </a>
                         ) : (
                           <span className="text-[10px] font-bold uppercase text-black/40">
-                            AIIMS TARANG
+                            TARANG · NIT PATNA
                           </span>
                         )}
                       </div>
@@ -248,103 +247,29 @@ export default async function SponsorsPage() {
             </div>
           )}
 
-          {/* Become a Sponsor & Chief Coordinators Contact Window */}
-          <div className="border-8 border-black bg-black p-8 text-white shadow-neo-xl sm:p-12">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 border-b-4 border-white/20 pb-8">
+          {/* Partner with TARANG */}
+          <div className="kit-rise t-halftone relative overflow-hidden rounded-[6px] border-[3px] border-black p-8 shadow-neo-xl sm:p-12">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <span className="border-2 border-white bg-neo-accent px-3 py-1 text-xs font-black uppercase tracking-wider text-black">
-                  Official Sponsorship Desk
-                </span>
-                <h3 className="mt-4 text-3xl font-black uppercase tracking-tight sm:text-4xl md:text-5xl text-white">
-                  Partner With TARANG 2026
-                </h3>
-                <p className="mt-3 max-w-2xl text-base font-bold text-white/85">
-                  Showcase your brand across 5 electric days to over 10,000+ medical delegates, students, and doctors from 450+ colleges across India.
+                <p className="t-label text-bone/85">Sponsorship desk</p>
+                <h3 className="t-display t-cut mt-4 text-[clamp(2.4rem,6vw,4.8rem)] leading-[0.9]">Partner with Tarang</h3>
+                <p className="mt-5 max-w-2xl rounded-[8px] bg-ink/70 px-5 py-3 text-base text-bone/85">
+                  Five days and five pronites at {FEST.college}, in front of students from colleges across the country.
+                  Title, category, stage and stall partnerships are open.
                 </p>
               </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <a
-                  href="mailto:studentsunion@aiims.edu?subject=TARANG 2026 Sponsorship Inquiry"
-                  className="inline-flex items-center justify-center gap-2 border-4 border-black bg-neo-secondary px-6 py-3.5 text-sm font-black uppercase tracking-wider text-black shadow-neo-white transition-transform hover:-translate-y-0.5"
-                >
-                  <Mail className="h-5 w-5" />
-                  Email: studentsunion@aiims.edu
-                </a>
-                <ButtonLink href="/ask" variant="primary">
-                  Send Inquiry Message
+              <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                {FEST.email && (
+                  <ButtonLink href={`mailto:${FEST.email}?subject=TARANG ${FEST.year} sponsorship`} variant="secondary">
+                    <Mail className="h-4 w-4" /> {FEST.email}
+                  </ButtonLink>
+                )}
+                <ButtonLink href="/ask" variant="dark">
+                  Send an enquiry
                 </ButtonLink>
               </div>
             </div>
-
-            {/* 4 Chief Coordinators Direct Contacts */}
-            <div className="mt-8">
-              <div className="flex items-center justify-between gap-4 mb-6">
-                <div>
-                  <h4 className="text-xl font-black uppercase tracking-tight text-neo-secondary">
-                    Chief Coordinators — TARANG 2026
-                  </h4>
-                  <p className="text-xs font-bold text-white/70">
-                    Reach out directly for brand integration packages, title sponsorships, and stall bookings:
-                  </p>
-                </div>
-                <span className="hidden sm:inline-block border border-white/30 px-2 py-1 text-[11px] font-mono text-white/80">
-                  AIIMS Student Association
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { name: "Abdul Rafey", phone: "+91 7007162992", raw: "7007162992" },
-                  { name: "Abhay Mittal", phone: "+91 9772778706", raw: "9772778706" },
-                  { name: "Priyanshu Dhaka", phone: "+91 9521547110", raw: "9521547110" },
-                  { name: "Mohit Dahiya", phone: "+91 9256529200", raw: "9256529200" },
-                ].map((coord) => (
-                  <div
-                    key={coord.raw}
-                    className="border-2 border-white bg-zinc-900 p-4 shadow-neo-sm flex flex-col justify-between"
-                  >
-                    <div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-neo-accent">
-                        Chief Coordinator
-                      </span>
-                      <p className="text-lg font-black uppercase text-white mt-1">
-                        {coord.name}
-                      </p>
-                      <p className="text-xs font-mono font-bold text-white/80 mt-1">
-                        {coord.phone}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-white/20 flex items-center gap-2">
-                      <a
-                        href={`tel:${coord.phone.replace(/\s+/g, "")}`}
-                        className="flex-1 text-center border border-white bg-white py-1 text-[11px] font-black uppercase text-black hover:bg-neo-accent transition-colors"
-                      >
-                        Call
-                      </a>
-                      <a
-                        href={`https://wa.me/91${coord.raw}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 text-center border border-white bg-[#17784a] py-1 text-[11px] font-black uppercase text-black hover:bg-[#1d8f58] transition-colors"
-                      >
-                        WhatsApp
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Footer Association Attribution */}
-            <div className="mt-8 pt-6 border-t-2 border-white/15 flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-white/70">
-              <span className="inline-flex items-center gap-2">
-                <Mail className="h-4 w-4 text-neo-secondary" /> Official Student Union Mail:{" "}
-                <strong className="text-white font-mono">studentsunion@aiims.edu</strong>
-              </span>
-              <span>AIIMS Campus, Ansari Nagar, New Delhi — 110029</span>
-            </div>
+            <p className="mt-10 border-t border-bone/25 pt-5 text-sm text-bone/75">{FEST.venue}</p>
           </div>
         </div>
       </section>

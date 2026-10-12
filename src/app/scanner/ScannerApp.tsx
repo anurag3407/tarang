@@ -352,9 +352,9 @@ export default function ScannerApp() {
             {
               id: scanId,
               time: formatTimeIST(new Date()),
-              code: scanData.display?.passClass || "VIP QR",
-              name: scanData.display?.maskedName || "VIP Attendee",
-              product: "VIP All-Access Pass",
+              code: scanData.display?.passClass || "Pronite QR",
+              name: scanData.display?.maskedName || "Pronite Pass holder",
+              product: "Pronite Pass",
               outcome: isReentry
                 ? "RE-ENTRY CLEARED"
                 : scanData.outcome === "refunded"
@@ -367,7 +367,7 @@ export default function ScannerApp() {
           ]);
 
           let outcomeTitle = "ENTRY CLEARED · ADMITTED";
-          let outcomeSubtitle = "Valid VIP Delegate Pass verified.";
+          let outcomeSubtitle = "Valid Pronite Pass verified.";
 
           if (isReentry) {
             outcomeTitle = "VERIFIED · RE-ENTRY CLEARED";
@@ -389,8 +389,8 @@ export default function ScannerApp() {
             success: isGood,
             outcomeTitle,
             outcomeSubtitle,
-            displayName: scanData.display?.maskedName || "VIP Delegate Attendee",
-            productName: "VIP All-Access Delegate Pass",
+            displayName: scanData.display?.maskedName || "Pronite Pass holder",
+            productName: "Pronite Pass",
             passCode: displayCode,
             entries: entryHistory,
             rawToken: rawCode,
@@ -450,7 +450,7 @@ export default function ScannerApp() {
                       time: formatTimeIST(new Date()),
                       code: cardData.publicPassCode || payload.pass,
                       name: cardData.displayName || "Participant",
-                      product: cardData.productName || "VIP All-Access Pass",
+                      product: cardData.productName || "Pronite Pass",
                       outcome: isGood
                         ? isReentry
                           ? "RE-ENTRY CLEARED"
@@ -475,12 +475,12 @@ export default function ScannerApp() {
                         ? "PASS REFUNDED · ADMISSION DENIED"
                         : "NO ACTIVE PASS FOUND",
                     outcomeSubtitle: isGood
-                      ? `VIP Delegate Pass verified and admission recorded at ${currentGate.gateName}.`
+                      ? `Pronite Pass verified and admission recorded at ${currentGate.gateName}.`
                       : isRefunded
                         ? "This pass was cancelled and refunded by organizers. Entry is strictly prohibited."
                         : cardData.message || "Pass is either expired, inactive, or not found.",
                     displayName: cardData.displayName || "Participant",
-                    productName: cardData.productName || "VIP All-Access Pass",
+                    productName: cardData.productName || "Pronite Pass",
                     passCode: cardData.publicPassCode || payload.pass,
                     email: cardData.email,
                     collegeName: cardData.collegeName ?? undefined,
@@ -843,7 +843,7 @@ export default function ScannerApp() {
             )}
           </div>
           <p className="text-[10px] font-bold text-white/60">
-            AIIMS New Delhi Gate Control
+            NIT Patna Gate Control
           </p>
         </div>
 
@@ -1269,7 +1269,7 @@ export default function ScannerApp() {
                 type="text"
                 value={manualQuery}
                 onChange={(e) => setManualQuery(e.target.value)}
-                placeholder="e.g. PP-A1B2C3 or student@aiims.edu"
+                placeholder="e.g. PP-A1B2C3 or student@college.edu"
                 className="flex-1 border-2 border-black bg-neo-cream px-3 py-2 text-sm font-bold uppercase placeholder:normal-case focus:outline-none"
                 required
               />

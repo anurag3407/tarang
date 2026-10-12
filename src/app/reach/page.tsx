@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import {
   Train,
@@ -21,7 +20,7 @@ import {
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Marquee } from "@/components/ui/Marquee";
 import { ButtonLink } from "@/components/ui/Button";
-import { ROUTES, LANDMARKS } from "@/lib/data";
+import { FEST, ROUTES, LANDMARKS } from "@/lib/data";
 
 const MODE_ICON = {
   metro: Train,
@@ -41,7 +40,7 @@ const MODE_ACCENT = {
 
 export default function ReachPage() {
   const [copied, setCopied] = useState(false);
-  const fullAddress = "AIIMS Quadrangle, Sri Aurobindo Marg, Ansari Nagar, New Delhi – 110029";
+  const fullAddress = FEST.venue;
 
   function copyAddress() {
     navigator.clipboard.writeText(fullAddress);
@@ -49,22 +48,19 @@ export default function ReachPage() {
     setTimeout(() => setCopied(false), 2200);
   }
 
-  const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    "AIIMS Quadrangle, Sri Aurobindo Marg, Ansari Nagar, New Delhi 110029"
-  )}`;
+  const gmapsUrl = FEST.mapsUrl;
 
   return (
     <>
       <PageHeader
         kicker="Campus Transit & Navigation"
         title="How to Reach"
-        accent="AIIMS"
-        description="Getting to AIIMS New Delhi for TARANG — Yellow & Pink Line metros, direct cab drop-offs, inter-state bus hubs, railway stations, and airport connections."
+        accent="NIT Patna"
+        description="Getting to TARANG at NIT Patna — on Ashok Rajpath, on the south bank of the Ganga. Routes from Patna Junction, the airport and the city’s bus terminals."
       />
 
       {/* Main Destination Showcase Banner */}
       <section className="relative overflow-hidden border-b-8 border-black bg-black py-10 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(#d4190f_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
         <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 sm:px-6 lg:flex-row lg:items-center">
           <div className="flex items-start gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center border-4 border-white bg-neo-accent text-black shadow-neo-white">
@@ -83,19 +79,12 @@ export default function ReachPage() {
                 {fullAddress}
               </h2>
               <p className="mt-1 text-sm font-bold text-white/80">
-                CR Desk &amp; Registration: Near Swimming Pool, AIIMS Campus
+                Help desk &amp; registration point: announced on the Notices page before the fest
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            {/* <Link
-              href="/map"
-              className="inline-flex flex-1 sm:flex-initial items-center justify-center gap-2 border-4 border-white bg-neo-secondary px-5 py-3 text-sm font-black uppercase tracking-wider text-black shadow-neo-white transition-transform hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px]"
-            >
-              <Compass className="h-4 w-4 text-black" strokeWidth={2.5} />
-              <span>Campus Venue Map</span>
-            </Link> */}
 
             <button
               type="button"
@@ -132,22 +121,12 @@ export default function ReachPage() {
       {/* Transit Quick Stats Strip */}
       <section className="border-b-4 border-black bg-neo-secondary py-3 text-black">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6 text-xs font-black uppercase tracking-widest">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-yellow-400 border border-black" />
-            <span>AIIMS Metro: Gate 1 &amp; 2</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-pink-400 border border-black" />
-            <span>South Ext Metro: Gate 3 &amp; 4</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-blue-400 border border-black" />
-            <span>Cabs: AIIMS Quadrangle Drop</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-emerald-400 border border-black" />
-            <span>Buses: Kashmere Gate / Dhaula Kuan</span>
-          </div>
+          {["Patna Junction: ~8 km", "Patna Airport: ~20 km", "Drop: NIT Patna main gate", "Landmark: Gandhi Ghat"].map((t) => (
+            <div key={t} className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-bone" />
+              <span>{t}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -164,7 +143,7 @@ export default function ReachPage() {
               </h2>
             </div>
             <p className="max-w-md text-sm font-bold text-black/70">
-              Multiple seamless transit links deliver you right at AIIMS gates. Check the gate exit numbers for quickest festival access.
+              Rail, air or road — every route ends at the NIT Patna main gate on Ashok Rajpath.
             </p>
           </div>
 
@@ -238,27 +217,28 @@ export default function ReachPage() {
             })}
           </div>
 
-          {/* CR Desk & Physical Collection Callout */}
+          {/* Pass callout */}
           <div className="mt-16 border-8 border-black bg-neo-accent p-6 sm:p-8 md:p-10 text-black shadow-neo-lg">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-wider text-black">
                   <Sparkles className="h-4 w-4 text-black" />
-                  Card Collection Point
+                  At the gate
                 </div>
                 <h3 className="text-3xl font-black uppercase tracking-tight text-black sm:text-4xl">
-                  Central Registration (CR) Desk
+                  Keep your gate QR ready
                 </h3>
                 <p className="max-w-2xl text-base font-bold text-black/85">
-                  Collect your physical <strong>BR Card &amp; Delegate Card</strong> on festival days at the CR Desk located <strong>near the Swimming Pool, AIIMS Campus</strong>.
+                  Your <strong>Pronite Pass</strong> lives in your dashboard as a gate QR. Show it with a valid photo ID and
+                  you’re in.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <ButtonLink href="/basic-card" variant="secondary">
-                  Get BR Card First
+                <ButtonLink href="/pronite-pass" variant="secondary">
+                  Get your Pronite Pass
                 </ButtonLink>
-                <ButtonLink href="/delegate-pass" variant="dark">
-                  Pro Shows Delegate Card
+                <ButtonLink href="/dashboard" variant="dark">
+                  My gate QR
                 </ButtonLink>
               </div>
             </div>
@@ -271,7 +251,7 @@ export default function ReachPage() {
               <div className="flex items-center gap-3 border-b-4 border-black pb-4 mb-6">
                 <Compass className="h-7 w-7 text-black dark:text-white" strokeWidth={2.5} />
                 <h3 className="text-2xl font-black uppercase tracking-tight sm:text-3xl text-black dark:text-white">
-                  Key Campus Landmarks
+                  Landmarks &amp; distances
                 </h3>
               </div>
               <ul className="space-y-3.5">
@@ -291,13 +271,13 @@ export default function ReachPage() {
                   Campus Arrival FAQ
                 </span>
                 <h3 className="mt-4 text-3xl font-black uppercase tracking-tight text-white sm:text-4xl">
-                  First Time at AIIMS?
+                  First time in Patna?
                 </h3>
                 <p className="mt-4 text-base font-bold leading-relaxed text-white/85">
-                  Tell any cab, auto, or bus conductor <strong>&quot;AIIMS Quadrangle, Ansari Nagar&quot;</strong> — it is one of the most recognizable landmarks in the capital.
+                  Ask any cab or auto for <strong>&quot;NIT Patna, Ashok Rajpath&quot;</strong> — the campus sits on the Ganga, right behind Gandhi Ghat.
                 </p>
                 <p className="mt-3 text-sm font-bold text-neo-secondary leading-relaxed">
-                  Inside campus, look for the neon yellow TARANG signage and student coordinators at Gate 1 and Gate 2 who will direct you straight to the venues.
+                  At the main gate, follow the red TARANG signage and the student volunteers to the festival grounds.
                 </p>
               </div>
 
@@ -316,12 +296,11 @@ export default function ReachPage() {
 
       <Marquee
         items={[
-          "AIIMS Metro (Yellow Line) — Exit Gate 1 & 2",
-          "South Extension Metro (Pink Line) — Exit Gate 3 & 4",
-          "Cab Destination: AIIMS Quadrangle, Sri Aurobindo Marg",
-          "CR Desk: Near Swimming Pool, AIIMS Campus",
-          "Airport Express + Yellow Line to AIIMS",
-          "Buses: Kashmere Gate & Dhaula Kuan Hubs",
+          "NIT Patna · Ashok Rajpath",
+          "Behind Gandhi Ghat, on the Ganga",
+          "Patna Junction ~8 km",
+          "Patna Airport ~20 km",
+          "Gate QR ready",
         ]}
         variant="black"
       />

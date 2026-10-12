@@ -71,8 +71,8 @@ function Support({ supportEmail }: { supportEmail: string }) {
   return (
     <p style={{ fontSize: 13, color: "#333333" }}>
       Need help? Contact the help desk at <b>{supportEmail}</b> or visit the
-      Student Centre. Quote your public code — never share passwords or
-      payment details.
+      TARANG help desk on campus. Quote your public code — never share
+      passwords or payment details.
     </p>
   );
 }
@@ -85,14 +85,14 @@ export function renderTemplate(
   switch (name) {
     case "delegate-pass-confirmation":
       return {
-        subject: `Your TARANG 2026 Delegate Card & Gate QR is confirmed (${d.publicPassCode ?? d.publicOrderCode ?? ""})`,
+        subject: `Your TARANG 2026 Pronite Pass & gate QR are confirmed (${d.publicPassCode ?? d.publicOrderCode ?? ""})`,
         element: (
-          <EmailLayout title="Delegate Card Confirmed">
-            <StatusBanner text="Payment Confirmed — Delegate Card Active" color={EMAIL_COLORS.secondary} />
+          <EmailLayout title="Pronite Pass Confirmed">
+            <StatusBanner text="Payment Confirmed — Pronite Pass Active" color={EMAIL_COLORS.secondary} />
             <Spacer />
             <p>Hi {d.displayName},</p>
             <p>
-              Your <b>{d.productName ?? "All-Access Delegate Card"}</b> for TARANG 2026 is confirmed.
+              Your <b>Pronite Pass</b> for TARANG 2026 is confirmed.
               Below is your official Gate Entry QR Code. Present this QR at the campus gates for entry.
             </p>
             <Spacer height={8} />

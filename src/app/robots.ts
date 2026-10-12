@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.PUBLIC_SITE_URL ||
     process.env.APP_BASE_URL ||
-    "https://pulseasa.org";
+    "http://localhost:3000";
 
   return {
     rules: [

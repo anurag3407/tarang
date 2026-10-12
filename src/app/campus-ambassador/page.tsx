@@ -6,7 +6,7 @@ import CampusAmbassadorForm from "./CampusAmbassadorForm";
 export const metadata: Metadata = {
   title: "Campus Ambassador",
   description:
-    "Apply as a Campus Ambassador for TARANG 2026 AIIMS New Delhi — represent your college, lead your contingent, and unlock exclusive VIP perks and certificates.",
+    "Apply as a Campus Ambassador for TARANG 2026 at NIT Patna — represent your college, lead your contingent, and unlock free Pronite Passes and certificates.",
 };
 
 export default function CampusAmbassadorPage() {
@@ -16,7 +16,7 @@ export default function CampusAmbassadorPage() {
         kicker="Leadership Program"
         title="Campus"
         accent="Ambassador"
-        description="Represent your college at TARANG 2026. Lead your campus contingent, earn official certificates from AIIMS New Delhi, and unlock VIP pro-night passes."
+        description="Represent your college at TARANG 2026. Lead your campus contingent, earn an official certificate from TARANG, NIT Patna, and unlock free Pronite Passes."
       />
       <section className="bg-neo-cream">
         <Suspense

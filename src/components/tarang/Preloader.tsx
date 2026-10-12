@@ -104,8 +104,6 @@ function Face({ count, edge }: { count: number; edge: "top" | "bottom" }) {
 
       <div className="absolute left-1/2 top-1/2 w-[min(84vw,860px)] -translate-x-1/2 -translate-y-1/2">
         <Wordmark
-          eager
-          sizes="(max-width: 768px) 15vw, 150px"
           letterStyle={(i) => {
             const on = count > 10 + i * 13;
             return {

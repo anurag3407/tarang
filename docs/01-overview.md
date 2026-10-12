@@ -2,7 +2,7 @@
 
 ## What this project is
 
-**PULSE** is the website + ticketing system for AIIMS Delhi's college fest. It started as a
+**TARANG** is the website + ticketing system for NIT Patna's cultural fest. It started as a
 static event website and grew into a full platform:
 
 - **Public site** — browse events, schedule, notices, venues, FAQs.

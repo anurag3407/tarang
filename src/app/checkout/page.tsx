@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
-import CheckoutFlow from "./CheckoutFlow";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Checkout",
-  robots: { index: false },
-};
-
-export default function CheckoutPage() {
-  return <CheckoutFlow />;
+/** The old base-pass checkout now lives on the Pronite Pass page. */
+export default function CheckoutRedirect() {
+  redirect("/pronite-pass");
 }

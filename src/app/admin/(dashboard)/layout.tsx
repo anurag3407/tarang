@@ -83,7 +83,7 @@ export default async function AdminLayout({
               ⚡ TARANG ADMIN
             </Link>
             <span className="hidden sm:inline-block font-mono text-[10px] uppercase tracking-wider text-white/50 border-l border-white/20 pl-3">
-              AIIMS 2026
+              NIT Patna 2026
             </span>
           </div>
 

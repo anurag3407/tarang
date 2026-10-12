@@ -7,7 +7,7 @@ import { ButtonLink } from "@/components/ui/Button";
 export const metadata: Metadata = {
   title: "Tech Team & Developers — TARANG 2026",
   description:
-    "Meet the tech geeks and developers behind the official digital platform of TARANG 2026 at AIIMS New Delhi.",
+    "Meet the developers behind the official digital platform of TARANG 2026 at NIT Patna.",
 };
 
 function LinkedinIcon({ className = "h-4 w-4" }: { className?: string }) {
@@ -118,7 +118,7 @@ export default function TechTeamPage() {
               The Platform Engineers
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-sm font-bold text-black/75 dark:text-zinc-400">
-              Designed, built, and shipped for South Asia&apos;s largest medical fest. Connect with the team below.
+              Designed, built and shipped for TARANG at NIT Patna. Connect with the team below.
             </p>
           </div>
 
@@ -205,7 +205,7 @@ export default function TechTeamPage() {
           {/* Bottom Actions Banner */}
           <div className="mt-14 border-4 border-black dark:border-white/20 bg-white dark:bg-neo-card p-6 text-center shadow-neo sm:p-8 max-w-3xl mx-auto">
             <p className="text-sm font-black uppercase tracking-widest text-black dark:text-white">
-              Platform Engineering · TARANG 2026 · AIIMS New Delhi
+              Platform Engineering · TARANG 2026 · NIT Patna
             </p>
             <p className="mt-2 text-xs font-bold text-black/60 dark:text-zinc-400">
               Next.js · React · TypeScript · Tailwind CSS · Supabase
@@ -225,7 +225,7 @@ export default function TechTeamPage() {
       <Marquee
         items={[
           "TECH GEEKS",
-          "AIIMS TARANG 2026",
+          "TARANG 2026 · NIT PATNA",
           "NEXT.JS & REACT",
           "HIGH SPEED INFRASTRUCTURE",
           "BUILT BY TECH GEEKS",

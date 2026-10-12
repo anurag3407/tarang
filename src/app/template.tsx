@@ -18,7 +18,7 @@ export default function Template({ children }: { children: ReactNode }) {
   return (
     <>
       <div aria-hidden className="kit-shutter t-halftone flex items-center justify-center">
-        <Wordmark eager className="w-[min(60vw,420px)]" sizes="70px" />
+        <Wordmark className="w-[min(60vw,420px)]" />
       </div>
       <div className="kit-page-in">{children}</div>
     </>

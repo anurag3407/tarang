@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Bungee, Yatra_One, Inter_Tight, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Yatra_One, Inter_Tight, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -11,14 +12,18 @@ const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
   process.env.PUBLIC_SITE_URL ||
   process.env.APP_BASE_URL ||
-  "https://pulseasa.org";
+  "http://localhost:3000";
 
-// Blocky cut-out display face — closest match to the poster lettering.
-const display = Bungee({
-  subsets: ["latin"],
-  weight: "400",
+// Noot — the face the poster lettering is set in (see src/fonts/README.md).
+const display = localFont({
+  src: "../fonts/Noot-Regular.ttf",
   variable: "--nf-display",
   display: "swap",
+  weight: "400",
+  // No metric fallback: missing glyphs (₹, curly quotes) should drop to the body face,
+  // which `--font-display` lists next.
+  adjustFontFallback: false,
+  fallback: [],
 });
 
 // Devanagari accents (तरंग) on the landing page.
@@ -44,25 +49,23 @@ const mono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Tarang ’26 — Annual Cultural Fest | AIIMS New Delhi",
+    default: "Tarang ’26 — Mute the Mundane | NIT Patna",
     template: "%s | Tarang ’26",
   },
   description:
-    "Tarang ’26 is South Asia's largest medical college cultural, literary, and sports fest at AIIMS New Delhi. Five days of star pro shows, 250+ events, and campus glory from 17–21 September 2026.",
+    "Tarang ’26 is the cultural festival of NIT Patna — five pronites, every kind of competition and five days on the banks of the Ganga. 17–21 September 2026.",
   keywords: [
     "TARANG",
     "TARANG 2026",
     "Tarang 26",
-    "AIIMS Delhi",
-    "AIIMS Tarang 2026",
-    "AIIMS cultural fest",
-    "college fest New Delhi",
-    "medical college fest",
-    "TARANG delegate card",
-    "TARANG BR card",
-    "pro shows AIIMS",
-    "AIIMS Student Association",
-    "Delhi collegiate fest",
+    "Tarang NIT Patna",
+    "NIT Patna fest",
+    "NIT Patna cultural fest",
+    "Patna college fest",
+    "Bihar college fest",
+    "TARANG pronite pass",
+    "pronites Patna",
+    "Mute the Mundane",
   ],
   alternates: {
     canonical: "./",
@@ -93,10 +96,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: baseUrl,
-    siteName: "Tarang ’26 — AIIMS New Delhi",
-    title: "Tarang ’26 — Annual Cultural Fest | AIIMS New Delhi",
+    siteName: "Tarang ’26 — NIT Patna",
+    title: "Tarang ’26 — Mute the Mundane | NIT Patna",
     description:
-      "South Asia's largest medical college cultural, literary, and sports festival — five days of pro shows, 250+ competitions, and 10k+ footfall at AIIMS New Delhi. 17–21 September 2026.",
+      "The cultural festival of NIT Patna — five pronites and five days of music, dance, theatre and competitions on the banks of the Ganga. 17–21 September 2026.",
     images: [
       {
         url: "/tarang/og.jpg",
@@ -108,9 +111,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tarang ’26 — Annual Cultural Fest | AIIMS New Delhi",
-    description:
-      "South Asia's largest medical college cultural, literary, and sports fest at AIIMS New Delhi. 17–21 September 2026.",
+    title: "Tarang ’26 — Mute the Mundane | NIT Patna",
+    description: "The cultural festival of NIT Patna. Five pronites, one pass. 17–21 September 2026.",
     images: ["/tarang/og.jpg"],
   },
   verification: {

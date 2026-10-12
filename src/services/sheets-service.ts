@@ -704,7 +704,7 @@ export async function syncOrderToSpreadsheets(orderId: string): Promise<{ synced
       const customerEmail = merchOrder?.recipient_email || email;
       const customerPhone = merchOrder?.recipient_phone || phone;
       const deliveryMode = "Campus Pickup";
-      const address = "Campus Quadrangle Counter";
+      const address = "Festival Merch Counter";
       const orderStatus = merchOrder?.state || "CONFIRMED";
 
       const row = [
@@ -1073,7 +1073,7 @@ export async function syncAllHistoricalRecordsToSheets(): Promise<{
       const customerEmail = merchOrder?.recipient_email || email;
       const customerPhone = merchOrder?.recipient_phone || phone;
       const deliveryMode = "Campus Pickup";
-      const address = "Campus Quadrangle Counter";
+      const address = "Festival Merch Counter";
       const orderStatus = merchOrder?.state || "CONFIRMED";
 
       merchRows.push([

@@ -345,7 +345,7 @@ export function MerchandiseCheckoutModal({
               <div className="flex justify-between items-center">
                 <span className="text-xs font-black uppercase text-black/60 dark:text-zinc-500">Fulfillment</span>
                 <span className="text-xs font-bold text-black dark:text-white">
-                  Campus Quadrangle Counter Pickup
+                  Festival Merch Counter Pickup
                 </span>
               </div>
             </div>
@@ -550,7 +550,7 @@ export function MerchandiseCheckoutModal({
                       Campus Counter Pickup Only
                     </span>
                     <p className="text-[11px] font-bold text-black/75 dark:text-zinc-300 leading-tight mt-0.5">
-                      Collect your merchandise at the Central Fest Quadrangle Counter during fest days by presenting your Order Code.
+                      Collect your merchandise at the festival merch counter during fest days by presenting your Order Code.
                     </p>
                   </div>
                 </div>

@@ -82,9 +82,8 @@ export default function GalleryPage() {
               Shot something at TARANG?
             </p>
             <p className="mx-auto mt-3 max-w-xl text-lg font-bold leading-snug text-black">
-              Tag <span className="bg-ink px-1.5 text-bone">@pulse.aiims</span> on
-              Instagram with #TARANG26 — the best frames make it to this wall
-              and the closing film.
+              Post it with <span className="bg-ink px-1.5 text-bone">#TARANG26</span> — the best frames
+              make it to this wall and the closing film.
             </p>
           </div>
         </div>

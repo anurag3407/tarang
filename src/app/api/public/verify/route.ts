@@ -242,7 +242,7 @@ export async function POST(req: NextRequest) {
         maskedName: maskName(profileRecord?.display_name ?? null),
         maskedCollege: maskCollege(profileRecord?.college_name ?? null),
         festivalName: fest?.name ? `${fest.name} ${fest.year || ""}`.trim() : "TARANG 2026",
-        venue: "AIIMS New Delhi",
+        venue: "NIT Patna",
       });
     }
 
@@ -336,7 +336,7 @@ export async function POST(req: NextRequest) {
         maskedCollege: maskCollege(profileRecord?.college_name ?? null),
         teamName: regRecord.team_name ?? null,
         festivalName: "TARANG 2026",
-        venue: "AIIMS New Delhi",
+        venue: "NIT Patna",
       });
     }
 
@@ -433,7 +433,7 @@ export async function POST(req: NextRequest) {
         maskedName: maskName(profileRecord?.display_name ?? null),
         maskedCollege: maskCollege(profileRecord?.college_name ?? null),
         festivalName: "TARANG 2026",
-        venue: "AIIMS New Delhi",
+        venue: "NIT Patna",
       });
     }
 

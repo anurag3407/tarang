@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { Users, CheckCircle2, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { FEST } from "@/lib/data";
+import { FEST, HAS_CONTACT } from "@/lib/data";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -249,6 +249,7 @@ export default function GroupEntryForm() {
               Talk to us instead
             </h2>
             <ul className="mt-4 space-y-3">
+              {FEST.email && (
               <li className="flex items-center gap-3">
                 <Mail className="h-6 w-6 shrink-0 text-black" strokeWidth={3} />
                 <a
@@ -258,10 +259,18 @@ export default function GroupEntryForm() {
                   {FEST.email}
                 </a>
               </li>
+              )}
+              {FEST.phone && (
               <li className="flex items-center gap-3">
                 <Phone className="h-6 w-6 shrink-0 text-black" strokeWidth={3} />
                 <span className="text-base font-bold text-black">{FEST.phone}</span>
               </li>
+              )}
+              {!HAS_CONTACT && (
+                <li className="text-base font-bold text-black">
+                  Contact details are being finalised — use this form and the help desk will reply.
+                </li>
+              )}
             </ul>
           </div>
         </aside>

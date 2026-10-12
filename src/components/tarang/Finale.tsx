@@ -55,18 +55,18 @@ export default function Finale() {
           Mute the mundane. See you at Tarang ’26.
         </h2>
         <div ref={mark} aria-hidden className="mt-8 w-[min(86vw,780px)]">
-          <Wordmark sizes="(max-width: 768px) 15vw, 140px" />
+          <Wordmark />
         </div>
         <p aria-hidden className="t-display mt-6 text-[clamp(1.4rem,3.4vw,2.6rem)] text-bone">
           Unmute <span className="text-ink [-webkit-text-stroke:0.14em_var(--color-bone)] [paint-order:stroke_fill]">September.</span>
         </p>
 
         <div className="mt-12 flex flex-wrap justify-center gap-4">
-          <Link href="/delegate-card" className="t-btn t-btn-ink">
-            Get Delegate Card <span className="t-btn-arrow">→</span>
+          <Link href="/pronite-pass" className="t-btn t-btn-ink">
+            Get your Pronite Pass <span className="t-btn-arrow">→</span>
           </Link>
-          <Link href="/basic-card" className="t-btn t-btn-solid" style={{ "--t-shadow": "var(--color-ink)" } as CSSProperties}>
-            Get BR Card
+          <Link href="/events" className="t-btn t-btn-solid" style={{ "--t-shadow": "var(--color-ink)" } as CSSProperties}>
+            Browse events
           </Link>
         </div>
         <p className="t-label mt-12 max-w-md rounded-[10px] bg-ink/75 px-5 py-3 leading-loose text-bone/80 backdrop-blur-sm">

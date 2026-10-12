@@ -1,17 +1,16 @@
 import Link from "next/link";
 import Wordmark from "@/components/tarang/Wordmark";
-import { FEST } from "@/lib/data";
+import { FEST, HAS_CONTACT } from "@/lib/data";
 import { ClickTracker } from "@/components/analytics/ClickTracker";
 
 const EXPLORE = [
   { href: "/events", label: "All Events" },
   { href: "/schedule", label: "Schedule" },
-  { href: "/basic-card", label: "BR Card" },
-  { href: "/delegate-card", label: "Delegate Card" },
+  { href: "/pronite-pass", label: "Pronite Pass" },
   { href: "/merchandise", label: "Merchandise" },
   { href: "/gallery", label: "Gallery" },
   { href: "/sponsors", label: "Sponsors & Partners" },
-  { href: "/about", label: "About AIIMS & Tarang" },
+  { href: "/about", label: "About Tarang" },
   { href: "/team", label: "Our Team" },
 ];
 
@@ -21,14 +20,13 @@ const HELP = [
   { href: "/ask", label: "Ask a Question" },
   { href: "/campus-ambassador", label: "Campus Ambassador" },
   { href: "/reach", label: "How to Reach" },
-  { href: "/verify", label: "Verify a Pass" },
 ];
 
 const STAFF_LINKS = [
   { href: "/admin/login", label: "Staff Sign In" },
   { href: "/admin", label: "Admin Control Room" },
   { href: "/scanner", label: "Gate Scanner" },
-  { href: "/dashboard", label: "Delegate Dashboard" },
+  { href: "/dashboard", label: "My Dashboard" },
 ];
 
 function Column({ title, links }: { title: string; links: { href: string; label: string }[] }) {
@@ -62,14 +60,15 @@ export default function Footer() {
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-bone/55">
               The annual cultural festival of {FEST.college}. {FEST.dates}.
             </p>
-            <a
-              href={FEST.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="t-btn t-btn-ghost mt-8"
-            >
-              Instagram <span className="t-btn-arrow">↗</span>
-            </a>
+            {FEST.instagram ? (
+              <a href={FEST.instagram} target="_blank" rel="noopener noreferrer" className="t-btn t-btn-ghost mt-8">
+                Instagram <span className="t-btn-arrow">↗</span>
+              </a>
+            ) : (
+              <Link href="/pronite-pass" className="t-btn t-btn-ghost mt-8">
+                Get your Pronite Pass <span className="t-btn-arrow">→</span>
+              </Link>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 md:col-span-8">
@@ -81,11 +80,20 @@ export default function Footer() {
               <div>
                 <h3 className="t-label mb-6 text-bone/40">Contact</h3>
                 <ul className="space-y-3 text-[0.95rem] text-bone/75">
-                  <li>
-                    <a href={`mailto:${FEST.email}`} className="t-link hover:text-bone">
-                      {FEST.email}
-                    </a>
-                  </li>
+                  {FEST.email && (
+                    <li>
+                      <a href={`mailto:${FEST.email}`} className="t-link hover:text-bone">
+                        {FEST.email}
+                      </a>
+                    </li>
+                  )}
+                  {!HAS_CONTACT && (
+                    <li>
+                      <Link href="/ask" className="t-link hover:text-bone">
+                        Ask the help desk
+                      </Link>
+                    </li>
+                  )}
                   {FEST.phones.map((phone) => (
                     <li key={phone}>
                       <a href={`tel:${phone.replace(/\s+/g, "")}`} className="t-link hover:text-bone">
@@ -93,7 +101,11 @@ export default function Footer() {
                       </a>
                     </li>
                   ))}
-                  <li className="pt-2 text-sm leading-relaxed text-bone/45">{FEST.venue}</li>
+                  <li className="pt-2 text-sm leading-relaxed text-bone/45">
+                    <a href={FEST.mapsUrl} target="_blank" rel="noopener noreferrer" className="t-link hover:text-bone/80">
+                      {FEST.venue}
+                    </a>
+                  </li>
                 </ul>
               </div>
               <Column title="Staff & crew" links={STAFF_LINKS} />
@@ -116,7 +128,7 @@ export default function Footer() {
 
       {/* Oversized wordmark, cropped by the page edge */}
       <div aria-hidden className="pointer-events-none -mb-[3vw] select-none px-4 opacity-[0.09] md:px-12">
-        <Wordmark className="w-full" sizes="16vw" />
+        <Wordmark tone="hollow" className="w-full" />
       </div>
     </footer>
   );

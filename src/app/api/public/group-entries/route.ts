@@ -13,9 +13,6 @@ import { runEmailDispatcher } from "@/workers/outbox-dispatcher";
 
 export const dynamic = "force-dynamic";
 
-/** Organizer inbox that receives a copy of every group-entry submission. */
-const GROUP_ENTRY_NOTIFY_EMAIL = "pulseaiims141@gmail.com";
-
 /**
  * POST /api/public/group-entries — submit a group-entry request.
  *
@@ -84,47 +81,54 @@ export async function POST(req: NextRequest) {
     const entryId = data.id as string;
     const entryCode = data.public_entry_code as string;
 
-    // Durable organizer notification via the email outbox. Idempotent by
-    // logical_key; the dispatcher does the actual Resend send.
-    const { error: emailErr } = await sb.from("email_jobs").upsert(
-      {
-        logical_key: `group-entry-notification:${entryId}`,
-        recipient_user_id: null,
-        to_email_snapshot: GROUP_ENTRY_NOTIFY_EMAIL,
-        template_name: "group-entry-notification",
-        template_version: 1,
-        render_data: {
-          displayName: "Organizer",
-          entryCode,
-          leadName: input.leadName,
-          entryEmail: input.email,
-          phone: input.phone,
-          college: input.college || "",
-          groupSize: input.groupSize,
-          notes: input.notes || "",
-        },
-        idempotency_key: `email:group-entry-notification:${entryId}:v1`,
-        state: "PENDING",
-      },
-      { onConflict: "logical_key", ignoreDuplicates: true }
-    );
-    if (emailErr) {
-      // The entry is already persisted; a failed enqueue must not fail the
-      // request. The dispatcher will not pick this one up, so log it loudly.
-      logger().error(
-        { err: emailErr.message, entryId },
-        "group entry: failed to enqueue organizer email job"
-      );
+    // Organizer inbox for a copy of every submission. Configured per
+    // deployment — never hard-coded, since entries carry personal details.
+    const notifyTo = env().GROUP_ENTRY_NOTIFY_EMAIL;
+    if (!notifyTo) {
+      logger().warn({ entryId }, "group entry: GROUP_ENTRY_NOTIFY_EMAIL not set, organizer email skipped");
     } else {
-      // Trigger the email dispatcher right away so organizers get the mail
-      // immediately; the durable queue retries on any transient failure.
-      try {
-        await runEmailDispatcher({ batchSize: 5 });
-      } catch (dispErr) {
-        logger().warn(
-          { err: dispErr instanceof Error ? dispErr.message : String(dispErr), entryId },
-          "group entry: immediate email dispatch failed, will retry"
+      // Durable organizer notification via the email outbox. Idempotent by
+      // logical_key; the dispatcher does the actual Resend send.
+      const { error: emailErr } = await sb.from("email_jobs").upsert(
+        {
+          logical_key: `group-entry-notification:${entryId}`,
+          recipient_user_id: null,
+          to_email_snapshot: notifyTo,
+          template_name: "group-entry-notification",
+          template_version: 1,
+          render_data: {
+            displayName: "Organizer",
+            entryCode,
+            leadName: input.leadName,
+            entryEmail: input.email,
+            phone: input.phone,
+            college: input.college || "",
+            groupSize: input.groupSize,
+            notes: input.notes || "",
+          },
+          idempotency_key: `email:group-entry-notification:${entryId}:v1`,
+          state: "PENDING",
+        },
+        { onConflict: "logical_key", ignoreDuplicates: true }
+      );
+      if (emailErr) {
+        // The entry is already persisted; a failed enqueue must not fail the
+        // request. The dispatcher will not pick this one up, so log it loudly.
+        logger().error(
+          { err: emailErr.message, entryId },
+          "group entry: failed to enqueue organizer email job"
         );
+      } else {
+        // Trigger the email dispatcher right away so organizers get the mail
+        // immediately; the durable queue retries on any transient failure.
+        try {
+          await runEmailDispatcher({ batchSize: 5 });
+        } catch (dispErr) {
+          logger().warn(
+            { err: dispErr instanceof Error ? dispErr.message : String(dispErr), entryId },
+            "group entry: immediate email dispatch failed, will retry"
+          );
+        }
       }
     }
 

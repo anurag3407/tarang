@@ -108,13 +108,13 @@ export async function GET(req: NextRequest) {
     // If categories table has no entries for this festival, auto-seed defaults
     if (!categories || categories.length === 0) {
       const defaultCats = [
-        { festival_id: ctx.festivalId, slug: "music", name: "Socio cultural", tagline: "Bands, vocals, acoustics & beats", icon_key: "music", color_key: "accent", sort_order: 1, is_active: true },
-        { festival_id: ctx.festivalId, slug: "dance", name: "aQuSiS", tagline: "Solo, duet, street & crew battles", icon_key: "activity", color_key: "secondary", sort_order: 2, is_active: true },
-        { festival_id: ctx.festivalId, slug: "drama", name: "Workshop", tagline: "Stage plays, street theatre & workshops", icon_key: "film", color_key: "muted", sort_order: 3, is_active: true },
+        { festival_id: ctx.festivalId, slug: "music", name: "Music", tagline: "Bands, vocals, acoustics & beats", icon_key: "music", color_key: "accent", sort_order: 1, is_active: true },
+        { festival_id: ctx.festivalId, slug: "dance", name: "Dance", tagline: "Solo, duet, street & crew battles", icon_key: "activity", color_key: "secondary", sort_order: 2, is_active: true },
+        { festival_id: ctx.festivalId, slug: "drama", name: "Dramatics", tagline: "Stage plays, street theatre & workshops", icon_key: "film", color_key: "muted", sort_order: 3, is_active: true },
         { festival_id: ctx.festivalId, slug: "arts", name: "Fine Arts", tagline: "Painting, sketching, digital art & crafts", icon_key: "palette", color_key: "white", sort_order: 4, is_active: true },
         { festival_id: ctx.festivalId, slug: "literary", name: "Literary", tagline: "Debate, quiz, poetry & creative writing", icon_key: "book-open", color_key: "accent", sort_order: 5, is_active: true },
         { festival_id: ctx.festivalId, slug: "sports", name: "Sports", tagline: "Cricket, football, badminton, athletics & gaming", icon_key: "trophy", color_key: "secondary", sort_order: 6, is_active: true },
-        { festival_id: ctx.festivalId, slug: "medsci", name: "Scientific society", tagline: "Clinical skills, medical quiz & case presentations", icon_key: "cross", color_key: "muted", sort_order: 7, is_active: true },
+        { festival_id: ctx.festivalId, slug: "medsci", name: "Tech & Quiz", tagline: "Quizzing, robotics, hackathons & tech showcases", icon_key: "cross", color_key: "muted", sort_order: 7, is_active: true },
         { festival_id: ctx.festivalId, slug: "informal", name: "Informals", tagline: "Fun games, scavenger hunts & casual contests", icon_key: "sparkles", color_key: "white", sort_order: 8, is_active: true },
       ];
       const { data: seededCats } = await adminSb
@@ -130,12 +130,12 @@ export async function GET(req: NextRequest) {
     // If venues table has no entries for this festival, auto-seed defaults
     if (!venues || venues.length === 0) {
       const defaultVenues = [
-        { festival_id: ctx.festivalId, name: "Main Quadrangle Stage", short_name: "Main Stage", description: "Central open-air stage for flagship events and pronites", is_active: true },
-        { festival_id: ctx.festivalId, name: "JL Auditorium", short_name: "JL Audi", description: "Main indoor air-conditioned auditorium", is_active: true },
+        { festival_id: ctx.festivalId, name: "Main Stage", short_name: "Main Stage", description: "Open-air stage for flagship events and pronites", is_active: true },
+        { festival_id: ctx.festivalId, name: "Auditorium", short_name: "Audi", description: "Main indoor air-conditioned auditorium", is_active: true },
         { festival_id: ctx.festivalId, name: "LT 1 (Lecture Theatre 1)", short_name: "LT 1", description: "Indoor tiered hall for quizzes and academic events", is_active: true },
         { festival_id: ctx.festivalId, name: "LT 2 (Lecture Theatre 2)", short_name: "LT 2", description: "Indoor tiered hall for literary competitions", is_active: true },
-        { festival_id: ctx.festivalId, name: "Gymkhana Ground", short_name: "Gymkhana", description: "Outdoor sports complex and athletic field", is_active: true },
-        { festival_id: ctx.festivalId, name: "Swimming Pool Area / CR Desk", short_name: "CR Desk", description: "Central registration and help desk area", is_active: true },
+        { festival_id: ctx.festivalId, name: "Sports Ground", short_name: "Ground", description: "Outdoor sports complex and athletic field", is_active: true },
+        { festival_id: ctx.festivalId, name: "Registration Desk", short_name: "Reg Desk", description: "Central registration and help desk", is_active: true },
       ];
       const { data: seededVenues } = await adminSb
         .from("venues")

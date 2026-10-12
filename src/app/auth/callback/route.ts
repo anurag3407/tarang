@@ -19,6 +19,7 @@ const ALLOWED_PREFIXES = [
   "/complete-profile",
   "/events",
   "/checkout",
+  "/pronite-pass",
   "/reset-password",
 ];
 
@@ -55,7 +56,7 @@ function getOrigin(req: NextRequest): string {
   } catch {
     // ignore
   }
-  return process.env.APP_BASE_URL || (host ? `${proto}://${host}` : "https://pulseasa.org");
+  return process.env.APP_BASE_URL || (host ? `${proto}://${host}` : "http://localhost:3000");
 }
 
 export async function GET(req: NextRequest) {

@@ -79,10 +79,10 @@ export default function PassQr({ passId }: { passId: string }) {
             <p className="font-bold text-sm text-black">{message}</p>
             <div className="flex flex-col gap-2 pt-2">
               <Link
-                href="/delegate-card"
+                href="/pronite-pass"
                 className="inline-block border-2 border-black bg-black py-2.5 px-4 text-xs font-black uppercase text-white shadow-neo-sm hover:bg-zinc-800"
               >
-                Get VIP Delegate Card →
+                Get your Pronite Pass →
               </Link>
               <Button variant="outline" className="w-full text-xs" onClick={load}>
                 Retry
@@ -99,7 +99,7 @@ export default function PassQr({ passId }: { passId: string }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrSrc}
-              alt="Delegate card QR code"
+              alt="Pronite Pass gate QR code"
               width={320}
               height={320}
               className="mx-auto mt-4 border-4 border-black bg-white p-3"

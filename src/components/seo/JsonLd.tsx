@@ -17,28 +17,28 @@ export function FestivalEventJsonLd({ baseUrl }: { baseUrl: string }) {
   const eventSchema = {
     "@context": "https://schema.org",
     "@type": "Festival",
-    "name": `${FEST.name} ${FEST.year} — AIIMS New Delhi Cultural Fest`,
-    "alternateName": ["TARANG AIIMS", "AIIMS Tarang 2026", "Tarang Festival AIIMS Delhi"],
-    "description": "TARANG is the annual cultural, literary, and sports fest of AIIMS New Delhi — South Asia's largest medical college festival featuring 250+ events and 5 star pro shows.",
+    "name": `${FEST.name} ${FEST.year} — ${FEST.college} Cultural Fest`,
+    "alternateName": ["TARANG NIT Patna", "Tarang 2026", "Tarang ’26"],
+    "description": `TARANG is the cultural festival of ${FEST.collegeFull} — five pronites and five days of music, dance, theatre and competitions. ${FEST.tagline}`,
     "startDate": "2026-09-17T09:00:00+05:30",
     "endDate": "2026-09-21T23:59:59+05:30",
     "eventStatus": "https://schema.org/EventScheduled",
     "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
     "location": {
       "@type": "Place",
-      "name": "AIIMS Quadrangle & Campus",
+      "name": FEST.collegeFull,
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Sri Aurobindo Marg, Ansari Nagar",
-        "addressLocality": "New Delhi",
-        "addressRegion": "Delhi",
-        "postalCode": "110029",
+        "streetAddress": "Ashok Rajpath, Mahendru",
+        "addressLocality": "Patna",
+        "addressRegion": "Bihar",
+        "postalCode": "800005",
         "addressCountry": "IN"
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 28.5672,
-        "longitude": 77.2100
+        "latitude": FEST.geo.lat,
+        "longitude": FEST.geo.lng
       }
     },
     "image": [
@@ -47,24 +47,16 @@ export function FestivalEventJsonLd({ baseUrl }: { baseUrl: string }) {
     ],
     "organizer": {
       "@type": "Organization",
-      "name": "AIIMS Student Association (ASA)",
+      "name": `${FEST.name} — ${FEST.collegeFull}`,
       "url": baseUrl,
-      "email": FEST.email,
-      "telephone": FEST.phone
+      ...(FEST.email && { "email": FEST.email }),
+      ...(FEST.phone && { "telephone": FEST.phone })
     },
     "offers": [
       {
         "@type": "Offer",
-        "name": "Delegate Card (Prime Pro Nights + All Events)",
-        "url": `${baseUrl}/delegate-card`,
-        "priceCurrency": "INR",
-        "availability": "https://schema.org/InStock",
-        "validFrom": "2026-01-01T00:00:00+05:30"
-      },
-      {
-        "@type": "Offer",
-        "name": "BR Card (Basic Registration + Campus Entry)",
-        "url": `${baseUrl}/basic-card`,
+        "name": "Pronite Pass (all pronites, campus access, competitions)",
+        "url": `${baseUrl}/pronite-pass`,
         "priceCurrency": "INR",
         "availability": "https://schema.org/InStock",
         "validFrom": "2026-01-01T00:00:00+05:30"
@@ -79,26 +71,26 @@ export function OrganizationJsonLd({ baseUrl }: { baseUrl: string }) {
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
-    "name": "AIIMS Student Association (ASA) — TARANG",
+    "name": `${FEST.name} — ${FEST.collegeFull}`,
     "url": baseUrl,
     "logo": `${baseUrl}/icon-512.png`,
-    "sameAs": [
-      FEST.instagram
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": FEST.phone,
-      "contactType": "customer service",
-      "email": FEST.email,
-      "areaServed": "IN",
-      "availableLanguage": ["English", "Hindi"]
-    },
+    ...(FEST.instagram && { "sameAs": [FEST.instagram] }),
+    ...((FEST.email || FEST.phone) && {
+      "contactPoint": {
+        "@type": "ContactPoint",
+        ...(FEST.phone && { "telephone": FEST.phone }),
+        ...(FEST.email && { "email": FEST.email }),
+        "contactType": "customer service",
+        "areaServed": "IN",
+        "availableLanguage": ["English", "Hindi"]
+      }
+    }),
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "All India Institute of Medical Sciences, Ansari Nagar",
-      "addressLocality": "New Delhi",
-      "addressRegion": "Delhi",
-      "postalCode": "110029",
+      "streetAddress": "Ashok Rajpath, Mahendru",
+      "addressLocality": "Patna",
+      "addressRegion": "Bihar",
+      "postalCode": "800005",
       "addressCountry": "IN"
     }
   };

@@ -5,7 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.PUBLIC_SITE_URL ||
     process.env.APP_BASE_URL ||
-    "https://pulseasa.org";
+    "http://localhost:3000";
 
   const currentDate = new Date().toISOString();
 
@@ -29,13 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/delegate-card`,
-      lastModified: currentDate,
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/basic-card`,
+      url: `${baseUrl}/pronite-pass`,
       lastModified: currentDate,
       changeFrequency: "weekly" as const,
       priority: 0.9,
@@ -48,12 +42,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/reach`,
-      lastModified: currentDate,
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/map`,
       lastModified: currentDate,
       changeFrequency: "monthly" as const,
       priority: 0.8,

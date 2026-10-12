@@ -146,7 +146,7 @@ export default function VerifyChecker() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t-2 border-black/10 pt-3 text-xs font-bold text-black/60">
-          <span>Supports: Delegate Passes (PP-...), Basic Cards, Event Registrations (PR-...), and Orders (ORD-...)</span>
+          <span>Supports: Pronite Passes (PP-...), Event Registrations (PR-...), and Orders (ORD-...)</span>
           <span className="font-mono text-[11px] text-black/40">Real-time anti-fraud engine</span>
         </div>
       </form>
@@ -210,7 +210,7 @@ export default function VerifyChecker() {
                     {result.data.productName}
                   </h3>
                   <p className="text-sm font-bold text-black/70 mt-1">
-                    {result.data.festivalName || "TARANG 2026"} · {result.data.venue || "AIIMS New Delhi"}
+                    {result.data.festivalName || "TARANG 2026"} · {result.data.venue || "NIT Patna"}
                   </p>
                 </div>
 
@@ -383,7 +383,7 @@ export default function VerifyChecker() {
                 <ul className="list-disc list-inside space-y-1 text-black/70">
                   <li>Check your confirmation email from TARANG 2026 for the exact pass code.</li>
                   <li>Log in to your <Link href="/dashboard" className="font-black underline">TARANG Dashboard</Link> to view all passes issued to your account.</li>
-                  <li>If you need assistance, visit the Help Desk at the AIIMS Student Centre with your payment receipt.</li>
+                  <li>If you need assistance, visit the TARANG help desk on campus with your payment receipt.</li>
                 </ul>
               </div>
             </div>

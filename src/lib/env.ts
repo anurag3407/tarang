@@ -70,8 +70,11 @@ const schema = z.object({
   // Resend
   RESEND_API_KEY: z.string().optional(),
   RESEND_WEBHOOK_SECRET: z.string().optional(),
-  EMAIL_FROM: z.string().default("TARANG 2026 <no-reply@pulseasa.org>"),
+  // Set to an address on a domain verified with Resend.
+  EMAIL_FROM: z.string().default("TARANG 2026 <no-reply@example.com>"),
   EMAIL_REPLY_TO: z.string().optional(),
+  /** Organizer inbox that receives a copy of every group-entry submission. */
+  GROUP_ENTRY_NOTIFY_EMAIL: z.string().email().optional(),
 
   // QR signing
   QR_SIGNING_KEY_ID: z.string().default("k1"),

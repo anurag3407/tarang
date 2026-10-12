@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Sparkles, Music, Star, ShieldCheck, Ticket } from "lucide-react";
+import { QrCode } from "lucide-react";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { formatPaise } from "@/lib/money";
@@ -9,8 +8,7 @@ import { formatDateTimeIST } from "@/lib/dates";
 import { getCurrentFestivalId, getPublishedPassProducts } from "@/repositories/public-content";
 import { ButtonLink } from "@/components/ui/Button";
 import { SignOutButton } from "@/components/auth/SignOutButton";
-import ConcertPassCard from "@/components/cards/ConcertPassCard";
-import BasicCardView from "@/components/cards/BasicCardView";
+import PassTicket from "@/components/tarang/PassTicket";
 
 export const metadata: Metadata = {
   title: "My Dashboard — TARANG 2026",
@@ -22,7 +20,7 @@ export const dynamic = "force-dynamic";
 /**
  * Participant dashboard (plan §12.1, §14.4).
  *
- * Shows profile state, active passes (Basic Card and/or VIP Delegate Pass), orders, and event registrations.
+ * Shows profile state, the Pronite Pass, orders, and event registrations.
  */
 export default async function DashboardPage() {
   const supabase = await createServerSupabase();
@@ -99,51 +97,10 @@ export default async function DashboardPage() {
     });
   }
 
-  // Find dynamic pass products
-  const basicProduct =
-    products.find(
-      (p) =>
-        p.slug === "base-delegate-pass" ||
-        p.isBasePass ||
-        p.name.toLowerCase().includes("basic")
-    ) ?? products[0];
-
-  const delegateProduct =
-    products.find(
-      (p) =>
-        p.slug === "vip-delegate-pass" ||
-        !p.isBasePass ||
-        p.name.toLowerCase().includes("delegate") ||
-        p.name.toLowerCase().includes("all-access")
-    ) ?? products[1];
-
-  const basicPriceFormatted = basicProduct ? formatPaise(basicProduct.amountPaise) : "₹200";
-  const delegatePriceFormatted = delegateProduct ? formatPaise(delegateProduct.amountPaise) : "₹2,000";
-
-  // Identify active passes
-  const activePasses = (passesRes.data ?? []).filter((p) => p.state === "ACTIVE");
-
-  const activeDelegatePass = activePasses.find((p) => {
-    const prod = Array.isArray(p.pass_products) ? p.pass_products[0] : p.pass_products;
-    return (
-      prod?.slug === "vip-delegate-pass" ||
-      prod?.is_base_pass === false ||
-      prod?.name?.toLowerCase().includes("delegate") ||
-      prod?.name?.toLowerCase().includes("all-access") ||
-      prod?.name?.toLowerCase().includes("vip")
-    );
-  });
-
-  const activeBasicPass = activePasses.find((p) => {
-    const prod = Array.isArray(p.pass_products) ? p.pass_products[0] : p.pass_products;
-    return (
-      prod?.slug === "base-delegate-pass" ||
-      prod?.is_base_pass === true ||
-      prod?.name?.toLowerCase().includes("basic")
-    );
-  });
-
-  const hasAnyPass = Boolean(activeDelegatePass || activeBasicPass);
+  // One pass is on sale — the Pronite Pass (the base pass product).
+  const passProduct = products.find((p) => p.isBasePass) ?? products[0];
+  const passPrice = passProduct ? formatPaise(passProduct.amountPaise) : null;
+  const activePass = (passesRes.data ?? []).find((p) => p.state === "ACTIVE");
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
@@ -171,169 +128,39 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Festival Cards Section */}
+      {/* Pronite Pass */}
       <section className="mt-8 space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-2xl font-black uppercase tracking-tight">
-            Festival Cards
-          </h2>
-          <div className="flex gap-4 text-xs font-black uppercase">
-            {!activeDelegatePass && !activeBasicPass && (
-              <Link
-                href="/basic-card"
-                className="text-black hover:text-neo-accent underline"
-              >
-                Basic Card ({basicPriceFormatted})
-              </Link>
-            )}
-            {!activeDelegatePass && (
-              <Link
-                href="/delegate-card"
-                className="text-black hover:text-neo-accent underline"
-              >
-                VIP Delegate Card ({delegatePriceFormatted})
-              </Link>
-            )}
-          </div>
+          <h2 className="text-2xl font-black uppercase tracking-tight">Your Pronite Pass</h2>
+          {activePass && (
+            <span className="text-xs font-bold uppercase tracking-widest text-black/60">Gate QR issued</span>
+          )}
         </div>
 
-        {/* 1. Delegate Card (Concert Card Style with Gate QR) */}
-        {activeDelegatePass && (
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-black/70">
-                ⭐ All-Access VIP Concert Card
-              </span>
-              <span className="text-xs font-mono font-bold text-black/50">
-                Gate QR Issued
-              </span>
-            </div>
-            <ConcertPassCard
-              passId={activeDelegatePass.id}
-              passCode={activeDelegatePass.public_pass_code}
-              state={activeDelegatePass.state}
-              productName={getProductName(activeDelegatePass.pass_products) || "VIP All-Access Delegate Card"}
-              priceLabel={delegatePriceFormatted}
-              userName={profile?.display_name}
-              collegeName={profile?.college_name}
-              expiresAt={activeDelegatePass.expires_at}
-            />
-          </div>
-        )}
-
-        {/* 2. Basic Card (Simple ID Card Style with Unique String) */}
-        {activeBasicPass && (
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-black/70">
-                🪪 Basic Festival Participant Card
-              </span>
-              <span className="text-xs font-mono font-bold text-black/50">
-                Gate String Code
-              </span>
-            </div>
-            <BasicCardView
-              passId={activeBasicPass.id}
-              passCode={activeBasicPass.public_pass_code}
-              state={activeBasicPass.state}
-              productName={getProductName(activeBasicPass.pass_products) || "Basic Festival Card"}
-              userName={profile?.display_name}
-              collegeName={profile?.college_name}
-              email={user.email}
-              expiresAt={activeBasicPass.expires_at}
-            />
-          </div>
-        )}
-
-        {/* 3. If User Has No Passes At All, Show Both Available Options */}
-        {!hasAnyPass && (
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Basic Card Option */}
-            <div className="flex flex-col justify-between border-4 border-black bg-white p-6 shadow-neo">
-              <div>
-                <span className="inline-block border-2 border-black bg-neo-muted px-2 py-0.5 text-xs font-black uppercase">
-                  Standard Entity
-                </span>
-                <h3 className="mt-2 text-2xl font-black uppercase">Basic Card</h3>
-                <p className="text-2xl font-black mt-1">{basicPriceFormatted}</p>
-                <p className="mt-2 text-xs font-bold text-black/70">
-                  5-day general campus entry card. Required for participating in competitions.
-                </p>
-                <ul className="mt-4 space-y-1.5 text-xs font-bold text-black/80">
-                  <li className="flex items-center gap-2">
-                    <Ticket className="h-4 w-4 text-black" /> 5-Day General Campus Access
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-black" /> Competitions Participation
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-black font-black">#</span> Unique String Gate Verification
-                  </li>
-                </ul>
-              </div>
-              <ButtonLink href="/basic-card" variant="outline" className="mt-6 w-full text-center">
-                Get Basic Card — {basicPriceFormatted}
+        {activePass ? (
+          <div className="space-y-5">
+            <PassTicket price="Valid" serial={activePass.public_pass_code} />
+            <div className="flex flex-wrap items-center gap-4">
+              <ButtonLink href={`/dashboard/pass/${activePass.id}`}>
+                <QrCode className="h-4 w-4" /> Show gate QR
               </ButtonLink>
-            </div>
-
-            {/* VIP Delegate Card Option */}
-            <div className="relative flex flex-col justify-between overflow-hidden border-4 border-black bg-black p-6 text-white shadow-neo">
-              <div className="absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-neo-secondary/20 blur-xl" />
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1 border-2 border-black bg-neo-secondary px-2 py-0.5 text-xs font-black uppercase text-black">
-                    <Star className="h-3 w-3 fill-black" /> VIP Concert Card
-                  </span>
-                  <span className="text-xs font-black uppercase tracking-wider text-neo-secondary">
-                    All-Access
-                  </span>
-                </div>
-                <h3 className="mt-2 text-2xl font-black uppercase text-white">
-                  VIP Delegate Card
-                </h3>
-                <p className="text-2xl font-black mt-1 text-neo-secondary">{delegatePriceFormatted}</p>
-                <p className="mt-2 text-xs font-bold text-white/80">
-                  Full 5-day festival card including all 5 pro-shows, star concerts &amp; VIP perks.
-                </p>
-                <ul className="mt-4 space-y-1.5 text-xs font-bold text-white/90">
-                  <li className="flex items-center gap-2">
-                    <Music className="h-4 w-4 text-neo-secondary" /> All 5 Star Night Pro-Shows Included
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-neo-secondary" /> VIP Front-Row Stage Zone &amp; Fast-Track
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-neo-secondary" /> Dynamic QR Gate Entry &amp; Email Card
-                  </li>
-                </ul>
-              </div>
-              <ButtonLink href="/delegate-card" variant="secondary" className="mt-6 w-full text-center">
-                Get VIP Delegate Card — {delegatePriceFormatted}
-              </ButtonLink>
-            </div>
-          </div>
-        )}
-
-        {/* 4. If User Has Basic Card but Not Delegate Pass, Offer Delegate Card Option Cleanly */}
-        {activeBasicPass && !activeDelegatePass && (
-          <div className="border-4 border-black bg-black p-5 text-white shadow-neo flex flex-wrap items-center justify-between gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-neo-secondary fill-neo-secondary" />
-                <span className="text-xs font-black uppercase tracking-widest text-neo-secondary">
-                  VIP Pro-Show Concerts
-                </span>
-              </div>
-              <h3 className="text-lg font-black uppercase text-white">
-                Interested in the All-Access Delegate Card?
-              </h3>
-              <p className="text-xs font-bold text-white/70">
-                Includes all 5 Star Night Concerts, VIP Front-Row Arena, Backstage Lounge &amp; Official Gate QR Card.
+              <p className="text-sm font-bold text-black/60">
+                Issued to {profile?.display_name ?? user.email}
+                {profile?.college_name ? ` · ${profile.college_name}` : ""}
+                {activePass.expires_at ? ` · valid through ${formatDateTimeIST(activePass.expires_at)}` : ""}
               </p>
             </div>
-            <ButtonLink href="/delegate-card" variant="secondary">
-              Get VIP Delegate Card ({delegatePriceFormatted}) →
-            </ButtonLink>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-6 border-4 border-black bg-white p-6 shadow-neo">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-black/60">One pass · every night</p>
+              <h3 className="mt-2 text-3xl font-black uppercase">Pronite Pass{passPrice ? ` — ${passPrice}` : ""}</h3>
+              <p className="mt-2 max-w-lg text-sm font-bold text-black/70">
+                All five pronites, campus access for the whole fest, and registration for every competition.
+              </p>
+            </div>
+            <ButtonLink href="/pronite-pass">Get your pass</ButtonLink>
           </div>
         )}
       </section>
@@ -428,9 +255,4 @@ export default async function DashboardPage() {
       </section>
     </div>
   );
-}
-
-function getProductName(products: unknown): string {
-  const p = Array.isArray(products) ? products[0] : products;
-  return (p as { name?: string } | null)?.name ?? "";
 }

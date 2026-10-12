@@ -130,18 +130,18 @@ export default function Hero() {
         </div>
 
         {/* Lockup */}
-        <div aria-hidden className="absolute left-1/2 top-1/2 z-20 w-[min(88vw,84svh)] -translate-x-1/2 -translate-y-1/2">
+        <div aria-hidden className="absolute left-1/2 top-1/2 z-20 w-[min(88vw,84svh)] -translate-x-1/2 -translate-y-1/2 [container-type:inline-size]">
           <div ref={lockup} className="will-change-transform">
             <div data-meta>
-              <div className="t-enter-wipe mb-[1.2%] ml-auto w-[49.2%]" style={{ transitionDelay: "1000ms" }}>
-                <Image src="/tarang/tagline.webp" alt="" width={581} height={57} loading="eager" className="h-auto w-full" />
-              </div>
+              <p className="t-enter-wipe t-display t-cut mb-[4%] pr-[1.5%] text-right text-[5.2cqw] leading-none" style={{ transitionDelay: "1000ms" }}>
+                Mute the mundane
+              </p>
             </div>
-            <Wordmark eager letterClassName="will-change-transform" innerClassName="t-enter-letter" sizes="(max-width: 768px) 16vw, 150px" />
+            <Wordmark letterClassName="will-change-transform" innerClassName="t-enter-letter" />
             <div data-meta>
-              <div className="t-enter-wipe mt-[2.2%] w-[34.6%]" style={{ transitionDelay: "1120ms" }}>
-                <Image src="/tarang/date.webp" alt="" width={409} height={69} loading="eager" className="h-auto w-full" />
-              </div>
+              <p className="t-enter-wipe t-display t-cut mt-[2.4%] pl-[1.5%] text-[7cqw] leading-none" style={{ transitionDelay: "1120ms" }}>
+                Sept 2026
+              </p>
             </div>
           </div>
         </div>

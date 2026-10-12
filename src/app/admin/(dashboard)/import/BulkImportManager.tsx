@@ -228,7 +228,7 @@ export default function BulkImportManager() {
   }
 
   function downloadSampleCsv() {
-    const sample = `Name,Email,Phone,College\nDr. Ramesh Kumar,ramesh.kumar@aiims.edu,9876543210,AIIMS New Delhi\nAarav Sharma,aarav.sharma@gmail.com,9811223344,MAMC New Delhi\nPriya Patel,priya.patel@outlook.com,9822334455,Lady Hardinge Medical College\nRohan Gupta,rohan.gupta@vmmc.edu,9833445566,VMMC & Safdarjung Hospital\nAnanya Verma,ananya.verma@ucms.edu,9844556677,UCMS Delhi`;
+    const sample = `Name,Email,Phone,College\nRamesh Kumar,ramesh.kumar@example.com,9876543210,NIT Patna\nAarav Sharma,aarav.sharma@gmail.com,9811223344,IIT Patna\nPriya Patel,priya.patel@outlook.com,9822334455,Lady Hardinge Medical College\nRohan Gupta,rohan.gupta@vmmc.edu,9833445566,VMMC & Safdarjung Hospital\nAnanya Verma,ananya.verma@ucms.edu,9844556677,UCMS Delhi`;
     const blob = new Blob([sample], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -290,7 +290,7 @@ export default function BulkImportManager() {
                 Admin Automation
               </span>
               <span className="text-xs font-bold text-black/70">
-                AIIMS TARANG 2026
+                TARANG 2026 · NIT PATNA
               </span>
             </div>
             <h1 className="mt-1 text-2xl sm:text-3xl font-black uppercase tracking-tight text-black">
@@ -543,7 +543,7 @@ export default function BulkImportManager() {
                   rows={7}
                   value={csvText}
                   onChange={(e) => setCsvText(e.target.value)}
-                  placeholder={`Name,Email,Phone,College\nAarav Sharma,aarav@example.com,9876543210,AIIMS New Delhi\nPriya Patel,priya@example.com,9811223344,MAMC`}
+                  placeholder={`Name,Email,Phone,College\nAarav Sharma,aarav@example.com,9876543210,NIT Patna\nPriya Patel,priya@example.com,9811223344,MAMC`}
                   className="w-full border-2 border-black p-3 font-mono text-xs focus:outline-none bg-neo-cream focus:bg-white"
                 />
                 <p className="text-[11px] font-bold text-black/60 mt-1">

@@ -14,28 +14,42 @@ export const FEST = {
   name: "TARANG",
   short: "Tarang ’26",
   year: "2026",
-  edition: "51st Edition",
-  college: "AIIMS New Delhi",
-  tagline: "Feel The Beat. Ride The Wave.",
+  edition: "Edition ’26",
+  college: "NIT Patna",
+  collegeShort: "NIT Patna",
+  collegeFull: "National Institute of Technology Patna",
+  tagline: "Mute the mundane.",
   dates: "17 – 21 September 2026",
   datesShort: "17–21 SEP '26",
+  /** Printed on the Pronite Pass, set in Noot. */
+  ticketDate: "17—21.09",
+  ticketDateShort: "17-21/09/26",
+  proniteTime: "7 PM",
   days: 5,
-  venue: "AIIMS Quadrangle, Sri Aurobindo Marg, Ansari Nagar, New Delhi – 110029",
-  instagram: "https://instagram.com/pulse.aiims",
-  email: "studentsunion@aiims.edu",
-  phone: "+91 7007162992",
-  phones: [
-    "+91 7007162992",
-    "+91 9256529200",
-    "+91 9565514854",
-  ],
+  venue: "NIT Patna, Ashok Rajpath, Mahendru, Patna, Bihar – 800005",
+  venueShort: "NIT Patna · Ashok Rajpath · Patna",
+  /** Map pin for the campus (Wikipedia: 25°36′38″N 85°08′30″E). */
+  geo: { lat: 25.61056, lng: 85.14167 },
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=National+Institute+of+Technology+Patna",
+  /**
+   * Official contact channels. Left empty until the organising committee
+   * confirms them — every place that shows contact details hides itself
+   * while these are blank.
+   */
+  instagram: "" as string,
+  email: "" as string,
+  phone: "" as string,
+  phones: [] as string[],
   stats: [
-    { value: "5", label: "Days of Glory" },
-    { value: "450+", label: "Institutions" },
-    { value: "50+", label: "Years Legacy" },
-    { value: "10K+", label: "Footfall" },
+    { value: "5", label: "Days" },
+    { value: "5", label: "Pronites" },
+    { value: "8", label: "Arenas" },
+    { value: "1886", label: "NIT Patna roots" },
   ],
 } as const;
+
+/** True once the committee has published at least one contact channel. */
+export const HAS_CONTACT = Boolean(FEST.email || FEST.phone || FEST.phones.length);
 
 /* ------------------------------------------------------------------ */
 /* Categories                                                          */
@@ -62,21 +76,21 @@ export type Category = {
 export const CATEGORIES: Category[] = [
   {
     id: "music",
-    name: "Socio cultural",
+    name: "Music",
     tagline: "Bands, vocals, acoustics & beats",
     icon: "music",
     color: "accent",
   },
   {
     id: "dance",
-    name: "aQuSiS",
+    name: "Dance",
     tagline: "Solo, duet, street & crew battles",
     icon: "activity",
     color: "secondary",
   },
   {
     id: "drama",
-    name: "Workshop",
+    name: "Dramatics",
     tagline: "Stage plays, street theatre & workshops",
     icon: "film",
     color: "muted",
@@ -104,8 +118,8 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: "medsci",
-    name: "Scientific society",
-    tagline: "Clinical skills, medical quiz & case presentations",
+    name: "Tech & Quiz",
+    tagline: "Quizzing, robotics, hackathons & tech showcases",
     icon: "cross",
     color: "muted",
   },
@@ -218,228 +232,11 @@ export type TeamGroup = {
   members: TeamMember[];
 };
 
-export const CHIEF_COORDINATORS = [
-  {
-    name: "Abdul Rafey Ansari",
-    shortName: "Abdul Rafey",
-    phone: "+91 7007162992",
-    rawPhone: "7007162992",
-    role: "Chief Coordinator",
-    initials: "AR",
-    color: "accent" as const,
-  },
-  {
-    name: "Abhay Mittal",
-    shortName: "Abhay Mittal",
-    phone: "+91 9772778706",
-    rawPhone: "9772778706",
-    role: "Chief Coordinator",
-    initials: "AM",
-    color: "secondary" as const,
-  },
-  {
-    name: "Priyanshu Dhaka",
-    shortName: "Priyanshu Dhaka",
-    phone: "+91 9521547110",
-    rawPhone: "9521547110",
-    role: "Chief Coordinator",
-    initials: "PD",
-    color: "muted" as const,
-  },
-  {
-    name: "Mohit Dahiya",
-    shortName: "Mohit Dahiya",
-    phone: "+91 9256529200",
-    rawPhone: "9256529200",
-    role: "Chief Coordinator",
-    initials: "MD",
-    color: "white" as const,
-  },
-];
-
-export const TEAM: TeamGroup[] = [
-  {
-    id: "chief-coordinators",
-    name: "Chief Coordinators",
-    blurb: "Leading operations, festival administration, and campus execution for TARANG.",
-    members: [
-      {
-        name: "Abdul Rafey Ansari",
-        role: "Chief Coordinator",
-        dept: "AIIMS New Delhi",
-        phone: "+91 7007162992",
-        rawPhone: "7007162992",
-        initials: "AR",
-        color: "accent",
-        isChief: true,
-      },
-      {
-        name: "Abhay Mittal",
-        role: "Chief Coordinator",
-        dept: "AIIMS New Delhi",
-        phone: "+91 9772778706",
-        rawPhone: "9772778706",
-        initials: "AM",
-        color: "secondary",
-        isChief: true,
-      },
-      {
-        name: "Priyanshu Dhaka",
-        role: "Chief Coordinator",
-        dept: "AIIMS New Delhi",
-        phone: "+91 9521547110",
-        rawPhone: "9521547110",
-        initials: "PD",
-        color: "muted",
-        isChief: true,
-      },
-      {
-        name: "Mohit Dahiya",
-        role: "Chief Coordinator",
-        dept: "AIIMS New Delhi",
-        phone: "+91 9256529200",
-        rawPhone: "9256529200",
-        initials: "MD",
-        color: "white",
-        isChief: true,
-      },
-    ],
-  },
-  {
-    id: "executive-council",
-    name: "AIIMS Student Association (ASA) Leadership",
-    blurb: "The elected executive student council of AIIMS New Delhi behind TARANG.",
-    members: [
-      {
-        name: "Prashant Yadav",
-        role: "President",
-        dept: "AIIMS Student Association",
-        phone: "+91 9565514854",
-        rawPhone: "9565514854",
-        initials: "PY",
-        color: "secondary",
-      },
-      {
-        name: "Ranit Bagchi",
-        role: "Vice President",
-        dept: "AIIMS Student Association",
-        phone: "+91 7439460925",
-        rawPhone: "7439460925",
-        initials: "RB",
-        color: "accent",
-      },
-      {
-        name: "Shubhamm Bansal",
-        role: "General Secretary",
-        dept: "AIIMS Student Association",
-        phone: "+91 9560425484",
-        rawPhone: "9560425484",
-        initials: "SB",
-        color: "muted",
-      },
-      {
-        name: "Jatin Saharan",
-        role: "Finance Secretary",
-        dept: "AIIMS Student Association",
-        phone: "+91 6350048665",
-        rawPhone: "6350048665",
-        initials: "JS",
-        color: "white",
-      },
-      {
-        name: "Jacob Bivin",
-        role: "Gymkhana Secretary",
-        dept: "AIIMS Student Association",
-        phone: "+91 9080207467",
-        rawPhone: "9080207467",
-        initials: "JB",
-        color: "secondary",
-      },
-      {
-        name: "Kushagra Maru",
-        role: "Socio-Cultural Secretary",
-        dept: "AIIMS Student Association",
-        phone: "+91 8875190605",
-        rawPhone: "8875190605",
-        initials: "KM",
-        color: "accent",
-      },
-      {
-        name: "Ankita Mandal",
-        role: "Literary Secretary",
-        dept: "AIIMS Student Association",
-        phone: "+91 8101748575",
-        rawPhone: "8101748575",
-        initials: "AM",
-        color: "muted",
-      },
-    ],
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/* Key Venues                                                          */
-/* ------------------------------------------------------------------ */
-
-export type VenueInfo = {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  tag: string;
-};
-
-export const PULSE_VENUES: VenueInfo[] = [
-  {
-    id: "quadrangle",
-    name: "Quadrangle Main Stage",
-    category: "Pro Nights & Grand Finals",
-    description: "The epic open-air epicenter of TARANG hosting prime night headliners, Star Nights, Battle of the Bands, and grand opening/closing spectacles.",
-    tag: "Prime Stage",
-  },
-  {
-    id: "jl-auditorium",
-    name: "JL Auditorium",
-    category: "Cultural & Theatrics",
-    description: "AIIMS's iconic 1,000+ seat proscenium auditorium hosting premier stage play competitions, classical showcases, and prestigious symposiums.",
-    tag: "Auditorium",
-  },
-  {
-    id: "gymkhana",
-    name: "Gymkhana Sports Complex",
-    category: "Athletics & Tournaments",
-    description: "Multipurpose floodlit sports arena hosting cricket, football, basketball, badminton, volleyball, and pulse-pounding collegiate face-offs.",
-    tag: "Sports Arena",
-  },
-  {
-    id: "teaching-block",
-    name: "Teaching Block",
-    category: "Academics & Scientific society",
-    description: "Hub for cutting-edge medical quizzes, case presentations, literary debates, poetry slams, and creative arts workshops.",
-    tag: "Academic Hub",
-  },
-  {
-    id: "set-facility",
-    name: "SET Facility",
-    category: "Simulation & Workshops",
-    description: "Skills, E-learning & Telemedicine center hosting hands-on clinical simulations, surgical workshops, and specialized tech exhibitions.",
-    tag: "Clinical Center",
-  },
-  {
-    id: "foyer",
-    name: "Foyer",
-    category: "Arts & Informals",
-    description: "Central exhibition walkway for fine arts displays, sketch-offs, impromptu open mics, face painting, and dynamic interactive stalls.",
-    tag: "Exhibition Zone",
-  },
-  {
-    id: "squash-court",
-    name: "Squash Court",
-    category: "Indoor Racket Sports",
-    description: "High-intensity indoor glass-back squash arena for individual knockout championships and rapid-fire racket showdowns.",
-    tag: "Indoor Arena",
-  },
-];
+/**
+ * The organising committee. Empty until the NIT Patna team is announced —
+ * the team page shows a “revealing soon” state while this is empty.
+ */
+export const TEAM: TeamGroup[] = [];
 
 /* ------------------------------------------------------------------ */
 /* FAQs                                                                */
@@ -453,29 +250,29 @@ export type Faq = {
 
 export const FAQS: Faq[] = [
   {
+    category: "Passes & Entry",
+    q: "What pass do I need?",
+    a: "Just one — the TARANG Pronite Pass. It gets you into every pronite (the headline night shows), opens campus access for the festival days, and lets you register for competitions.",
+  },
+  {
     category: "Registration",
     q: "How do I register for events?",
-    a: "First, get your mandatory TARANG BR Card. Then register for individual or team events from the Events page. Team events need one captain to register the squad.",
+    a: "Get your Pronite Pass first, then register for individual or team events from the Events page. For team events, one captain registers the whole squad.",
   },
   {
     category: "Registration",
     q: "Can students from other colleges participate?",
-    a: "Yes! TARANG is South Asia's largest medical college festival and is open to students of all colleges for cultural, literary, sports, and informal events. Carry a valid college ID card at the venue.",
+    a: "Yes. TARANG is open to students of all colleges for cultural, literary, sports and informal events. Carry a valid college ID to the venue.",
   },
   {
     category: "Passes & Entry",
-    q: "What is the difference between BR Card and Delegate Card?",
-    a: "The Delegate Card gives you access to Prime Events and covers everything included with the BR Card. The BR Card is mandatory for participating in all TARANG events other than Prime Events. If taking a Delegate Card, you do not need a BR Card. If not taking a Delegate Card, you need a BR Card to participate in other events.",
-  },
-  {
-    category: "Passes & Entry",
-    q: "Where do I collect my physical cards?",
-    a: "Collect your BR Card or Delegate Card from the CR Desk near the Swimming Pool, AIIMS Campus on the day of the event.",
+    q: "How do I get in on the night?",
+    a: "Your Pronite Pass lives in your dashboard as a gate QR. Keep it ready on your phone along with a valid photo ID; volunteers scan it at the gate.",
   },
   {
     category: "Logistics",
-    q: "How do I reach AIIMS New Delhi?",
-    a: "AIIMS has its own metro station on the Yellow Line (Gate 1 or Gate 2). South Extension station on the Pink Line (Gate 3 or Gate 4) is also directly accessible. See the How to Reach page for cab, train, and airport routes.",
+    q: "Where is TARANG held?",
+    a: "At NIT Patna on Ashok Rajpath, Mahendru — on the south bank of the Ganga, behind Gandhi Ghat. The How to Reach page has routes from Patna Junction and the airport.",
   },
 ];
 
@@ -493,14 +290,14 @@ export type GalleryItem = {
 };
 
 export const GALLERY: GalleryItem[] = [
-  { id: "g1", title: "Battle of Bands — finals", category: "Socio cultural", color: "accent", pattern: "halftone", tall: true },
-  { id: "g2", title: "Street Dance battle, main stage", category: "aQuSiS", color: "secondary", pattern: "grid" },
-  { id: "g3", title: "Nukkad natak at Central Lawn", category: "Workshop", color: "muted", pattern: "dots" },
+  { id: "g1", title: "Battle of Bands — finals", category: "Music", color: "accent", pattern: "halftone", tall: true },
+  { id: "g2", title: "Street Dance battle, main stage", category: "Dance", color: "secondary", pattern: "grid" },
+  { id: "g3", title: "Nukkad natak on the lawns", category: "Dramatics", color: "muted", pattern: "dots" },
   { id: "g4", title: "Prime Night under the lights", category: "Pro Shows", color: "white", pattern: "halftone" },
   { id: "g5", title: "Flash mob — cafeteria takeover", category: "Informal", color: "secondary", pattern: "dots", tall: true },
-  { id: "g6", title: "MedQuiz finals on the big stage", category: "Scientific society", color: "muted", pattern: "grid" },
-  { id: "g7", title: "Box cricket at Gymkhana", category: "Sports", color: "accent", pattern: "grid" },
-  { id: "g8", title: "Fine Arts gallery at Foyer", category: "Fine Arts", color: "white", pattern: "dots" },
+  { id: "g6", title: "Quiz finals on the big stage", category: "Tech & Quiz", color: "muted", pattern: "grid" },
+  { id: "g7", title: "Box cricket on the main ground", category: "Sports", color: "accent", pattern: "grid" },
+  { id: "g8", title: "Fine arts gallery walk", category: "Fine Arts", color: "white", pattern: "dots" },
   { id: "g9", title: "Sufi & Classical showcase", category: "Pro Shows", color: "secondary", pattern: "halftone" },
   { id: "g10", title: "Cupid Waltz & Informals", category: "Informal", color: "accent", pattern: "dots" },
   { id: "g11", title: "Literary Nighter & Slam Poetry", category: "Literary", color: "muted", pattern: "halftone", tall: true },
@@ -526,307 +323,70 @@ export type RouteOption = {
 
 export const ROUTES: RouteOption[] = [
   {
-    id: "metro-yellow",
-    mode: "metro",
-    title: "AIIMS Metro Station",
-    lineOrHub: "Yellow Line",
-    badgeColor: "bg-yellow-400 text-black border-black",
-    summary: "The closest station to the festival grounds — right outside AIIMS main gate.",
-    gateExit: "Exit from Gate 1 or Gate 2 for easy access to the AIIMS campus.",
-    steps: [
-      "Board the Yellow Line (Samaypur Badli ↔ Millennium City Centre Gurugram) to AIIMS Metro Station.",
-      "Take Exit Gate 1 or Gate 2 for immediate direct access to the AIIMS campus.",
-      "Follow the vibrant TARANG signboards for Central Registration (CR) Desk and festival venues.",
-    ],
-    tip: "Yellow Line connects directly with Rajiv Chowk (Connaught Place), Kashmere Gate, New Delhi Railway Station, and Huda City Centre.",
-  },
-  {
-    id: "metro-pink",
-    mode: "metro",
-    title: "South Extension Metro Station",
-    lineOrHub: "Pink Line",
-    badgeColor: "bg-pink-400 text-black border-black",
-    summary: "Convenient Pink Line connection across South and East Delhi with easy campus access.",
-    gateExit: "Exit from Gate 3 or Gate 4 for easy access to the AIIMS campus.",
-    steps: [
-      "Board the Pink Line (Majlis Park ↔ Shiv Vihar) to South Extension Station.",
-      "Take Exit Gate 3 or Gate 4 for easy direct access to AIIMS campus.",
-      "Just a 3-5 minute walk / quick auto ride directly to AIIMS entrance gates.",
-    ],
-    tip: "Pink Line connects smoothly with Durgabai Deshmukh South Campus, INA (interchange with Yellow Line), and Hazrat Nizamuddin.",
-  },
-  {
-    id: "cab",
-    mode: "cab",
-    title: "By Cab / Car",
-    lineOrHub: "GPS Drop-Off",
-    badgeColor: "bg-blue-400 text-black border-black",
-    destination: "AIIMS Quadrangle, Sri Aurobindo Marg, Ansari Nagar, New Delhi – 110029",
-    summary: "Direct drop-off at the heart of the AIIMS campus and main stage entrance.",
-    gateExit: "Drop at AIIMS Quadrangle / Main Gate on Sri Aurobindo Marg.",
-    steps: [
-      "Set your navigation app destination to: AIIMS Quadrangle, Sri Aurobindo Marg, Ansari Nagar, New Delhi – 110029.",
-      "Ask your cab or auto driver for 'AIIMS Quadrangle / Ansari Nagar'.",
-      "Designated drop-off lanes operate at Gate 1 and Gate 2 along Sri Aurobindo Marg / Ring Road.",
-    ],
-    tip: "Parking inside campus is limited during TARANG. We strongly recommend drop-and-go via Uber/Ola or Delhi Metro.",
-  },
-  {
-    id: "bus",
-    mode: "bus",
-    title: "By Bus",
-    lineOrHub: "DTC & Inter-State Hubs",
-    badgeColor: "bg-emerald-400 text-black border-black",
-    summary: "Choose your drop-off at Kashmere Gate or Dhaula Kuan as per your convenience.",
-    gateExit: "Drop at Kashmere Gate (ISBT) or Dhaula Kuan Hub.",
-    steps: [
-      "From North/East India: Drop off at ISBT Kashmere Gate → Take Yellow Line Metro directly to AIIMS station (~25 min).",
-      "From West/Airport route: Drop off at Dhaula Kuan → Take Airport Express / DTC bus (Route 764/724/605) or Pink Line to AIIMS (~20 min).",
-      "Direct DTC buses (routes 348, 465, 502, 505, 605) stop right at 'AIIMS' Ring Road bus stand.",
-    ],
-    tip: "DTC buses run round-the-clock across Ring Road connecting directly with AIIMS bus shelter.",
-  },
-  {
     id: "train",
     mode: "train",
     title: "By Train",
-    lineOrHub: "Major Delhi Railway Hubs",
-    badgeColor: "bg-purple-400 text-black border-black",
-    summary: "Drop-off at New Delhi (NDLS), Delhi Cantt, or Sarai Rohilla as per onward travel preference.",
-    gateExit: "NDLS, Delhi Cantt, or Sarai Rohilla Railway Stations.",
+    lineOrHub: "Patna Junction (PNBE)",
+    summary: "Patna Junction is about 8 km from campus — the most common way into the city.",
+    gateExit: "Arrive at Patna Junction, then head east along Ashok Rajpath.",
     steps: [
-      "New Delhi Railway Station (NDLS): Walk into Yellow Line Metro (New Delhi Station) and ride directly to AIIMS Station (6 stops, ~15 min).",
-      "Delhi Cantt Railway Station: Take an auto or DTC bus via Ring Road (~25 min) or metro to AIIMS.",
-      "Sarai Rohilla Railway Station: Take a quick cab (~25 min) or Red Line from Shastri Nagar switching to Yellow Line at Kashmere Gate.",
+      "Arrive at Patna Junction (PNBE).",
+      "Take an app cab, auto or e-rickshaw towards Ashok Rajpath, Mahendru.",
+      "Ask for “NIT Patna” — the campus sits on Ashok Rajpath, behind Gandhi Ghat.",
     ],
-    tip: "If carrying heavy luggage from NDLS, prepaid cabs and autos are available 24/7 right outside Ajmeri Gate / Paharganj sides.",
+    tip: "Prepaid autos and app cabs are available outside the station round the clock.",
   },
   {
     id: "flight",
     mode: "flight",
     title: "By Air",
-    lineOrHub: "IGI Airport (DEL)",
-    badgeColor: "bg-cyan-400 text-black border-black",
-    summary: "Indira Gandhi International Airport (IGI) is ~15 km away with seamless high-speed connectivity.",
-    gateExit: "Terminal 1, 2, or 3 (IGI Airport New Delhi).",
+    lineOrHub: "Patna Airport (PAT)",
+    summary: "Jay Prakash Narayan International Airport is about 20 km from campus.",
+    gateExit: "Jay Prakash Narayan International Airport, Patna.",
     steps: [
-      "Board the high-speed Airport Express Line from Terminal 2/3 to New Delhi Metro Station (~20 min).",
-      "Switch to the Yellow Line towards HUDA City Centre / Millennium City and get down at AIIMS Station (~15 min).",
-      "Direct app cabs (Uber / Ola / BluSmart) from airport terminals take ~35-45 minutes via Rao Tula Ram Marg & Ring Road.",
+      "Land at Jay Prakash Narayan International Airport (PAT).",
+      "Book an app cab or prepaid taxi to “NIT Patna, Ashok Rajpath”.",
+      "Allow extra time in the evening — Ashok Rajpath gets busy during peak hours.",
     ],
-    tip: "Airport Express + Yellow Line is the fastest, traffic-free route to AIIMS during peak morning and evening fest hours.",
+    tip: "Share your cab from the airport with friends heading to TARANG — it is the quickest door-to-door option.",
+  },
+  {
+    id: "cab",
+    mode: "cab",
+    title: "By Cab / Auto",
+    lineOrHub: "Drop at main gate",
+    destination: FEST.venue,
+    summary: "Set your map to NIT Patna and get dropped right at the main gate on Ashok Rajpath.",
+    gateExit: "Drop-off at the NIT Patna main gate, Ashok Rajpath.",
+    steps: [
+      `Set your navigation destination to: ${FEST.venue}.`,
+      "Autos and e-rickshaws run along Ashok Rajpath all day.",
+      "Parking on campus is limited during the fest — drop-and-go is easiest.",
+    ],
+    tip: "Coming in a group? Pin the main gate as your meeting point before you set off.",
+  },
+  {
+    id: "bus",
+    mode: "bus",
+    title: "By Bus",
+    lineOrHub: "Patna bus terminals",
+    summary: "Inter-city buses arrive at Patna’s bus terminals; finish the trip by cab or auto.",
+    gateExit: "Any Patna bus terminal, then local transport to Ashok Rajpath.",
+    steps: [
+      "Arrive at your Patna bus terminal.",
+      "Take an app cab or auto to “NIT Patna, Ashok Rajpath”.",
+      "Follow the TARANG signboards from the main gate to the festival grounds.",
+    ],
+    tip: "Check the Notices page on the day for any traffic or gate advisories.",
   },
 ];
 
 export const LANDMARKS = [
-  "AIIMS Metro Station (Yellow Line) — Gate 1 & 2 (0 m)",
-  "South Extension Metro Station (Pink Line) — Gate 3 & 4 (600 m)",
-  "AIIMS Quadrangle Main Stage — Ansari Nagar (Inside Campus)",
-  "Safdarjung Hospital — Opposite Ring Road",
-  "Dilli Haat & INA Market — 1.5 km",
-  "Lodhi Art District & Khan Market — 3.5 km",
+  "Gandhi Ghat, on the Ganga — right behind campus",
+  "Ashok Rajpath — the campus frontage road",
+  "Patna Junction — about 8 km",
+  "Jay Prakash Narayan International Airport — about 20 km",
 ];
-
-/* ------------------------------------------------------------------ */
-/* Landing page flow (The Tarang Flow)                                  */
-/* ------------------------------------------------------------------ */
-
-export type FlowHighlight = {
-  label: string;
-  text: string;
-  variant?: "secondary" | "accent" | "muted" | "white";
-};
-
-export type FlowNote = {
-  label: string;
-  items: string[];
-};
-
-export type FlowStep = {
-  step: string;
-  title: string;
-  tag: string;
-  highlights: FlowHighlight[];
-  note?: FlowNote;
-  href?: string;
-  cta?: string;
-  secondaryHref?: string;
-  secondaryCta?: string;
-};
-
-export const FLOW: FlowStep[] = [
-  {
-    step: "01",
-    title: "GET YOUR BR / DELEGATE CARD",
-    tag: "Card Selection",
-    highlights: [
-      {
-        label: "DELEGATE CARD",
-        text: "Full access to all 5 Prime Star Nights + covers everything included with the BR Card.",
-        variant: "secondary",
-      },
-      {
-        label: "BR CARD",
-        text: "Mandatory base card for participating in all 250+ festival competitions and campus access.",
-        variant: "accent",
-      },
-    ],
-    note: {
-      label: "DO I NEED BOTH ?",
-      items: [
-        "Taking a Delegate Card? You do not need a BR Card.",
-        "Attending day events only? You only need a BR Card.",
-      ],
-    },
-    href: "/delegate-card",
-    cta: "Delegate Card",
-    secondaryHref: "/basic-card",
-    secondaryCta: "BR Card",
-  },
-  {
-    step: "02",
-    title: "REGISTER FOR YOUR EVENTS",
-    tag: "Competitions & Shows",
-    highlights: [
-      {
-        label: "250+ COMPETITIONS",
-        text: "aQuSiS, Socio cultural, Workshop, Fine Arts, Quizzing, Literary, Sports, and Gaming battles.",
-        variant: "secondary",
-      },
-      {
-        label: "SOLO & TEAM SLOTS",
-        text: "Register directly as an individual or create & manage your college team roster.",
-        variant: "accent",
-      },
-    ],
-    note: {
-      label: "INSTANT CONFIRMATION",
-      items: [
-        "Instant digital confirmation and schedule sync.",
-        "View prize pools, rules, and team requirements.",
-      ],
-    },
-    href: "/events",
-    cta: "Browse Events",
-    secondaryHref: "/schedule",
-    secondaryCta: "View Schedule",
-  },
-  {
-    step: "03",
-    title: "COLLECT YOUR CARDS",
-    tag: "At The Venue",
-    highlights: [
-      {
-        label: "CR DESK LOCATION",
-        text: "Central Registration (CR) Desk at Swimming Pool complex, AIIMS Campus.",
-        variant: "secondary",
-      },
-      {
-        label: "TIMINGS & DESKS",
-        text: "Open 09:00 AM daily across all 5 festival days with dedicated express counters.",
-        variant: "accent",
-      },
-    ],
-    note: {
-      label: "WHAT TO BRING",
-      items: [
-        "Your digital card QR code from your dashboard.",
-        "Valid college student ID or government identity card.",
-      ],
-    },
-    href: "/reach",
-    cta: "CR Desk & Venue Map",
-    secondaryHref: "/dashboard",
-    secondaryCta: "My QR Cards",
-  },
-  {
-    step: "04",
-    title: "LIVE THE WAVE",
-    tag: "5 Days of Action",
-    highlights: [
-      {
-        label: "FESTIVAL ARENA",
-        text: "Non-stop competitive heats, informal games, and festival food village.",
-        variant: "secondary",
-      },
-      {
-        label: "LIVE NOTICES & FEED",
-        text: "Real-time updates, stage schedules, and live scoreboards on the web app.",
-        variant: "accent",
-      },
-    ],
-    note: {
-      label: "CAMPUS ACCESS",
-      items: [
-        "Keep your physical badge or RFID wristband equipped.",
-        "Free movement across indoor auditoriums & zones.",
-      ],
-    },
-    href: "/schedule",
-    cta: "Full Schedule",
-    secondaryHref: "/merchandise",
-    secondaryCta: "Official Merch",
-  },
-  {
-    step: "05",
-    title: "END THE DAY WITH PRIME NIGHTS 🌙",
-    tag: "Prime Pro Nights",
-    highlights: [
-      {
-        label: "5 PRO CONCERTS",
-        text: "Star-studded concerts with Bollywood artists, EDM DJs, and Rock headliners.",
-        variant: "secondary",
-      },
-      {
-        label: "EXCLUSIVE ENTRY",
-        text: "Strictly for Delegate Card holders. Main arena gates open at 06:30 PM daily.",
-        variant: "accent",
-      },
-    ],
-    note: {
-      label: "NIGHT ACCESS RULES",
-      items: [
-        "Delegate Card pass required for prime arena gates.",
-        "Arrive early for front-stage pit access & checks.",
-      ],
-    },
-    href: "/delegate-pass",
-    cta: "Get Delegate Card",
-    secondaryHref: "/basic-card",
-    secondaryCta: "Compare Passes",
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/* TARANG BR Card Perks & Inclusions                                    */
-/* ------------------------------------------------------------------ */
-
-export const BR_CARD_PERKS = {
-  mandatoryNotice:
-    "A BR Card is mandatory to participate in any event (except Star Nights - for which you will need delegate card) and also gives you access to the AIIMS campus throughout TARANG.",
-  recommendations: [
-    "Movie Nighters",
-    "Literary Nighters",
-    "Battle of Bands",
-    "Rap Battles",
-    "Street Dance",
-    "Short Films",
-    "Open Mic",
-    "JAM",
-    "IPL Auction",
-    "Fine Arts Exhibitions",
-    "All sports events",
-  ],
-  informals: [
-    "Cupid Waltz",
-    "Musical Chairs",
-    "Mr. & Miss TARANG",
-    "Water Balloon Fights, etc.",
-  ],
-  tagline: "Get your BR Card. Live the Beat. Experience TARANG.",
-  leadParagraph:
-    "From music and dance to literature, art, comedy, competitions and everything in between, these events form the heart and soul of TARANG.",
-};
 
 /* ------------------------------------------------------------------ */
 /* Sponsors & Partners                                                */
@@ -850,8 +410,3 @@ export type Sponsor = {
 };
 
 export const SPONSORS: Sponsor[] = [];
-
-
-
-
-

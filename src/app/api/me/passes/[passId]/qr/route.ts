@@ -39,21 +39,7 @@ export async function GET(
       return apiError(req, "CONFLICT", "This pass is not active — QR is unavailable");
     }
 
-    const prod = Array.isArray(pass.pass_products) ? pass.pass_products[0] : pass.pass_products;
-    const isVipDelegatePass =
-      prod?.slug === "vip-delegate-pass" ||
-      (!prod?.is_base_pass && prod !== null) ||
-      prod?.name?.toLowerCase().includes("delegate") ||
-      prod?.name?.toLowerCase().includes("all-access") ||
-      prod?.name?.toLowerCase().includes("vip");
-
-    if (!isVipDelegatePass) {
-      return apiError(
-        req,
-        "FORBIDDEN",
-        "QR codes are issued exclusively for the VIP All-Access Delegate Pass. Basic Cards use the unique verification string code in the dashboard for gate entry."
-      );
-    }
+    // TARANG sells a single Pronite Pass, so every active pass carries a gate QR.
 
     // Ensure a credential exists (normally created by the ISSUE_QR worker;
     // this is a safe idempotent fallback for the dashboard).

@@ -816,7 +816,7 @@ export async function GET(req: NextRequest) {
                   timeZone: "Asia/Kolkata",
                 }).format(new Date(festival.ends_at))}`
               : "TBD",
-          venue: "AIIMS New Delhi",
+          venue: "NIT Patna",
         },
       },
     });

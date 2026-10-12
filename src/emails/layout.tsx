@@ -8,13 +8,14 @@ import type { ReactNode } from "react";
  * are blocked (all meaning is in text).
  */
 
+/** The poster palette, lightened where ink type has to sit on it. */
 export const EMAIL_COLORS = {
-  cream: "#fffdf5",
-  black: "#000000",
-  accent: "#ff6b6b",
-  secondary: "#ffd93d",
-  muted: "#c4b5fd",
-  white: "#ffffff",
+  cream: "#f4eac8",
+  black: "#141310",
+  accent: "#ff8a6a",
+  secondary: "#f4eac8",
+  muted: "#e6d6a8",
+  white: "#fffaf0",
 } as const;
 
 export function EmailLayout({

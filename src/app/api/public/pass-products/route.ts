@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
  * (checkout UI needs the product id; the amount is display-only, the server
  * always recalculates at checkout).
  *
- * When Supabase is not configured we serve the bundled base delegate pass for
+ * When Supabase is not configured we serve the bundled Pronite Pass for
  * display (plan §16: keep public static content on outage). Actual checkout
  * still fails closed because writes require the database.
  */
@@ -69,32 +69,17 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/** Static pass products matching seed.sql (₹200 basic + ₹2000 delegate). */
+/** Static fallback: the single Pronite Pass (the base pass product in seed.sql). */
 function staticPassProducts() {
   return [
     {
       id: "static-base-delegate-pass",
       slug: "base-delegate-pass",
-      name: "Basic Card",
-      description:
-        "Standard 5-day festival entry card. Required before registering for events.",
+      name: "Pronite Pass",
+      description: "Every pronite, campus access and competition registration.",
       isBasePass: true,
       requiresBasePass: false,
       amountPaise: 20000,
-      currency: "INR",
-      salesState: "OPEN",
-      validFrom: "2026-09-01T00:00:00+00:00",
-      validUntil: "2026-09-22T00:00:00+00:00",
-    },
-    {
-      id: "static-vip-delegate-pass",
-      slug: "vip-delegate-pass",
-      name: "All-Access Delegate Card",
-      description:
-        "All-access 5-day card with entry to all pro-show concerts, VIP front-row seating, fast-track entry, and artist lounge access.",
-      isBasePass: false,
-      requiresBasePass: true,
-      amountPaise: 200000,
       currency: "INR",
       salesState: "OPEN",
       validFrom: "2026-09-01T00:00:00+00:00",

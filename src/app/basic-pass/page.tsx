@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default function BasicPassRedirect() {
-  redirect("/basic-card");
+/** Legacy pass URL — TARANG now sells a single Pronite Pass. */
+export default function LegacyPassRedirect() {
+  redirect("/pronite-pass");
 }

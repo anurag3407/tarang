@@ -9,25 +9,25 @@ import { range, useScene } from "./motion";
 const STEPS = [
   {
     title: "Get your pass",
-    body: "The BR Card opens campus access and every competition. The Delegate Card adds the five headline nights.",
+    body: "One Pronite Pass: all five headline nights, campus access for the whole fest, and every competition.",
     href: "#passes",
     cta: "Compare passes",
   },
   {
     title: "Register",
-    body: "Enter solo or build your college squad across 250+ competitions. Confirmation lands instantly.",
+    body: "Enter solo or bring your college squad. Confirmation lands in your dashboard instantly.",
     href: "/events",
     cta: "Browse events",
   },
   {
-    title: "Collect",
-    body: "Swimming Pool complex, from 09:00 daily. Bring the QR from your dashboard and a valid college ID.",
+    title: "Find us",
+    body: "NIT Patna, Ashok Rajpath — on the Ganga, behind Gandhi Ghat. About 8 km from Patna Junction.",
     href: "/reach",
     cta: "How to reach",
   },
   {
     title: "Ride the wave",
-    body: "Five days on the floor, five nights at the Quadrangle. Prime Night gates open at 18:30.",
+    body: "Five days on the floor, five nights on the main stage. Show your gate QR and you’re in.",
     href: "/schedule",
     cta: "Full schedule",
   },

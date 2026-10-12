@@ -1,6 +1,6 @@
-# PULSE — AIIMS Delhi College Fest
+# TARANG ’26 — NIT Patna Cultural Fest
 
-The official website for **PULSE**, the annual cultural fest of AIIMS New Delhi.
+The official website for **TARANG**, the cultural festival of NIT Patna — *Mute the Mundane*.
 Five days of music, dance, drama, sports and med-science — built as a
 neo-brutalist frontend in **Next.js (App Router) + TypeScript + Tailwind CSS v4**.
 
@@ -38,10 +38,11 @@ pnpm lint
 | `/gallery`  | Photo grid (pattern placeholders until real shots land)              |
 | `/notices`  | Official notice board                                                |
 | `/team`     | Team cards grouped by committee                                      |
-| `/reach`    | How to reach AIIMS Delhi — metro, bus, train, flight, cab            |
+| `/reach`    | How to reach NIT Patna — train, flight, cab, bus                     |
 | `/faqs`     | Accordion FAQs grouped by topic                                      |
 | `/ask`      | Ask-a-question form (simulated submit)                               |
-| `/verify`   | Pass / registration ID verifier (mock records)                       |
+| `/pronite-pass` | The single Pronite Pass — ticket, perks and checkout             |
+| `/verify`   | Pass / registration ID verifier (currently disabled)                 |
 
 ## Architecture
 

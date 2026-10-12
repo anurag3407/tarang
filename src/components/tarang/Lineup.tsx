@@ -140,7 +140,7 @@ export default function Lineup({ artists }: { artists: LineupArtist[] }) {
                 One stage.
               </h2>
               <p className="mt-8 max-w-sm text-base leading-relaxed text-ink/70">
-                When the sun drops, the Quadrangle becomes the loudest room on campus. Headliners drop one by one — keep
+                When the sun drops over the Ganga, the main stage becomes the loudest room on campus. Headliners drop one by one — keep
                 scrolling.
               </p>
             </div>

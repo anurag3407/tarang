@@ -2,6 +2,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 import { rateLimiter, resetWorld, sb } from "./helpers/mocks";
 import { post, json, expectOkEnvelope, expectErrEnvelope } from "./helpers/requests";
 
+// The organizer inbox is deployment config; set it before env() is first parsed.
+vi.hoisted(() => {
+  process.env.GROUP_ENTRY_NOTIFY_EMAIL = "organizers@example.com";
+});
+
 vi.mock("@/lib/supabase/service-role", async () => {
   const m = await import("./helpers/mocks");
   return { createServiceRoleClient: () => m.sb };
@@ -88,7 +93,7 @@ describe("POST /api/public/group-entries (group entry form)", () => {
     expect(job?.payload).toMatchObject({
       logical_key: `group-entry-notification:${ENTRY_ID}`,
       recipient_user_id: null,
-      to_email_snapshot: "pulseaiims141@gmail.com",
+      to_email_snapshot: "organizers@example.com",
       template_name: "group-entry-notification",
       template_version: 1,
       idempotency_key: `email:group-entry-notification:${ENTRY_ID}:v1`,

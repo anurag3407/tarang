@@ -241,31 +241,14 @@ export async function enqueueOrderEmails(orderId: string, kind: string): Promise
       | { name?: string; slug?: string; is_base_pass?: boolean }
       | null;
 
-    const prodName = product?.name ?? p?.name ?? line?.description_snapshot ?? "All-Access Delegate Pass";
-    const prodSlug = product?.slug ?? p?.slug ?? "";
-    const isBase = product?.is_base_pass ?? p?.is_base_pass ?? false;
+    const prodName = product?.name ?? p?.name ?? line?.description_snapshot ?? "Pronite Pass";
 
-    const isDelegate =
-      prodSlug === "vip-delegate-pass" ||
-      prodSlug.includes("vip") ||
-      prodSlug.includes("delegate") ||
-      isBase === false ||
-      prodName.toLowerCase().includes("delegate") ||
-      prodName.toLowerCase().includes("vip") ||
-      prodName.toLowerCase().includes("all-access") ||
-      Number(order.amount_paise) >= 200000;
-
-    // Mail will ONLY be sent for Delegate Pass, NOT Basic Card
-    if (!isDelegate) {
-      logger().info({ orderId, prodName, prodSlug, isBase }, "skipping confirmation email for basic pass/card");
-      return;
-    }
-
+    // TARANG sells a single Pronite Pass — every pass confirmation is sent.
     if (pass) {
       publicPassCode = pass.public_pass_code;
       productName = prodName;
 
-      // Generate and embed gate QR code in email for Delegate Pass holders
+      // Embed the gate QR in the confirmation email
       try {
         const { generatePassQrDataUrl } = await import("@/services/qr-service");
         const qrRes = await generatePassQrDataUrl(pass.id);
@@ -655,7 +638,7 @@ async function setEmailRetryOrDead(job: EmailJob, message: string): Promise<bool
 function buildTemplateData(job: EmailJob): TemplateData {
   const e = env();
   const data = job.render_data as Partial<TemplateData>;
-  const base = (e.APP_BASE_URL || "https://pulseasa.org").replace(/\/$/, "");
+  const base = (e.APP_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
   // Group-entry notifications go to the organizers, so link the admin
   // mission-control dashboard instead of the participant dashboard.
   const dashboardUrl =
@@ -689,6 +672,6 @@ function buildTemplateData(job: EmailJob): TemplateData {
     groupSize: data.groupSize,
     notes: data.notes,
     dashboardUrl,
-    supportEmail: e.EMAIL_REPLY_TO ?? "support@pulseasa.org",
+    supportEmail: e.EMAIL_REPLY_TO ?? e.EMAIL_FROM.replace(/^.*<|>.*$/g, ""),
   };
 }

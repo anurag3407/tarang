@@ -453,7 +453,8 @@ input[type="radio"] {
 }
 
 @theme inline {
-  --font-display: var(--nf-display), Impact, "Arial Black", sans-serif;
+  /* Noot lacks ₹, curly quotes and middots — those fall through to the body face. */
+  --font-display: var(--nf-display), var(--nf-body), sans-serif;
   --font-deva: var(--nf-deva), "Devanagari Sangam MN", serif;
   --font-body: var(--nf-body), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--nf-mono), ui-monospace, SFMono-Regular, monospace;
@@ -580,6 +581,68 @@ input[type="radio"] {
 }
 @keyframes t-drift {
   to { background-position: 260px 130px; }
+}
+
+/* ---- Wordmark ------------------------------------------------------ */
+
+/* TARANG set live in Noot; the type scales with the box it is given. */
+.kit-wordmark {
+  container-type: inline-size;
+  width: 100%;
+}
+.kit-wordmark-line {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 27.5cqw;
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.t-hollow-mark {
+  color: transparent;
+  -webkit-text-stroke: 0.035em var(--color-bone);
+}
+
+/* ---- Pass ticket (PassTicket) ------------------------------------- */
+
+/* On cream stock the wordmark prints solid ink with a red offset. */
+.kit-ticket-mark .t-cut {
+  color: var(--color-ink);
+  -webkit-text-stroke: 0;
+  text-shadow: 0.045em 0.045em 0 var(--color-blood);
+}
+.kit-barcode > span {
+  width: var(--w);
+}
+@container (min-width: 42rem) {
+  .kit-barcode > span {
+    width: auto;
+    height: var(--w);
+  }
+}
+/* Perforation notches, punched in the page colour. */
+.kit-ticket-stub::before,
+.kit-ticket-stub::after {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--kit-notch, var(--color-ink));
+  top: -15px;
+}
+.kit-ticket-stub::before { left: -14px; }
+.kit-ticket-stub::after { right: -14px; }
+@container (min-width: 42rem) {
+  .kit-ticket-stub::before,
+  .kit-ticket-stub::after {
+    left: -15px;
+    right: auto;
+  }
+  .kit-ticket-stub::before { top: -14px; }
+  .kit-ticket-stub::after { top: auto; bottom: -14px; }
 }
 
 /* ---- Reveals ------------------------------------------------------- */
