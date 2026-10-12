@@ -187,7 +187,7 @@ export default function VenueMapPage() {
                         Gate {gate.number}
                       </span>
                       {gate.metroConnection && (
-                        <span className="border border-black bg-yellow-300 px-1.5 py-0.5 text-[10px] font-black uppercase flex items-center gap-1">
+                        <span className="border border-black bg-neo-accent px-1.5 py-0.5 text-[10px] font-black uppercase flex items-center gap-1">
                           <Train className="h-3 w-3" />
                           <span>Metro Link</span>
                         </span>

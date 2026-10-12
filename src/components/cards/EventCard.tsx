@@ -12,7 +12,7 @@ const CATEGORY_BG: Record<string, string> = {
   accent: "bg-neo-accent text-black",
   secondary: "bg-neo-secondary text-black",
   muted: "bg-neo-muted text-black",
-  white: "bg-white text-black dark:bg-[#121214] dark:text-white",
+  white: "bg-white text-black dark:bg-neo-card dark:text-white",
 };
 
 /** Sales states that block new registrations get a visible label. */
@@ -45,7 +45,7 @@ export function EventCard({
   const showImage = Boolean(event.imageUrl && !imgError);
 
   return (
-    <article className="group flex h-full flex-col border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg overflow-hidden">
+    <article className="kit-rise group flex h-full flex-col border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg overflow-hidden">
       {/* Header strip */}
       <div
         className={`flex items-center justify-between gap-2 border-b-4 border-black px-4 py-3 ${CATEGORY_BG[category.colorKey] ?? "bg-neo-secondary text-black"}`}
@@ -67,7 +67,7 @@ export function EventCard({
       </div>
 
       {/* Instagram Post Ratio Poster Area (1:1 Ratio) */}
-      <div className="relative aspect-square w-full overflow-hidden border-b-4 border-black bg-neo-cream dark:bg-[#000000]">
+      <div className="relative aspect-square w-full overflow-hidden border-b-4 border-black bg-neo-cream dark:bg-neo-cream">
         {showImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -82,7 +82,7 @@ export function EventCard({
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           </>
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-neo-cream dark:bg-[#000000] p-6 text-center">
+          <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-neo-cream dark:bg-neo-cream p-6 text-center">
             <div
               className={`flex h-16 w-16 items-center justify-center border-3 border-black shadow-neo-sm ${CATEGORY_BG[category.colorKey] ?? "bg-neo-accent text-black"}`}
             >

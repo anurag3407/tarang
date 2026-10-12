@@ -10,11 +10,11 @@ const CATEGORY_BG: Record<string, string> = {
   music: "bg-neo-accent text-black",
   dance: "bg-neo-secondary text-black",
   drama: "bg-neo-muted text-black",
-  arts: "bg-white text-black dark:bg-[#121214] dark:text-white",
+  arts: "bg-white text-black dark:bg-neo-card dark:text-white",
   literary: "bg-neo-secondary text-black",
   sports: "bg-neo-accent text-black",
   medsci: "bg-neo-muted text-black",
-  informal: "bg-white text-black dark:bg-[#121214] dark:text-white",
+  informal: "bg-white text-black dark:bg-neo-card dark:text-white",
   ceremony: "bg-neo-secondary text-black",
   proshow: "bg-black text-white",
 };
@@ -134,7 +134,7 @@ export default function ScheduleBoard({ days }: { days: DayScheduleRead[] }) {
               className={`border-4 border-black px-4 py-3 text-left shadow-neo-sm transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
                 active
                   ? "bg-black text-white"
-                  : "bg-white text-black dark:bg-[#121214] dark:text-white hover:-translate-y-0.5"
+                  : "bg-white text-black dark:bg-neo-card dark:text-white hover:-translate-y-0.5"
               }`}
             >
               <span

@@ -53,7 +53,7 @@ export default function CampusAmbassadorForm() {
   if (status === "sent") {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 sm:px-6">
-        <div className="border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-10 text-center shadow-neo-xl">
+        <div className="border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-10 text-center shadow-neo-xl">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-black bg-neo-secondary text-black shadow-neo">
             <CheckCircle2 className="h-10 w-10" strokeWidth={3} />
           </div>
@@ -83,7 +83,7 @@ export default function CampusAmbassadorForm() {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-8 shadow-neo-xl lg:col-span-3"
+          className="space-y-6 border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-8 shadow-neo-xl lg:col-span-3"
         >
           <div className="border-b-4 border-black pb-4">
             <h2 className="text-2xl font-black uppercase tracking-tight">
@@ -109,7 +109,7 @@ export default function CampusAmbassadorForm() {
                 value={form.leadName}
                 onChange={(e) => setForm({ ...form, leadName: e.target.value })}
                 placeholder="e.g. Aarav Sharma"
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               />
             </div>
             <div>
@@ -127,7 +127,7 @@ export default function CampusAmbassadorForm() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="you@college.edu"
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function CampusAmbassadorForm() {
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 placeholder="+91 98765 43210"
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               />
             </div>
             <div>
@@ -165,7 +165,7 @@ export default function CampusAmbassadorForm() {
                 value={form.college}
                 onChange={(e) => setForm({ ...form, college: e.target.value })}
                 placeholder="Your college / university name"
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               />
             </div>
           </div>
@@ -187,7 +187,7 @@ export default function CampusAmbassadorForm() {
               value={form.groupSize}
               onChange={(e) => setForm({ ...form, groupSize: e.target.value })}
               placeholder="Expected number of students coming from your college"
-              className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+              className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
             />
           </div>
 
@@ -205,7 +205,7 @@ export default function CampusAmbassadorForm() {
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
               placeholder="Tell us about student clubs, societies, or events you lead in your college..."
-              className="w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white p-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+              className="w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white p-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
             />
           </div>
 

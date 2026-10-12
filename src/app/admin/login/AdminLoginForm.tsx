@@ -180,7 +180,7 @@ function AdminLoginForm() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
-      <div className="border-8 border-black bg-neo-muted dark:bg-[#121214] text-black dark:text-white p-6 shadow-neo-lg sm:p-8">
+      <div className="border-8 border-black bg-neo-muted dark:bg-neo-card text-black dark:text-white p-6 shadow-neo-lg sm:p-8">
         <div className="flex items-center justify-between">
           <span className="border-2 border-black bg-black px-2 py-0.5 text-xs font-black uppercase tracking-wider text-white">
             Staff Portal
@@ -201,7 +201,7 @@ function AdminLoginForm() {
 
         {/* Tab Switcher */}
         {tab !== "forgot_password" && (
-          <div className="mt-6 flex border-4 border-black bg-white dark:bg-[#09090b] p-1 shadow-neo-xs">
+          <div className="mt-6 flex border-4 border-black bg-white dark:bg-neo-surface p-1 shadow-neo-xs">
             <button
               type="button"
               onClick={() => {
@@ -260,7 +260,7 @@ function AdminLoginForm() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                  className="mt-1 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                   placeholder="you@college.edu"
                 />
               </label>
@@ -286,7 +286,7 @@ function AdminLoginForm() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-3 py-2 pr-10 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                    className="w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-3 py-2 pr-10 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                     placeholder="••••••••"
                   />
                   <button
@@ -325,7 +325,7 @@ function AdminLoginForm() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                  className="mt-1 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                   placeholder="you@college.edu"
                 />
               </label>
@@ -345,7 +345,7 @@ function AdminLoginForm() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                  className="mt-1 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                   placeholder="you@college.edu"
                 />
               </label>

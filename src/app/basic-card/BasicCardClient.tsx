@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -92,17 +93,17 @@ const REVIEW_MESSAGE =
   "Your payment reached us, but we could not issue the card automatically. Our team has been alerted and will resolve it — please do not pay again.";
 
 const RECOMMENDED_EVENTS = [
-  { name: "Movie Nighters", icon: Film, cat: "Night Showcase", bg: "bg-blue-200" },
+  { name: "Movie Nighters", icon: Film, cat: "Night Showcase", bg: "bg-neo-secondary" },
   { name: "Literary Nighters", icon: BookOpen, cat: "Literary & Slam", bg: "bg-amber-200" },
-  { name: "Battle of Bands", icon: Music, cat: "Grand Rock Stage", bg: "bg-rose-200" },
-  { name: "Rap Battles", icon: Mic, cat: "Underground Hip-Hop", bg: "bg-purple-200" },
-  { name: "Street Dance", icon: Flame, cat: "Crew Showdown", bg: "bg-orange-200" },
-  { name: "Short Films", icon: Video, cat: "Cinematography", bg: "bg-cyan-200" },
-  { name: "Open Mic", icon: Radio, cat: "Acoustics & Comedy", bg: "bg-emerald-200" },
-  { name: "JAM", icon: Sparkles, cat: "Just A Minute", bg: "bg-yellow-200" },
-  { name: "IPL Auction", icon: Gavel, cat: "Strategy Mock Draft", bg: "bg-lime-200" },
-  { name: "Fine Arts Exhibitions", icon: Palette, cat: "Live Gallery", bg: "bg-pink-200" },
-  { name: "All Sports Events", icon: Dumbbell, cat: "Gymkhana Arena", bg: "bg-indigo-200" },
+  { name: "Battle of Bands", icon: Music, cat: "Grand Rock Stage", bg: "t-halftone" },
+  { name: "Rap Battles", icon: Mic, cat: "Underground Hip-Hop", bg: "bg-ink-3" },
+  { name: "Street Dance", icon: Flame, cat: "Crew Showdown", bg: "bg-neo-accent" },
+  { name: "Short Films", icon: Video, cat: "Cinematography", bg: "bg-[#5c1a10]" },
+  { name: "Open Mic", icon: Radio, cat: "Acoustics & Comedy", bg: "bg-neo-secondary" },
+  { name: "JAM", icon: Sparkles, cat: "Just A Minute", bg: "t-halftone" },
+  { name: "IPL Auction", icon: Gavel, cat: "Strategy Mock Draft", bg: "bg-ink-3" },
+  { name: "Fine Arts Exhibitions", icon: Palette, cat: "Live Gallery", bg: "bg-neo-accent" },
+  { name: "All Sports Events", icon: Dumbbell, cat: "Gymkhana Arena", bg: "bg-[#5c1a10]" },
 ];
 
 const FREE_INFORMALS = [
@@ -337,7 +338,7 @@ export default function BasicCardClient({
         prefill: {
           name: userProfile?.displayName ?? "",
         },
-        theme: { color: "#ff6b6b" },
+        theme: { color: "#d4190f" },
         handler: async (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;
@@ -461,8 +462,10 @@ export default function BasicCardClient({
   return (
     <div className="min-h-screen bg-neo-cream pb-24">
       {/* Hero Header */}
-      <section className="relative overflow-hidden border-b-8 border-black bg-black py-16 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(#ff6b6b_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
+      <section className="t-halftone relative isolate overflow-hidden border-b-[3px] border-ink pb-16 pt-28 text-white md:pt-36">
+        <div aria-hidden className="kit-hands pointer-events-none absolute -right-[18vw] -top-[10%] w-[min(92vw,680px)] md:-right-[4vw] md:-top-[30%]">
+          <Image src="/tarang/hands-top.webp" alt="" width={1407} height={833} loading="eager" sizes="(max-width: 768px) 92vw, 680px" className="h-auto w-full rotate-[-8deg]" />
+        </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -484,11 +487,12 @@ export default function BasicCardClient({
           </div>
 
           <div className="mt-8 max-w-3xl">
-            <span className="text-xs font-black uppercase tracking-[0.25em] text-neo-secondary">
+            <span className="text-xs font-black uppercase tracking-[0.25em] text-bone/80">
               TARANG 2026 · AIIMS New Delhi
             </span>
-            <h1 className="mt-2 text-5xl font-black uppercase leading-[0.9] tracking-tighter sm:text-6xl md:text-7xl">
-              TARANG <span className="text-neo-accent">BR Card</span>
+            <h1 className="t-display mt-4 text-[clamp(3rem,8.5vw,7.5rem)] leading-[0.88]">
+              <span className="t-cut">Tarang</span>{" "}
+              <span className="text-bone [text-shadow:5px_5px_0_var(--color-ink)]">BR Card</span>
             </h1>
             <p className="mt-4 text-lg font-bold text-white/85 sm:text-xl leading-relaxed">
               Your key to South Asia’s largest medical fest. Mandatory for campus entry and participating in all competitions across 5 electric days.

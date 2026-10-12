@@ -1,5 +1,6 @@
-import { Star } from "lucide-react";
+import { Ring } from "@/components/tarang/Icons";
 
+/** A strip of tape running across the page — the inner-page cousin of the landing marquee. */
 export function Marquee({
   items,
   variant = "black",
@@ -9,34 +10,26 @@ export function Marquee({
   variant?: "black" | "secondary" | "accent";
   fast?: boolean;
 }) {
-  const bg =
+  const tone =
     variant === "black"
-      ? "bg-black text-white"
+      ? { band: "bg-ink text-bone", word: "", ring: "text-signal" }
       : variant === "secondary"
-        ? "bg-neo-secondary text-black"
-        : "bg-neo-accent text-black";
+        ? { band: "bg-bone text-ink", word: "", ring: "text-blood" }
+        : { band: "t-halftone text-bone", word: "t-cut", ring: "text-bone" };
 
   const row = (ariaHidden: boolean) => (
-    <div
-      aria-hidden={ariaHidden}
-      className="flex shrink-0 items-center gap-6 pr-6"
-    >
+    <div aria-hidden={ariaHidden} className="flex shrink-0 items-center">
       {items.map((item, i) => (
-        <span
-          key={`${item}-${i}`}
-          className="flex items-center gap-6 whitespace-nowrap text-lg font-black uppercase tracking-widest md:text-xl"
-        >
-          {item}
-          <Star className="h-5 w-5 fill-current stroke-none" />
+        <span key={`${item}-${i}`} className="flex items-center">
+          <span className={`t-display whitespace-nowrap px-6 text-2xl md:px-8 md:text-4xl ${tone.word}`}>{item}</span>
+          <Ring className={`h-6 w-6 shrink-0 md:h-7 md:w-7 ${tone.ring}`} />
         </span>
       ))}
     </div>
   );
 
   return (
-    <div
-      className={`marquee-paused overflow-hidden border-y-4 border-black py-3 ${bg}`}
-    >
+    <div className={`marquee-paused relative overflow-hidden border-y-[3px] border-ink py-4 md:py-5 ${tone.band}`}>
       <div className={fast ? "marquee-track-fast" : "marquee-track"}>
         {row(false)}
         {row(true)}

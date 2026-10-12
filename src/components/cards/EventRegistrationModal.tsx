@@ -196,7 +196,7 @@ export default function EventRegistrationModal({
         currency: checkoutData.currency || "INR",
         name: "TARANG 2026",
         description: `Registration for ${event.name}`,
-        theme: { color: "#ff6b6b" },
+        theme: { color: "#d4190f" },
         handler: async (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;

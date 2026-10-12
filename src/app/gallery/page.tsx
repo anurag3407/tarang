@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Camera, Star } from "lucide-react";
+import { Camera } from "lucide-react";
+import { Ring } from "@/components/tarang/Icons";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Marquee } from "@/components/ui/Marquee";
 import { Badge } from "@/components/ui/Badge";
@@ -11,11 +12,12 @@ export const metadata: Metadata = {
     "Moments from past editions of TARANG — battle of bands, pro shows, flash mobs and everything in between.",
 };
 
-const COLOR_BG: Record<GalleryItem["color"], string> = {
-  accent: "bg-neo-accent text-black",
-  secondary: "bg-neo-secondary text-black",
-  muted: "bg-neo-muted text-black",
-  white: "bg-white text-black dark:bg-[#121214] dark:text-white",
+/** Each placeholder is printed like a frame off the poster until real photos land. */
+const FIELD: Record<GalleryItem["color"], string> = {
+  accent: "t-halftone",
+  secondary: "bg-neo-secondary",
+  muted: "bg-ink-3",
+  white: "bg-[#2a0605]",
 };
 
 const PATTERN: Record<GalleryItem["pattern"], string> = {
@@ -25,39 +27,35 @@ const PATTERN: Record<GalleryItem["pattern"], string> = {
 };
 
 function GalleryTile({ item, index }: { item: GalleryItem; index: number }) {
+  const tilt = index % 3 === 0 ? "-rotate-1" : index % 3 === 1 ? "rotate-1" : "";
   return (
     <figure
-      className={`group relative overflow-hidden border-4 border-black shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg ${
-        COLOR_BG[item.color]
-      } ${index % 3 === 0 ? "-rotate-1" : index % 3 === 1 ? "rotate-1" : ""} ${
+      className={`kit-rise group relative flex flex-col overflow-hidden rounded-[6px] border-[3px] border-black bg-neo-card shadow-neo transition-all duration-300 hover:-translate-y-2 hover:rotate-0 hover:shadow-neo-lg ${tilt} ${
         item.tall ? "row-span-2" : ""
       }`}
     >
-      {/* Pattern stand-in for the photo — swap for next/image when shots land */}
+      {/* Stand-in for the photo — swap for next/image when shots land */}
       <div
-        className={`flex items-center justify-center ${PATTERN[item.pattern]} ${
-          item.tall ? "h-72 md:h-96" : "h-56 md:h-64"
-        }`}
+        className={`relative flex flex-1 items-end overflow-hidden ${FIELD[item.color]} ${item.tall ? "min-h-80 md:min-h-[30rem]" : "min-h-60 md:min-h-72"}`}
         role="img"
         aria-label={`Photo placeholder: ${item.title}`}
       >
-        <Camera
-          className="h-16 w-16 stroke-black opacity-40 transition-transform duration-200 group-hover:scale-110"
-          strokeWidth={2.5}
-        />
+        <div className={`absolute inset-0 opacity-60 ${PATTERN[item.pattern]}`} aria-hidden />
+        <span
+          aria-hidden
+          className="t-display absolute -right-2 -top-4 text-[9rem] leading-none text-transparent [-webkit-text-stroke:2px_rgba(244,234,200,0.35)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-x-4 md:text-[11rem]"
+        >
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <Ring className="absolute left-4 top-4 h-8 w-8 text-bone/70 transition-transform duration-700 group-hover:rotate-180" />
+        <Camera className="relative m-4 h-6 w-6 text-bone/60" strokeWidth={1.75} aria-hidden />
       </div>
-      <figcaption className="border-t-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white px-4 py-3">
-        <p className="text-lg font-black uppercase leading-tight tracking-tight text-black dark:text-white">
-          {item.title}
-        </p>
-        <Badge variant="secondary" className="mt-2 shadow-none">
+      <figcaption className="flex items-start justify-between gap-4 border-t-[3px] border-black px-4 py-4">
+        <p className="t-display text-lg leading-tight text-bone">{item.title}</p>
+        <Badge variant="muted" className="shrink-0">
           {item.category}
         </Badge>
       </figcaption>
-      <Star
-        className="absolute right-3 top-3 h-8 w-8 fill-black stroke-none opacity-20"
-        aria-hidden
-      />
     </figure>
   );
 }
@@ -79,12 +77,12 @@ export default function GalleryPage() {
             ))}
           </div>
 
-          <div className="mt-16 border-8 border-black bg-neo-secondary p-8 text-center text-black shadow-neo-lg md:p-12">
-            <p className="text-3xl font-black uppercase tracking-tighter text-black md:text-4xl">
+          <div className="kit-rise t-halftone mt-16 rounded-[6px] border-[3px] border-black p-8 text-center shadow-neo-lg md:p-12">
+            <p className="t-display t-cut text-4xl md:text-6xl">
               Shot something at TARANG?
             </p>
             <p className="mx-auto mt-3 max-w-xl text-lg font-bold leading-snug text-black">
-              Tag <span className="bg-white dark:bg-black text-black dark:text-white px-1">@pulse.aiims</span> on
+              Tag <span className="bg-ink px-1.5 text-bone">@pulse.aiims</span> on
               Instagram with #TARANG26 — the best frames make it to this wall
               and the closing film.
             </p>

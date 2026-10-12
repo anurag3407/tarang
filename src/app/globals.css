@@ -3,11 +3,16 @@
 @custom-variant dark (&:is(.dark, .dark *));
 
 /* ------------------------------------------------------------------
-   TARANG — Neo-brutalism design tokens (Tailwind v4 CSS-first config)
+   TARANG ’26 — site-wide “poster kit”
+
+   The inner pages were built on a neo-brutalist kit (black borders, white
+   cards, yellow highlights, hard shadows). The class names stay; their
+   meaning is re-pointed at the poster: ink cut-outs with a cream keyline,
+   oxblood and crimson fills, hard crimson offsets. The site has a single
+   theme — `dark` is always set on <html> so every `dark:` variant applies.
    ------------------------------------------------------------------ */
 
 @theme {
-  /* Dynamic Neo-Brutalism Palette via CSS Variables */
   --color-neo-cream: var(--neo-cream);
   --color-neo-accent: var(--neo-accent);
   --color-neo-secondary: var(--neo-secondary);
@@ -22,7 +27,7 @@
   --shadow-neo: var(--shadow-neo);
   --shadow-neo-lg: var(--shadow-neo-lg);
   --shadow-neo-xl: var(--shadow-neo-xl);
-  --shadow-neo-white: 8px 8px 0 0 #fff;
+  --shadow-neo-white: 8px 8px 0 0 #f4eac8;
 
   /* Motion */
   --animate-spin-slow: spin-slow 10s linear infinite;
@@ -32,411 +37,323 @@
   --animate-scan-sweep: scan-sweep 2s ease-in-out infinite;
 
   @keyframes scan-sweep {
-    0% {
-      top: 5%;
-      opacity: 0.8;
-    }
-    50% {
-      top: 90%;
-      opacity: 1;
-    }
-    100% {
-      top: 5%;
-      opacity: 0.8;
-    }
+    0% { top: 5%; opacity: 0.8; }
+    50% { top: 90%; opacity: 1; }
+    100% { top: 5%; opacity: 0.8; }
   }
-
   @keyframes spin-slow {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
-
   @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
-
   @keyframes wiggle {
-    0%,
-    100% {
-      transform: rotate(-3deg);
-    }
-    50% {
-      transform: rotate(3deg);
-    }
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
   }
 }
 
-/* Font variable is injected on <html> by next/font — bridge it here. */
+/* Body copy shares the landing page’s grotesk. */
 @theme inline {
-  --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--nf-body), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* ------------------------------------------------------------------
-   Light Mode Design Tokens (Default)
-   ------------------------------------------------------------------ */
 :root {
-  --neo-cream: #fffdf5;
-  --neo-accent: #ff6b6b;
-  --neo-secondary: #ffd93d;
-  --neo-muted: #c4b5fd;
-  --neo-surface: #ffffff;
-  --neo-card: #ffffff;
-  --neo-text: #000000;
-  --neo-border: #000000;
+  color-scheme: dark;
 
-  --shadow-neo-xs: 2px 2px 0 0 #000;
-  --shadow-neo-sm: 4px 4px 0 0 #000;
-  --shadow-neo-md: 6px 6px 0 0 #000;
-  --shadow-neo: 8px 8px 0 0 #000;
-  --shadow-neo-lg: 12px 12px 0 0 #000;
-  --shadow-neo-xl: 16px 16px 0 0 #000;
+  --neo-cream: #141310; /* page */
+  --neo-surface: #191814; /* recessed panels */
+  --neo-card: #1f1e19; /* cards */
+  --neo-accent: #d4190f; /* poster red — cream text passes AA */
+  --neo-secondary: #7a0a08; /* oxblood fills */
+  --neo-muted: #34302a; /* quiet chips */
+  --neo-text: #f4eac8; /* cream */
+  --neo-border: #f4eac8; /* the keyline */
+  --neo-hot: #ff5a3c; /* bright red for type on ink */
+
+  --shadow-neo-xs: 2px 2px 0 0 #8f0c08;
+  --shadow-neo-sm: 4px 4px 0 0 #8f0c08;
+  --shadow-neo-md: 6px 6px 0 0 #8f0c08;
+  --shadow-neo: 8px 8px 0 0 #8f0c08;
+  --shadow-neo-lg: 12px 12px 0 0 #8f0c08;
+  --shadow-neo-xl: 16px 16px 0 0 #8f0c08;
 }
 
 /* ------------------------------------------------------------------
-   Dark Mode Design Tokens (Cyber Obsidian / Jet Black Neo-Brutalism)
-   High-contrast neon colors on ultra-premium pure obsidian black
+   Base
    ------------------------------------------------------------------ */
-.dark {
-  --neo-cream: #000000;
-  --neo-accent: #ff5470;
-  --neo-secondary: #8a6a0c;
-  --neo-muted: #9d82f7;
-  --neo-surface: #0c0c0e;
-  --neo-card: #121214;
-  --neo-text: #f4f4f6;
-  --neo-border: #26262b;
 
-  --shadow-neo-xs: 2px 2px 0 0 rgba(0, 0, 0, 0.95);
-  --shadow-neo-sm: 4px 4px 0 0 rgba(0, 0, 0, 0.95);
-  --shadow-neo-md: 6px 6px 0 0 rgba(0, 0, 0, 0.95);
-  --shadow-neo: 8px 8px 0 0 rgba(0, 0, 0, 0.95);
-  --shadow-neo-lg: 12px 12px 0 0 rgba(0, 0, 0, 0.95);
-  --shadow-neo-xl: 16px 16px 0 0 rgba(0, 0, 0, 0.95);
+/* Entrance animations start oversized or tilted; never let them widen the page. */
+main {
+  overflow-x: clip;
 }
-
-/* ------------------------------------------------------------------
-   Base Styles
-   ------------------------------------------------------------------ */
 
 body {
   background-color: var(--neo-cream);
   color: var(--neo-text);
   font-family: var(--font-sans);
-  font-weight: 700;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--neo-secondary);
-  color: #000000;
+  background: var(--neo-hot);
+  color: #141310;
+}
+
+/* Inner pages: the kit’s heavy uppercase headings become poster lettering… */
+main:not(:has(> .tarang)) :is(h1, h2, .font-black.uppercase):not([class*="tracking-wid"]):not(.t-display, .t-label) {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.01em;
+}
+/* …and tracked caps read as studio slug lines. */
+main:not(:has(> .tarang)) .uppercase[class*="tracking-wid"]:not(h1, h2) {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+/* Poster red for type on ink. */
+.text-neo-secondary,
+.dark .dark\:text-neo-secondary,
+.hover\:text-neo-secondary:hover {
+  color: var(--neo-hot);
+}
+.fill-neo-secondary { fill: var(--neo-hot); }
+.stroke-neo-secondary { stroke: var(--neo-hot); }
+.border-neo-secondary { border-color: var(--neo-hot); }
+.text-neo-accent,
+.hover\:text-neo-accent:hover {
+  color: var(--neo-hot);
 }
 
 /* ------------------------------------------------------------------
-   Textures & Patterns
+   Textures
    ------------------------------------------------------------------ */
 
-.bg-halftone {
-  background-image: radial-gradient(#000 1.5px, transparent 1.5px);
-  background-size: 20px 20px;
+.bg-halftone,
+.dark .bg-halftone,
+.bg-dots-lg,
+.dark .bg-dots-lg {
+  background-image: radial-gradient(circle, rgba(196, 24, 18, 0.3) 0 30%, transparent 33%);
+  background-size: 18px 18px;
 }
-
-.dark .bg-halftone {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1.25px, transparent 1.25px);
-  background-size: 20px 20px;
-}
-
 .bg-halftone-white {
-  background-image: radial-gradient(#fff 1.5px, transparent 1.5px);
+  background-image: radial-gradient(rgba(244, 234, 200, 0.5) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
 }
-
-.bg-grid-neo {
-  background-size: 40px 40px;
-  background-image: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.1) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-}
-
-.dark .bg-grid-neo {
-  background-size: 40px 40px;
-  background-image: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.18) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
-}
-
+.bg-grid-neo,
+.dark .bg-grid-neo,
 .bg-grid-white {
   background-size: 40px 40px;
-  background-image: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.18) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
-}
-
-.bg-dots-lg {
-  background-image: radial-gradient(circle, #000 2px, transparent 2.5px);
-  background-size: 30px 30px;
-}
-
-.dark .bg-dots-lg {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.18) 1.75px, transparent 2.25px);
+  background-image:
+    linear-gradient(to right, rgba(244, 234, 200, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 234, 200, 0.07) 1px, transparent 1px);
 }
 
 /* ------------------------------------------------------------------
-   Typography Effects
+   Type effects
    ------------------------------------------------------------------ */
 
-/* Hollow outlined display text */
-.text-stroke {
-  -webkit-text-stroke: 2px #000;
-  color: transparent;
-}
-
-.dark .text-stroke {
-  -webkit-text-stroke: 2px #ffffff;
-  color: transparent;
-}
-
+.text-stroke,
+.dark .text-stroke,
 .text-stroke-white {
-  -webkit-text-stroke: 2px #fff;
+  -webkit-text-stroke: 2px #f4eac8;
   color: transparent;
 }
-
-.text-stroke-thin {
-  -webkit-text-stroke: 1px #000;
-  color: transparent;
-}
-
+.text-stroke-thin,
 .dark .text-stroke-thin {
-  -webkit-text-stroke: 1px #ffffff;
+  -webkit-text-stroke: 1px #f4eac8;
   color: transparent;
 }
-
-.text-shadow-neo {
-  text-shadow: 4px 4px 0 #000;
-}
-
+.text-shadow-neo,
 .dark .text-shadow-neo {
-  text-shadow: 4px 4px 0 #000;
+  text-shadow: 4px 4px 0 #8f0c08;
 }
-
-.text-shadow-neo-lg {
-  text-shadow: 6px 6px 0 #000;
-}
-
+.text-shadow-neo-lg,
 .dark .text-shadow-neo-lg {
-  text-shadow: 6px 6px 0 #000;
+  text-shadow: 6px 6px 0 #8f0c08;
 }
 
 /* ------------------------------------------------------------------
-   Dark Mode Component & Surface Styles
+   Surfaces — white cards become ink cut-outs
    ------------------------------------------------------------------ */
 
-/* Cards and white surfaces in dark mode */
-.dark .bg-white:not(.keep-white) {
+.bg-white:not(.keep-white) {
   background-color: var(--neo-card);
   color: var(--neo-text);
 }
+.bg-white\/90 { background-color: rgb(31 30 25 / 0.9); }
+.bg-white\/60 { background-color: rgb(31 30 25 / 0.6); }
+.bg-white\/5 { background-color: rgb(244 234 200 / 0.05); }
 
-/* Dark mode text colors on dark surfaces */
-.dark .text-black:not(.dark\:text-black) {
+.bg-black,
+.dark .bg-black {
+  background-color: #0d0c0a;
   color: var(--neo-text);
 }
-
-.dark .text-black\/90,
-.dark .text-black\/85,
-.dark .text-black\/80,
-.dark .text-black\/75,
-.dark .text-black\/70 {
-  color: #d4d4d8;
+.bg-zinc-950,
+.bg-zinc-900,
+.dark .dark\:bg-zinc-900 {
+  background-color: #0d0c0a;
 }
-
-.dark .text-black\/60,
-.dark .text-black\/50,
-.dark .text-black\/40 {
-  color: #a1a1aa;
-}
-
-.dark .text-black\/30,
-.dark .text-black\/20,
-.dark .text-black\/10 {
-  color: #71717a;
-}
-
-.dark .text-zinc-600,
-.dark .text-zinc-500,
-.dark .text-zinc-400 {
-  color: #a1a1aa;
-}
-
-/* Explicit high-contrast utilities in dark mode */
-.dark .dark\:text-white,
-.dark .text-white {
-  color: #ffffff !important;
-}
-
-.dark .dark\:text-black {
-  color: #000000 !important;
-}
-
-.dark .dark\:bg-neo-secondary {
-  background-color: var(--neo-secondary) !important;
-}
-
-.dark .dark\:bg-neo-accent {
-  background-color: var(--neo-accent) !important;
-}
-
-.dark .dark\:bg-neo-muted {
-  background-color: var(--neo-muted) !important;
-}
-
-/* Dark mode border colors */
-.dark .border-black:not(.keep-border-black) {
-  border-color: #26262b;
-}
-
-.dark .border-black\/40,
-.dark .border-black\/30,
-.dark .border-black\/20,
-.dark .border-black\/15,
-.dark .border-black\/10 {
-  border-color: rgba(255, 255, 255, 0.14);
-}
-
-.dark .divide-black\/30 > :not([hidden]) ~ :not([hidden]),
-.dark .divide-black\/20 > :not([hidden]) ~ :not([hidden]),
-.dark .divide-black\/15 > :not([hidden]) ~ :not([hidden]),
-.dark .divide-black\/10 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(255, 255, 255, 0.14);
-}
-
-/* Dark CTA buttons & dark container elements */
-.dark .bg-black {
-  background-color: #0c0c0e;
-  color: #ffffff;
-  border-color: #26262b;
-}
-
-/* Prevent text turning black on hover in dark mode */
-.dark .hover\:text-black:hover {
-  color: #ffffff;
-}
-
-.dark .hover\:text-black\/70:hover {
-  color: #cbd5e1;
-}
-
-.dark .group:hover .group-hover\:text-black {
-  color: #ffffff;
-}
-
-/* Status Badges & Alert Tints in Dark Mode */
-.dark .bg-green-50,
-.dark .bg-green-100,
-.dark .bg-green-200 {
-  background-color: rgba(34, 197, 94, 0.15) !important;
-  border-color: rgba(34, 197, 94, 0.35) !important;
-  color: #86efac !important;
-}
-
-.dark .bg-green-50 *,
-.dark .bg-green-100 *,
-.dark .bg-green-200 * {
-  color: #86efac !important;
-}
-
-.dark .bg-amber-100,
-.dark .bg-amber-200 {
-  background-color: rgba(245, 158, 11, 0.15) !important;
-  border-color: rgba(245, 158, 11, 0.35) !important;
-  color: #fde68a !important;
-}
-
-.dark .bg-amber-100 *,
-.dark .bg-amber-200 * {
-  color: #fde68a !important;
-}
-
-.dark .bg-red-100,
-.dark .bg-red-200 {
-  background-color: rgba(239, 68, 68, 0.15) !important;
-  border-color: rgba(239, 68, 68, 0.35) !important;
-  color: #fca5a5 !important;
-}
-
-.dark .bg-red-100 *,
-.dark .bg-red-200 * {
-  color: #fca5a5 !important;
-}
-
+.bg-zinc-100,
 .dark .bg-zinc-100 {
-  background-color: #18181b !important;
-  border-color: #27272a !important;
-  color: #d4d4d8 !important;
+  background-color: var(--neo-surface) !important;
+  color: rgb(244 234 200 / 0.8) !important;
 }
+.bg-gray-100 { background-color: var(--neo-surface); }
 
-.dark .bg-zinc-100 * {
-  color: #d4d4d8 !important;
+/* ------------------------------------------------------------------
+   Ink → cream. Every shade of black text reads as cream on ink.
+   ------------------------------------------------------------------ */
+
+.text-black:not(.dark\:text-black),
+.text-gray-800,
+.text-zinc-700 {
+  color: var(--neo-text);
 }
+.text-black\/90, .text-black\/85 { color: rgb(244 234 200 / 0.88); }
+.text-black\/80, .text-black\/75, .text-black\/70 { color: rgb(244 234 200 / 0.74); }
+.text-black\/60, .text-black\/50 { color: rgb(244 234 200 / 0.58); }
+.text-black\/40, .text-black\/30 { color: rgb(244 234 200 / 0.44); }
+.text-black\/20, .text-black\/10 { color: rgb(244 234 200 / 0.28); }
 
-.dark .text-green-600,
-.dark .text-green-700,
-.dark .text-green-800,
-.dark .text-green-900,
-.dark .text-green-950 {
+.text-zinc-300, .dark .dark\:text-zinc-300 { color: rgb(244 234 200 / 0.8); }
+.text-zinc-400, .dark .dark\:text-zinc-400,
+.text-zinc-500, .dark .dark\:text-zinc-500,
+.text-zinc-600 { color: rgb(244 234 200 / 0.58); }
+
+.text-white,
+.dark .text-white,
+.dark .dark\:text-white {
+  color: var(--neo-text) !important;
+}
+.text-white\/90, .text-white\/85, .text-white\/80 { color: rgb(244 234 200 / 0.84); }
+.text-white\/70, .text-white\/60, .dark .dark\:text-white\/70, .dark .dark\:text-white\/60 { color: rgb(244 234 200 / 0.64); }
+.text-white\/50, .text-white\/40 { color: rgb(244 234 200 / 0.46); }
+
+/* Ink type is reserved for cream surfaces. */
+.dark .dark\:text-black { color: #141310 !important; }
+.dark .dark\:bg-white { background-color: var(--neo-text); }
+
+.hover\:text-black:hover,
+.dark .hover\:text-black:hover,
+.group:hover .group-hover\:text-black {
+  color: var(--neo-text);
+}
+.hover\:text-black\/70:hover { color: rgb(244 234 200 / 0.74); }
+.hover\:bg-white:hover { background-color: var(--neo-card); }
+.hover\:bg-zinc-100:hover { background-color: var(--neo-surface); }
+.hover\:bg-zinc-800:hover,
+.hover\:bg-zinc-900:hover { background-color: #2a2822; }
+
+.fill-black, .hover\:fill-black:hover { fill: var(--neo-text); }
+.stroke-black, .hover\:stroke-black:hover { stroke: var(--neo-text); }
+.fill-white { fill: var(--neo-text); }
+.stroke-white { stroke: var(--neo-text); }
+
+/* ------------------------------------------------------------------
+   Lines — the cream keyline
+   ------------------------------------------------------------------ */
+
+.border-black:not(.keep-border-black),
+.dark .border-black:not(.keep-border-black),
+.border-white,
+.hover\:border-black:hover,
+.hover\:border-white:hover {
+  border-color: var(--neo-border);
+}
+.border-black\/40, .border-white\/60, .border-white\/40, .border-zinc-400, .border-gray-400 { border-color: rgb(244 234 200 / 0.4); }
+.border-black\/30, .border-white\/30 { border-color: rgb(244 234 200 / 0.3); }
+.border-black\/20, .border-white\/20 { border-color: rgb(244 234 200 / 0.2); }
+.border-black\/15, .border-white\/15 { border-color: rgb(244 234 200 / 0.15); }
+.border-black\/10, .border-white\/10 { border-color: rgb(244 234 200 / 0.1); }
+.divide-black > :not([hidden]) ~ :not([hidden]) { border-color: var(--neo-border); }
+.divide-black\/30 > :not([hidden]) ~ :not([hidden]),
+.divide-black\/20 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(244 234 200 / 0.2); }
+.divide-black\/15 > :not([hidden]) ~ :not([hidden]),
+.divide-black\/10 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(244 234 200 / 0.12); }
+.ring-black { --tw-ring-color: var(--neo-border); }
+.ring-white { --tw-ring-color: var(--neo-border); }
+
+/* ------------------------------------------------------------------
+   Status tints — kept semantic, warmed for ink
+   ------------------------------------------------------------------ */
+
+.bg-green-50, .bg-green-100, .bg-green-200 {
+  background-color: rgba(74, 222, 128, 0.12) !important;
+  border-color: rgba(74, 222, 128, 0.4) !important;
   color: #86efac !important;
 }
-
-.dark .text-amber-600,
-.dark .text-amber-700,
-.dark .text-amber-800,
-.dark .text-amber-900,
-.dark .text-amber-950 {
+.bg-green-50 *, .bg-green-100 *, .bg-green-200 * { color: #86efac !important; }
+.bg-amber-100, .bg-amber-200 {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
   color: #fde68a !important;
 }
+.bg-amber-100 *, .bg-amber-200 * { color: #fde68a !important; }
+.bg-red-50, .bg-red-100, .bg-red-200 {
+  background-color: rgba(255, 90, 60, 0.12) !important;
+  border-color: rgba(255, 90, 60, 0.45) !important;
+  color: #ffb4a3 !important;
+}
+.bg-red-50 *, .bg-red-100 *, .bg-red-200 * { color: #ffb4a3 !important; }
+.bg-blue-100 { background-color: rgba(147, 197, 253, 0.12); }
 
-.dark .text-red-600,
-.dark .text-red-700,
-.dark .text-red-800,
-.dark .text-red-900,
-.dark .text-red-950 {
-  color: #fca5a5 !important;
+.text-green-600, .text-green-700, .text-green-800, .text-green-900, .text-green-950 { color: #86efac !important; }
+.text-amber-600, .text-amber-700, .text-amber-800, .text-amber-900, .text-amber-950 { color: #fde68a !important; }
+.text-red-600, .text-red-700, .text-red-800, .text-red-900, .text-red-950 { color: #ffb4a3 !important; }
+.text-blue-800, .text-blue-900 { color: #bfdbfe; }
+.text-purple-900 { color: #e9d5ff; }
+
+/* Cream stickers keep ink type, whatever their callers ask for. */
+.bg-bone:is(.text-black, [class*="text-black/"], .text-white),
+.bg-bone :is(.text-black, [class*="text-black/"]) {
+  color: var(--color-ink) !important;
+}
+.bg-bone :is(.fill-black) { fill: var(--color-ink); }
+
+/* Bright signal fills (success pills, scanner states) keep ink type. */
+:is(.bg-green-300, .bg-green-400, .bg-green-500, .bg-emerald-300, .bg-emerald-400, .bg-yellow-300, .bg-yellow-400, .bg-amber-300, .bg-amber-400):is(.text-black, :not([class*="text-"])),
+:is(.bg-green-300, .bg-green-400, .bg-green-500, .bg-emerald-300, .bg-emerald-400, .bg-yellow-300, .bg-yellow-400, .bg-amber-300, .bg-amber-400) :is(.text-black, [class*="text-black/"]) {
+  color: #141310 !important;
 }
 
-/* Form inputs & controls in dark mode */
-.dark input:not([type="checkbox"]):not([type="radio"]),
-.dark textarea,
-.dark select {
-  background-color: #09090b !important;
-  color: #f4f4f6 !important;
-  border-color: #26262b !important;
-}
+/* ------------------------------------------------------------------
+   Forms
+   ------------------------------------------------------------------ */
 
-.dark option {
-  background-color: #121214 !important;
-  color: #f4f4f6 !important;
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+textarea,
+select {
+  background-color: #0f0e0c !important;
+  color: var(--neo-text) !important;
+  border-color: rgb(244 234 200 / 0.55) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-.dark input::placeholder,
-.dark textarea::placeholder {
-  color: #71717a !important;
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--neo-hot) !important;
+  box-shadow: 4px 4px 0 0 #8f0c08 !important;
+  outline: none;
+}
+option {
+  background-color: var(--neo-card) !important;
+  color: var(--neo-text) !important;
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgb(244 234 200 / 0.38) !important;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--neo-accent);
 }
 
 /* ------------------------------------------------------------------
@@ -448,16 +365,53 @@ body {
   width: max-content;
   animation: var(--animate-marquee);
 }
-
 .marquee-track-fast {
   display: flex;
   width: max-content;
   animation: var(--animate-marquee-fast);
 }
-
 .marquee-paused:hover .marquee-track,
 .marquee-paused:hover .marquee-track-fast {
   animation-play-state: paused;
+}
+
+/* ------------------------------------------------------------------
+   Inner-page motion: content rises in as it scrolls into view.
+   Opt-in via .kit-rise; uses scroll-driven animations where supported.
+   ------------------------------------------------------------------ */
+
+@keyframes kit-rise {
+  from { opacity: 0; transform: translate3d(0, 48px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .kit-rise {
+      animation: kit-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+/* Page enter — a red shutter lifts off every route change. */
+@keyframes kit-shutter {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(0, -101%, 0); }
+}
+@keyframes kit-page-in {
+  from { opacity: 0; translate: 0 24px; }
+  to { opacity: 1; translate: none; }
+}
+.kit-shutter {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  pointer-events: none;
+  animation: kit-shutter 0.9s cubic-bezier(0.7, 0, 0.2, 1) 0.08s both;
+}
+.kit-page-in {
+  animation: kit-page-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
 }
 
 /* ------------------------------------------------------------------
@@ -470,8 +424,13 @@ body {
   .animate-spin-slow,
   .animate-wiggle,
   .animate-bounce,
-  .animate-pulse {
+  .animate-pulse,
+  .kit-shutter,
+  .kit-page-in {
     animation: none !important;
+  }
+  .kit-shutter {
+    display: none;
   }
 }
 
@@ -589,6 +548,8 @@ body {
 
 /* Oxblood field with two drifting layers of crimson halftone. */
 .t-halftone {
+  /* Layered, so .sticky / .absolute utilities still win. */
+  position: relative;
   isolation: isolate;
   background:
     radial-gradient(90% 70% at 50% 45%, #8a0306 0%, var(--color-blood) 45%, var(--color-blood-deep) 100%);
@@ -926,4 +887,47 @@ html.lenis body {
 }
 .lenis.lenis-stopped {
   overflow: hidden;
+}
+
+/* ------------------------------------------------------------------
+   Inner-page masthead motion (PageHeader)
+   ------------------------------------------------------------------ */
+
+.kit-drop-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.12em 0.14em;
+  margin: -0.12em -0.14em;
+}
+.kit-drop {
+  display: inline-block;
+  animation: kit-drop 1s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  animation-delay: calc(var(--d, 0ms) + 450ms);
+}
+@keyframes kit-drop {
+  from { transform: translate3d(0, 110%, 0) rotate(7deg); }
+  to { transform: none; }
+}
+.kit-fade {
+  animation: t-fade-in 1s ease both;
+  animation-delay: 600ms;
+}
+.kit-hands {
+  animation: kit-hands-in 1.6s cubic-bezier(0.22, 1.2, 0.36, 1) 0.3s both, kit-float 6s ease-in-out 2s infinite;
+}
+@keyframes kit-hands-in {
+  from { transform: translate3d(18%, -60%, 0) rotate(10deg); }
+  to { transform: none; }
+}
+@keyframes kit-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, 10px, 0) rotate(-1.2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kit-drop,
+  .kit-fade,
+  .kit-hands {
+    animation: none !important;
+  }
 }

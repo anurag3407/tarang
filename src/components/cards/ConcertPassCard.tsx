@@ -33,7 +33,7 @@ export default function ConcertPassCard({
       className={`relative overflow-hidden border-8 border-black bg-black text-white shadow-neo-xl ${className}`}
     >
       {/* Decorative background grid & glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(#ffde59_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(#f4eac8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
       <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-neo-secondary/20 blur-2xl pointer-events-none" />
       <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-neo-accent/20 blur-2xl pointer-events-none" />
 

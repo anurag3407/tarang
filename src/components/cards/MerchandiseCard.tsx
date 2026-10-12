@@ -34,10 +34,10 @@ export function MerchandiseCard({
   return (
     <article
       onClick={() => onSelect(item)}
-      className="group flex h-full cursor-pointer flex-col border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg overflow-hidden"
+      className="kit-rise group flex h-full cursor-pointer flex-col border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg overflow-hidden"
     >
       {/* Top Category / Tag Strip */}
-      <div className="flex items-center justify-between gap-2 border-b-4 border-black bg-neo-cream dark:bg-[#0c0c0e] px-4 py-2.5">
+      <div className="flex items-center justify-between gap-2 border-b-4 border-black bg-neo-cream dark:bg-neo-surface px-4 py-2.5">
         <div className="flex items-center gap-1.5">
           <Sparkles className="h-4 w-4 text-black dark:text-neo-secondary" />
           <span className="text-xs font-black uppercase tracking-widest text-black dark:text-white">
@@ -52,7 +52,7 @@ export function MerchandiseCard({
       </div>
 
       {/* Multi-Image Gallery Container (Instagram Square 1:1 Aspect Ratio) */}
-      <div className="relative aspect-square w-full overflow-hidden border-b-4 border-black bg-neo-cream/50 dark:bg-[#000000]">
+      <div className="relative aspect-square w-full overflow-hidden border-b-4 border-black bg-neo-cream/50 dark:bg-neo-cream">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images[activeImageIndex]}
@@ -73,7 +73,7 @@ export function MerchandiseCard({
               type="button"
               onClick={prevImage}
               aria-label="Previous image"
-              className="absolute left-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-[#121214]/90 p-1 opacity-0 shadow-neo-xs transition-opacity hover:bg-neo-accent group-hover:opacity-100"
+              className="absolute left-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-neo-card/90 p-1 opacity-0 shadow-neo-xs transition-opacity hover:bg-neo-accent group-hover:opacity-100"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -81,13 +81,13 @@ export function MerchandiseCard({
               type="button"
               onClick={nextImage}
               aria-label="Next image"
-              className="absolute right-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-[#121214]/90 p-1 opacity-0 shadow-neo-xs transition-opacity hover:bg-neo-accent group-hover:opacity-100"
+              className="absolute right-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-neo-card/90 p-1 opacity-0 shadow-neo-xs transition-opacity hover:bg-neo-accent group-hover:opacity-100"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
 
             {/* Dot indicators */}
-            <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full border-2 border-black bg-white/90 dark:bg-[#121214]/90 px-2 py-1 shadow-neo-xs">
+            <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full border-2 border-black bg-white/90 dark:bg-neo-card/90 px-2 py-1 shadow-neo-xs">
               {images.map((_, idx) => (
                 <button
                   key={idx}
@@ -137,7 +137,7 @@ export function MerchandiseCard({
               {item.sizes.map((size) => (
                 <span
                   key={size}
-                  className="border border-black bg-neo-cream dark:bg-[#0c0c0e] px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-black dark:text-white"
+                  className="border border-black bg-neo-cream dark:bg-neo-surface px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-black dark:text-white"
                 >
                   {size}
                 </span>

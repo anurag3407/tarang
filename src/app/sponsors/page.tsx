@@ -18,7 +18,7 @@ const COLOR_MAP = {
   accent: "bg-neo-accent text-black",
   secondary: "bg-neo-secondary text-black",
   muted: "bg-neo-muted text-black",
-  white: "bg-white text-black dark:bg-[#121214] dark:text-white",
+  white: "bg-white text-black dark:bg-neo-card dark:text-white",
 };
 
 export default async function SponsorsPage() {
@@ -327,7 +327,7 @@ export default async function SponsorsPage() {
                         href={`https://wa.me/91${coord.raw}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 text-center border border-white bg-emerald-400 py-1 text-[11px] font-black uppercase text-black hover:bg-emerald-300 transition-colors"
+                        className="flex-1 text-center border border-white bg-[#17784a] py-1 text-[11px] font-black uppercase text-black hover:bg-[#1d8f58] transition-colors"
                       >
                         WhatsApp
                       </a>

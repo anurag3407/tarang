@@ -56,7 +56,7 @@ export function MerchandiseExplorer({
               className={`border-2 border-black px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all duration-100 cursor-pointer ${
                 selectedCategory === cat
                   ? "bg-neo-accent text-black shadow-neo-xs scale-105"
-                  : "bg-neo-cream text-black dark:bg-[#18181b] dark:text-white hover:bg-white dark:hover:bg-[#27272a]"
+                  : "bg-neo-cream text-black dark:bg-neo-surface dark:text-white hover:bg-white dark:hover:bg-neo-muted"
               }`}
             >
               {cat}
@@ -72,7 +72,7 @@ export function MerchandiseExplorer({
             placeholder="Search merchandise…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border-2 border-black bg-neo-cream dark:bg-[#09090b] py-1.5 pl-9 pr-3 text-xs font-bold uppercase text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-zinc-500 outline-none focus:bg-white dark:focus:bg-[#121214]"
+            className="w-full border-2 border-black bg-neo-cream dark:bg-neo-surface py-1.5 pl-9 pr-3 text-xs font-bold uppercase text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-zinc-500 outline-none focus:bg-white dark:focus:bg-neo-card"
           />
         </div>
       </div>
@@ -90,8 +90,8 @@ export function MerchandiseExplorer({
         </div>
       ) : (
         /* Empty State */
-        <div className="border-4 border-black bg-white dark:bg-[#121214] p-12 text-center shadow-neo">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center border-3 border-black bg-neo-cream dark:bg-[#09090b] shadow-neo-sm">
+        <div className="border-4 border-black bg-white dark:bg-neo-card p-12 text-center shadow-neo">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center border-3 border-black bg-neo-cream dark:bg-neo-surface shadow-neo-sm">
             <ShoppingBag className="h-8 w-8 text-black/50 dark:text-zinc-400" />
           </div>
           <h3 className="mt-4 text-xl font-black uppercase tracking-tight text-black dark:text-white">

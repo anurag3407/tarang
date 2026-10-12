@@ -113,7 +113,7 @@ export default function BasicCardView({
               <button
                 type="button"
                 onClick={copyCode}
-                className="mt-3 w-full flex items-center justify-center gap-1.5 border-2 border-black bg-white dark:bg-[#121214] text-black dark:text-white py-1.5 px-3 text-xs font-black uppercase shadow-neo-sm hover:bg-neo-secondary dark:hover:bg-neo-secondary dark:hover:text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-colors"
+                className="mt-3 w-full flex items-center justify-center gap-1.5 border-2 border-black bg-white dark:bg-neo-card text-black dark:text-white py-1.5 px-3 text-xs font-black uppercase shadow-neo-sm hover:bg-neo-secondary dark:hover:bg-neo-secondary dark:hover:text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-colors"
               >
                 {copied ? (
                   <>

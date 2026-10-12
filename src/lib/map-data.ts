@@ -318,7 +318,7 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     width: 175,
     height: 125,
     borderRadius: 8,
-    accentColor: "#ffd93d", // Yellow
+    accentColor: "#f4eac8", // Yellow
     textColor: "#000000",
     nearestRoad: "Road No. 1 / Road No. 4",
     nearestGate: "Gate No. 1 (Sri Aurobindo Marg)",
@@ -355,7 +355,7 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     width: 140,
     height: 110,
     borderRadius: 8,
-    accentColor: "#ff6b6b", // Accent Coral Red
+    accentColor: "#d4190f", // Accent Coral Red
     textColor: "#ffffff",
     nearestRoad: "Road No. 1 (Director's Avenue)",
     nearestGate: "Gate No. 1 (Main AIIMS Gate)",
@@ -426,7 +426,7 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     width: 170,
     height: 110,
     borderRadius: 6,
-    accentColor: "#c4b5fd", // Muted Violet
+    accentColor: "#a3445a", // Muted Violet
     textColor: "#000000",
     nearestRoad: "Road No. 2 / Road No. 4",
     nearestGate: "Gate No. 2 (OPD & Academic Gate)",

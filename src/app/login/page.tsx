@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AuthStage } from "@/components/ui/AuthStage";
 import { Suspense } from "react";
 import LoginForm from "./LoginForm";
 
@@ -26,8 +27,10 @@ function LoginFormSkeleton() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<LoginFormSkeleton />}>
-      <LoginForm adminMode={false} />
-    </Suspense>
+    <AuthStage>
+      <Suspense fallback={<LoginFormSkeleton />}>
+        <LoginForm adminMode={false} />
+      </Suspense>
+    </AuthStage>
   );
 }

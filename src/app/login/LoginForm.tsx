@@ -283,7 +283,7 @@ export default function LoginForm({ adminMode = false }: { adminMode?: boolean }
 
         {/* Mode Selector Tabs */}
         {!adminMode && mode !== "forgot_password" && (
-          <div className="mt-6 flex border-4 border-black bg-neo-cream dark:bg-[#09090b] p-1 shadow-neo-xs">
+          <div className="mt-6 flex border-4 border-black bg-neo-cream dark:bg-neo-surface p-1 shadow-neo-xs">
             <button
               type="button"
               onClick={() => {
@@ -587,7 +587,7 @@ export default function LoginForm({ adminMode = false }: { adminMode?: boolean }
       </div>
 
       {/* Staff / Admin Portal Switcher */}
-      <div className="mt-6 border-4 border-black bg-neo-muted dark:bg-[#121214] text-black dark:text-white p-5 text-center shadow-neo-sm">
+      <div className="mt-6 border-4 border-black bg-neo-muted dark:bg-neo-card text-black dark:text-white p-5 text-center shadow-neo-sm">
         <p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
           Organizing Committee or Fest Crew?
         </p>

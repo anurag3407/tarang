@@ -25,7 +25,7 @@ export function TeamCard({ member }: { member: TeamMember }) {
   const waNumber = rawDigits.startsWith("91") ? rawDigits : `91${rawDigits}`;
 
   return (
-    <article className="group relative flex flex-col justify-between border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-6 shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg">
+    <article className="kit-rise group relative flex flex-col justify-between border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white p-6 shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg">
       <div>
         {/* Avatar & Chief Pin */}
         <div className="flex items-center justify-between">
@@ -65,7 +65,7 @@ export function TeamCard({ member }: { member: TeamMember }) {
               type="button"
               onClick={copyPhone}
               title="Copy Phone Number"
-              className="border border-black bg-neo-cream dark:bg-[#0c0c0e] p-1 text-black dark:text-white hover:bg-neo-secondary dark:hover:bg-neo-secondary dark:hover:text-black transition-colors"
+              className="border border-black bg-neo-cream dark:bg-neo-surface p-1 text-black dark:text-white hover:bg-neo-secondary dark:hover:bg-neo-secondary dark:hover:text-black transition-colors"
             >
               {copied ? (
                 <Check className="h-3.5 w-3.5 text-green-700 dark:text-green-400" strokeWidth={3} />
@@ -87,7 +87,7 @@ export function TeamCard({ member }: { member: TeamMember }) {
               href={`https://wa.me/${waNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 border-2 border-black bg-emerald-300 py-1.5 px-2 text-[11px] font-black uppercase tracking-wider text-black shadow-neo-xs hover:bg-emerald-400 transition-colors"
+              className="flex items-center justify-center gap-1.5 border-2 border-black bg-[#17784a] py-1.5 px-2 text-[11px] font-black uppercase tracking-wider text-black shadow-neo-xs hover:bg-[#1d8f58] transition-colors"
             >
               <MessageSquare className="h-3 w-3" />
               <span>Chat</span>

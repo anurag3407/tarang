@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AuthStage } from "@/components/ui/AuthStage";
 import AdminLoginForm from "./AdminLoginForm";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLoginPage() {
-  return <AdminLoginForm />;
+  return (
+    <AuthStage>
+      <AdminLoginForm />
+    </AuthStage>
+  );
 }

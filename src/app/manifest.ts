@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Official web application for TARANG 2026, South Asia's largest medical college cultural, literary, and sports fest at AIIMS New Delhi.",
     start_url: "/",
     display: "standalone",
-    background_color: "#000000",
-    theme_color: "#fffb00",
+    background_color: "#141310",
+    theme_color: "#6e0001",
     icons: [
       {
         src: "/icon-192.png",
@@ -17,7 +17,7 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
       {
-        src: "/pulse-logo.png",
+        src: "/icon-512.png",
         sizes: "512x512",
         type: "image/png",
       },

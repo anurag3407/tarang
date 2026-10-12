@@ -92,7 +92,7 @@ export default function AskForm() {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-8 shadow-neo-xl lg:col-span-3"
+          className="space-y-6 border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-8 shadow-neo-xl lg:col-span-3"
         >
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
@@ -109,7 +109,7 @@ export default function AskForm() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Full name"
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               />
             </div>
             <div>
@@ -127,7 +127,7 @@ export default function AskForm() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="you@college.edu"
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               />
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function AskForm() {
                 value={form.college}
                 onChange={(e) => setForm({ ...form, college: e.target.value })}
                 placeholder="Your college / institute"
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               />
             </div>
             <div>
@@ -162,7 +162,7 @@ export default function AskForm() {
                 required
                 value={form.topic}
                 onChange={(e) => setForm({ ...form, topic: e.target.value })}
-                className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white px-4 text-lg font-bold focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+                className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white px-4 text-lg font-bold focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
               >
                 <option value="" disabled>
                   Pick a topic
@@ -192,7 +192,7 @@ export default function AskForm() {
               value={form.question}
               onChange={(e) => setForm({ ...form, question: e.target.value })}
               placeholder="Type your question here — the more detail, the faster we can help."
-              className="w-full border-4 border-black bg-white dark:bg-[#09090b] text-black dark:text-white p-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+              className="w-full border-4 border-black bg-white dark:bg-neo-surface text-black dark:text-white p-4 text-lg font-bold placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
             />
           </div>
 
@@ -260,7 +260,7 @@ export default function AskForm() {
             </p>
             <a
               href="/faqs"
-              className="mt-4 inline-block border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white px-4 py-2 text-sm font-black uppercase tracking-widest shadow-neo-sm transition-transform duration-100 hover:-translate-y-0.5"
+              className="mt-4 inline-block border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white px-4 py-2 text-sm font-black uppercase tracking-widest shadow-neo-sm transition-transform duration-100 hover:-translate-y-0.5"
             >
               Check the FAQs →
             </a>

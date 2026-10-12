@@ -16,7 +16,7 @@ const CATEGORY_BG: Record<string, string> = {
   Registration: "bg-neo-accent text-black",
   "Passes & Entry": "bg-neo-secondary text-black",
   Events: "bg-neo-muted text-black",
-  Logistics: "bg-white text-black dark:bg-[#121214] dark:text-white",
+  Logistics: "bg-white text-black dark:bg-neo-card dark:text-white",
 };
 
 export default function FaqAccordion() {
@@ -43,14 +43,14 @@ export default function FaqAccordion() {
                 return (
                   <div
                     key={faq.q}
-                    className="border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white shadow-neo transition-all duration-200"
+                    className="border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white shadow-neo transition-all duration-200"
                   >
                     <button
                       type="button"
                       onClick={() => setOpen(isOpen ? null : faq.q)}
                       aria-expanded={isOpen}
                       className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors duration-100 ${
-                        isOpen ? CATEGORY_BG[cat] : "bg-white dark:bg-[#121214] text-black dark:text-white"
+                        isOpen ? CATEGORY_BG[cat] : "bg-white dark:bg-neo-card text-black dark:text-white"
                       }`}
                     >
                       <span className="text-lg font-black uppercase leading-tight tracking-tight md:text-xl">
@@ -65,7 +65,7 @@ export default function FaqAccordion() {
                       />
                     </button>
                     {isOpen && (
-                      <div className="border-t-4 border-black bg-neo-cream dark:bg-[#09090b] text-black dark:text-white px-5 py-4">
+                      <div className="border-t-4 border-black bg-neo-cream dark:bg-neo-surface text-black dark:text-white px-5 py-4">
                         <p className="text-base font-bold leading-relaxed md:text-lg text-black dark:text-zinc-300">
                           {faq.a}
                         </p>

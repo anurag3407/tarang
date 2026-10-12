@@ -44,13 +44,13 @@ import {
 } from "@/lib/map-data";
 
 const CATEGORIES: { id: VenueCategory; label: string; iconColor: string }[] = [
-  { id: "all", label: "All Grounds", iconColor: "bg-white" },
+  { id: "all", label: "All Grounds", iconColor: "bg-bone" },
   { id: "stages", label: "Prime Stages", iconColor: "bg-neo-secondary" },
-  { id: "sports", label: "Sports Complex", iconColor: "bg-emerald-300" },
+  { id: "sports", label: "Sports Complex", iconColor: "bg-[#17784a]" },
   { id: "academic", label: "Scientific society & Academics", iconColor: "bg-neo-muted" },
-  { id: "arts", label: "Arts & Informals", iconColor: "bg-amber-300" },
-  { id: "amenities", label: "CR Desk & Amenities", iconColor: "bg-sky-300" },
-  { id: "hostels", label: "Hostel Zone", iconColor: "bg-pink-300" },
+  { id: "arts", label: "Arts & Informals", iconColor: "bg-[#c9862a]" },
+  { id: "amenities", label: "CR Desk & Amenities", iconColor: "bg-[#3b6f8f]" },
+  { id: "hostels", label: "Hostel Zone", iconColor: "bg-[#a3445a]" },
 ];
 
 export default function VenueMap() {
@@ -445,7 +445,7 @@ export default function VenueMap() {
       <div className="relative flex flex-1 flex-col lg:flex-row overflow-hidden min-h-[520px]">
         {/* SVG Canvas Area */}
         <div
-          className="relative flex-1 cursor-grab overflow-hidden bg-[#faf8f0] select-none active:cursor-grabbing"
+          className="relative flex-1 cursor-grab overflow-hidden bg-neo-surface select-none active:cursor-grabbing"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -532,7 +532,7 @@ export default function VenueMap() {
                   <feDropShadow dx="8" dy="8" stdDeviation="0" floodColor="#000000" />
                 </filter>
                 <filter id="active-pulse">
-                  <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#ff6b6b" />
+                  <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#d4190f" />
                 </filter>
               </defs>
 
@@ -798,7 +798,7 @@ export default function VenueMap() {
                   x="247"
                   y="354"
                   textAnchor="middle"
-                  fill="#ffd93d"
+                  fill="#f4eac8"
                   fontSize="10"
                   fontWeight="900"
                   letterSpacing="1"
@@ -964,14 +964,14 @@ export default function VenueMap() {
                         ? "M 910 290 L 790 290 L 790 380"
                         : "M 90 350 L 420 350 L 420 390"
                     }
-                    stroke="#ff6b6b"
+                    stroke="#d4190f"
                     strokeWidth="8"
                     strokeLinecap="round"
                     strokeDasharray="10 6"
                     fill="none"
                   />
                   {/* Glowing Start Beacon */}
-                  <circle cx="90" cy="350" r="14" fill="#ff6b6b" opacity="0.75" />
+                  <circle cx="90" cy="350" r="14" fill="#d4190f" opacity="0.75" />
                   <circle cx="90" cy="350" r="7" fill="#ffffff" stroke="#000" strokeWidth="2" />
                 </g>
               )}
@@ -1093,7 +1093,7 @@ export default function VenueMap() {
                           cx={building.x + building.width / 2}
                           cy={building.y - 12}
                           r="10"
-                          fill="#ff6b6b"
+                          fill="#d4190f"
                           stroke="#000000"
                           strokeWidth="2"
                         />
@@ -1126,7 +1126,7 @@ export default function VenueMap() {
                       width="44"
                       height="28"
                       rx="4"
-                      fill={isSelected ? "#ff6b6b" : "#000000"}
+                      fill={isSelected ? "#d4190f" : "#000000"}
                       stroke="#ffffff"
                       strokeWidth="2"
                       filter="url(#neo-shadow)"

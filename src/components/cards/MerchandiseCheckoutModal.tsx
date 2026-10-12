@@ -247,7 +247,7 @@ export function MerchandiseCheckoutModal({
           contact: recipientPhone,
         },
         theme: {
-          color: "#FFDE59",
+          color: "#f4eac8",
         },
         handler: async (response: RazorpayResponse) => {
           setPhase("verifying");
@@ -298,12 +298,12 @@ export function MerchandiseCheckoutModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 sm:p-6 backdrop-blur-sm animate-in fade-in overflow-y-auto">
-      <div className="relative my-auto w-full max-w-4xl border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white shadow-neo-xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="relative my-auto w-full max-w-4xl border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white shadow-neo-xl overflow-hidden max-h-[92vh] flex flex-col">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 border-2 border-black bg-white dark:bg-[#121214] p-1 text-black dark:text-white shadow-neo-sm hover:bg-neo-accent transition-colors"
+          className="absolute right-4 top-4 z-20 border-2 border-black bg-white dark:bg-neo-card p-1 text-black dark:text-white shadow-neo-sm hover:bg-neo-accent transition-colors"
           aria-label="Close modal"
         >
           <X className="h-5 w-5" />
@@ -329,7 +329,7 @@ export function MerchandiseCheckoutModal({
               </p>
             </div>
 
-            <div className="border-4 border-black bg-neo-cream dark:bg-[#0c0c0e] p-6 max-w-md mx-auto text-left space-y-3">
+            <div className="border-4 border-black bg-neo-cream dark:bg-neo-surface p-6 max-w-md mx-auto text-left space-y-3">
               <div className="flex justify-between items-center border-b-2 border-black/20 pb-2">
                 <span className="text-xs font-black uppercase text-black/60 dark:text-zinc-500">Order Code</span>
                 <span className="font-mono text-sm font-black text-black dark:text-white">{confirmedOrderCode}</span>
@@ -390,9 +390,9 @@ export function MerchandiseCheckoutModal({
           /* PRODUCT DETAILS & CHECKOUT FORM */
           <div className="grid grid-cols-1 md:grid-cols-12 overflow-y-auto">
             {/* Left: Multi-Image Showcase (4-5 Images) */}
-            <div className="md:col-span-5 border-b-4 md:border-b-0 md:border-r-4 border-black bg-neo-cream dark:bg-[#0c0c0e] p-5 flex flex-col justify-between">
+            <div className="md:col-span-5 border-b-4 md:border-b-0 md:border-r-4 border-black bg-neo-cream dark:bg-neo-surface p-5 flex flex-col justify-between">
               <div>
-                <div className="relative aspect-square w-full overflow-hidden border-4 border-black bg-white dark:bg-[#121214] shadow-neo-sm">
+                <div className="relative aspect-square w-full overflow-hidden border-4 border-black bg-white dark:bg-neo-card shadow-neo-sm">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={images[activeImageIndex]}
@@ -404,14 +404,14 @@ export function MerchandiseCheckoutModal({
                       <button
                         type="button"
                         onClick={() => setActiveImageIndex((p) => (p - 1 + images.length) % images.length)}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-[#121214]/90 p-1 shadow-neo-xs hover:bg-neo-accent"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-neo-card/90 p-1 shadow-neo-xs hover:bg-neo-accent"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveImageIndex((p) => (p + 1) % images.length)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-[#121214]/90 p-1 shadow-neo-xs hover:bg-neo-accent"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 border-2 border-black bg-white/90 dark:bg-neo-card/90 p-1 shadow-neo-xs hover:bg-neo-accent"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
@@ -439,7 +439,7 @@ export function MerchandiseCheckoutModal({
                 )}
               </div>
 
-              <div className="mt-4 border-2 border-black bg-white dark:bg-[#121214] p-3 space-y-1">
+              <div className="mt-4 border-2 border-black bg-white dark:bg-neo-card p-3 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-black uppercase text-black dark:text-white">
                   <ShieldCheck className="h-4 w-4 text-black dark:text-neo-secondary" />
                   <span>Official Festival Drop</span>
@@ -506,7 +506,7 @@ export function MerchandiseCheckoutModal({
                             className={`border-2 border-black px-2.5 py-1 text-xs font-black uppercase transition-all ${
                               selectedSize === size
                                 ? "bg-black text-white dark:bg-white dark:text-black shadow-neo-xs"
-                                : "bg-white text-black dark:bg-[#121214] dark:text-white hover:bg-neo-cream"
+                                : "bg-white text-black dark:bg-neo-card dark:text-white hover:bg-neo-cream"
                             }`}
                           >
                             {size}
@@ -524,7 +524,7 @@ export function MerchandiseCheckoutModal({
                       <button
                         type="button"
                         onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                        className="flex h-8 w-8 items-center justify-center border-2 border-black bg-neo-cream dark:bg-[#0c0c0e] text-black dark:text-white font-black shadow-neo-xs hover:bg-white dark:hover:bg-[#27272a]"
+                        className="flex h-8 w-8 items-center justify-center border-2 border-black bg-neo-cream dark:bg-neo-surface text-black dark:text-white font-black shadow-neo-xs hover:bg-white dark:hover:bg-neo-muted"
                       >
                         -
                       </button>
@@ -532,7 +532,7 @@ export function MerchandiseCheckoutModal({
                       <button
                         type="button"
                         onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-                        className="flex h-8 w-8 items-center justify-center border-2 border-black bg-neo-cream dark:bg-[#0c0c0e] text-black dark:text-white font-black shadow-neo-xs hover:bg-white dark:hover:bg-[#27272a]"
+                        className="flex h-8 w-8 items-center justify-center border-2 border-black bg-neo-cream dark:bg-neo-surface text-black dark:text-white font-black shadow-neo-xs hover:bg-white dark:hover:bg-neo-muted"
                       >
                         +
                       </button>
@@ -541,7 +541,7 @@ export function MerchandiseCheckoutModal({
                 </div>
 
                 {/* Fulfillment Notice: Campus Pickup Only */}
-                <div className="flex items-start gap-3 border-2 border-black bg-neo-cream dark:bg-[#0c0c0e] p-3 shadow-neo-xs">
+                <div className="flex items-start gap-3 border-2 border-black bg-neo-cream dark:bg-neo-surface p-3 shadow-neo-xs">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center border-2 border-black bg-neo-accent">
                     <MapPin className="h-4 w-4 text-black" />
                   </div>
@@ -567,7 +567,7 @@ export function MerchandiseCheckoutModal({
                       placeholder="Full Name *"
                       value={recipientName}
                       onChange={(e) => setRecipientName(e.target.value)}
-                      className="border-2 border-black bg-white dark:bg-[#09090b] px-3 py-1.5 text-xs font-bold text-black dark:text-white outline-none focus:bg-neo-cream dark:focus:bg-[#18181b]"
+                      className="border-2 border-black bg-white dark:bg-neo-surface px-3 py-1.5 text-xs font-bold text-black dark:text-white outline-none focus:bg-neo-cream dark:focus:bg-neo-surface"
                     />
                     <input
                       required
@@ -575,7 +575,7 @@ export function MerchandiseCheckoutModal({
                       placeholder="Phone Number *"
                       value={recipientPhone}
                       onChange={(e) => setRecipientPhone(e.target.value)}
-                      className="border-2 border-black bg-white dark:bg-[#09090b] px-3 py-1.5 text-xs font-bold text-black dark:text-white outline-none focus:bg-neo-cream dark:focus:bg-[#18181b]"
+                      className="border-2 border-black bg-white dark:bg-neo-surface px-3 py-1.5 text-xs font-bold text-black dark:text-white outline-none focus:bg-neo-cream dark:focus:bg-neo-surface"
                     />
                   </div>
                   <input
@@ -584,7 +584,7 @@ export function MerchandiseCheckoutModal({
                     placeholder="Email Address *"
                     value={recipientEmail}
                     onChange={(e) => setRecipientEmail(e.target.value)}
-                    className="w-full border-2 border-black bg-white dark:bg-[#09090b] px-3 py-1.5 text-xs font-bold text-black dark:text-white outline-none focus:bg-neo-cream dark:focus:bg-[#18181b]"
+                    className="w-full border-2 border-black bg-white dark:bg-neo-surface px-3 py-1.5 text-xs font-bold text-black dark:text-white outline-none focus:bg-neo-cream dark:focus:bg-neo-surface"
                   />
                 </div>
 

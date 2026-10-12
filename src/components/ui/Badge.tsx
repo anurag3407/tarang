@@ -2,13 +2,17 @@ import type { ReactNode } from "react";
 
 type Variant = "accent" | "secondary" | "muted" | "white" | "black";
 
+/** Slug-line chips. Accent is poster red, secondary a cream sticker, the rest sit on ink. */
 const styles: Record<Variant, string> = {
-  accent: "bg-neo-accent text-black dark:text-black",
-  secondary: "bg-neo-secondary text-black dark:text-black",
-  muted: "bg-neo-muted text-black dark:text-black",
-  white: "bg-white text-black dark:bg-[#121214] dark:text-white",
-  black: "bg-black text-white dark:bg-[#0c0c0e] dark:text-white",
+  accent: "border-[#d4190f] bg-[#d4190f] text-bone",
+  secondary: "border-bone bg-bone text-ink",
+  muted: "border-bone/25 bg-ink-3 text-bone",
+  white: "border-bone/40 bg-ink-2 text-bone",
+  black: "border-bone bg-ink text-bone",
 };
+
+const base =
+  "keep-border-black inline-flex items-center gap-1.5 border px-3 py-1 font-[family-name:var(--font-mono)] text-[0.68rem] font-medium uppercase tracking-[0.16em]";
 
 export function Badge({
   variant = "secondary",
@@ -19,13 +23,7 @@ export function Badge({
   className?: string;
   children: ReactNode;
 }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1 border-2 border-black px-3 py-1 font-black text-xs uppercase tracking-widest shadow-neo-sm ${styles[variant]} ${className}`}
-    >
-      {children}
-    </span>
-  );
+  return <span className={`${base} ${styles[variant]} ${className}`}>{children}</span>;
 }
 
 export function PillBadge({
@@ -37,11 +35,5 @@ export function PillBadge({
   className?: string;
   children: ReactNode;
 }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border-2 border-black px-4 py-1 font-black text-xs uppercase tracking-widest shadow-neo-sm ${styles[variant]} ${className}`}
-    >
-      {children}
-    </span>
-  );
+  return <span className={`${base} rounded-full px-4 ${styles[variant]} ${className}`}>{children}</span>;
 }

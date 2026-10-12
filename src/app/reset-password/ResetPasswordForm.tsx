@@ -164,7 +164,7 @@ export default function ResetPasswordForm() {
   if (checkingSession) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <div className="border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-8 shadow-neo-lg">
+        <div className="border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-8 shadow-neo-lg">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-black dark:border-white border-t-transparent dark:border-t-transparent" />
           <p className="text-sm font-black uppercase tracking-wider">
             Verifying security session…
@@ -177,7 +177,7 @@ export default function ResetPasswordForm() {
   if (!hasSession) {
     return (
       <div className="mx-auto max-w-md px-4 py-16">
-        <div className="border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-6 shadow-neo-lg sm:p-8">
+        <div className="border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-6 shadow-neo-lg sm:p-8">
           <div className="mb-4 inline-flex items-center gap-2 border-2 border-black bg-neo-accent px-2.5 py-1 text-xs font-black uppercase text-black shadow-neo-xs">
             <AlertTriangle className="h-4 w-4" />
             Session Required
@@ -206,7 +206,7 @@ export default function ResetPasswordForm() {
             </Link>
             <Link
               href="/admin/login"
-              className="block w-full border-2 border-black bg-neo-muted dark:bg-[#1e1e24] py-2 text-center text-xs font-black uppercase tracking-wider text-black dark:text-white transition-colors hover:bg-black hover:text-white"
+              className="block w-full border-2 border-black bg-neo-muted dark:bg-neo-card py-2 text-center text-xs font-black uppercase tracking-wider text-black dark:text-white transition-colors hover:bg-black hover:text-white"
             >
               Staff &amp; Admin Sign In
             </Link>
@@ -218,7 +218,7 @@ export default function ResetPasswordForm() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
-      <div className="border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-6 shadow-neo-lg sm:p-8">
+      <div className="border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-6 shadow-neo-lg sm:p-8">
         <div className="mb-3 inline-flex items-center gap-2 border-2 border-black bg-neo-secondary px-2.5 py-1 text-xs font-black uppercase text-black shadow-neo-xs">
           <KeyRound className="h-4 w-4" />
           Secure Credential Update
@@ -249,7 +249,7 @@ export default function ResetPasswordForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={status === "loading" || status === "success"}
-                className="w-full border-4 border-black bg-neo-cream dark:bg-[#09090b] text-black dark:text-white px-3 py-2 pr-10 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                className="w-full border-4 border-black bg-neo-cream dark:bg-neo-surface text-black dark:text-white px-3 py-2 pr-10 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                 placeholder="••••••••"
               />
               <button
@@ -272,7 +272,7 @@ export default function ResetPasswordForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={status === "loading" || status === "success"}
-              className="mt-1 w-full border-4 border-black bg-neo-cream dark:bg-[#09090b] text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              className="mt-1 w-full border-4 border-black bg-neo-cream dark:bg-neo-surface text-black dark:text-white px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
               placeholder="••••••••"
             />
           </label>

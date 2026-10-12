@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import { FEST } from "@/lib/data";
 import { createClient } from "@/lib/supabase/browser";
 import type { User } from "@supabase/supabase-js";
-import ThemeToggle from "@/components/theme/ThemeToggle";
 import TarangWordmark from "@/components/tarang/Wordmark";
 
 const PRIMARY_LINKS = [
@@ -169,7 +168,6 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-5 lg:flex">
-          {!isHome && <ThemeToggle variant="studio" />}
           {user ? (
             <Link href="/dashboard" className="t-label t-link text-bone/70 hover:text-bone">
               Dashboard
@@ -259,10 +257,6 @@ export default function Navbar() {
               Register / Sign in
             </Link>
           )}
-          <div className="mt-4 flex items-center justify-between border-t border-bone/10 pt-5">
-            <span className="t-label text-bone/50">Appearance</span>
-            <ThemeToggle variant="studio" />
-          </div>
         </div>
       </div>
     </header>

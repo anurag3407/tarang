@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AuthStage } from "@/components/ui/AuthStage";
 import { Suspense } from "react";
 import ResetPasswordForm from "./ResetPasswordForm";
 
@@ -26,8 +27,10 @@ function ResetPasswordSkeleton() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<ResetPasswordSkeleton />}>
-      <ResetPasswordForm />
-    </Suspense>
+    <AuthStage>
+      <Suspense fallback={<ResetPasswordSkeleton />}>
+        <ResetPasswordForm />
+      </Suspense>
+    </AuthStage>
   );
 }

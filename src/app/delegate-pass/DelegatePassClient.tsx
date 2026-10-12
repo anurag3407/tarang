@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -296,7 +297,7 @@ export default function DelegatePassClient({
         prefill: {
           name: userProfile?.displayName ?? "",
         },
-        theme: { color: "#ffde59" },
+        theme: { color: "#d4190f" },
         handler: async (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;
@@ -413,8 +414,10 @@ export default function DelegatePassClient({
   return (
     <div className="min-h-screen bg-neo-cream pb-20">
       {/* Hero Header */}
-      <section className="relative overflow-hidden border-b-8 border-black bg-black py-16 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(#ffde59_1px,transparent_1px)] [background-size:24px_24px] opacity-15" />
+      <section className="t-halftone relative isolate overflow-hidden border-b-[3px] border-ink pb-16 pt-28 text-white md:pt-36">
+        <div aria-hidden className="kit-hands pointer-events-none absolute -right-[18vw] -top-[10%] w-[min(92vw,680px)] md:-right-[4vw] md:-top-[30%]">
+          <Image src="/tarang/hands-top.webp" alt="" width={1407} height={833} loading="eager" sizes="(max-width: 768px) 92vw, 680px" className="h-auto w-full rotate-[-8deg]" />
+        </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -435,8 +438,10 @@ export default function DelegatePassClient({
           </div>
 
           <div className="mt-8 max-w-3xl">
-            <h1 className="text-5xl font-black uppercase leading-[0.9] tracking-tighter sm:text-6xl md:text-7xl">
-              All-Access <span className="text-neo-secondary">Delegate Card</span> &amp; Concert Card
+            <h1 className="t-display text-[clamp(2.8rem,7.5vw,6.5rem)] leading-[0.9]">
+              <span className="t-cut">All-Access</span>{" "}
+              <span className="text-bone [text-shadow:5px_5px_0_var(--color-ink)]">Delegate Card</span>{" "}
+              <span className="t-cut">&amp; Concert Card</span>
             </h1>
             <p className="mt-4 text-lg font-bold text-white/80 sm:text-xl">
               Experience the pinnacle of TARANG 2026. Full 5-day festival access, all star pro shows,
@@ -480,7 +485,7 @@ export default function DelegatePassClient({
           
           {/* Left Column: Official Perks Showcase (7 Cols) */}
           <div className="space-y-6 lg:col-span-7">
-            <div className="border-8 border-black bg-[#121214] text-white p-6 sm:p-8 shadow-neo-xl relative overflow-hidden">
+            <div className="border-8 border-black bg-neo-card text-white p-6 sm:p-8 shadow-neo-xl relative overflow-hidden">
               {/* Halftone grid & glow effects */}
               <div className="bg-grid-white absolute inset-0 opacity-10" aria-hidden />
               <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-neo-accent/20 blur-3xl pointer-events-none" />

@@ -127,7 +127,7 @@ export default function TechTeamPage() {
             {TECH_TEAM.map((member) => (
               <article
                 key={member.name}
-                className="group relative flex flex-col justify-between border-4 border-black dark:border-white/20 bg-white dark:bg-[#121214] p-6 shadow-neo transition-all duration-200 hover:-translate-y-1 hover:shadow-neo-lg"
+                className="group relative flex flex-col justify-between border-4 border-black dark:border-white/20 bg-white dark:bg-neo-card p-6 shadow-neo transition-all duration-200 hover:-translate-y-1 hover:shadow-neo-lg"
               >
                 <div>
                   {/* Top Badge & Icon */}
@@ -141,7 +141,7 @@ export default function TechTeamPage() {
                     >
                       {member.badge}
                     </span>
-                    <div className="flex h-8 w-8 items-center justify-center border-2 border-black dark:border-white bg-black dark:bg-[#1f1f23] text-white">
+                    <div className="flex h-8 w-8 items-center justify-center border-2 border-black dark:border-white bg-black dark:bg-neo-card text-white">
                       {member.icon === "code" ? (
                         <Code2 className="h-4 w-4 text-neo-secondary" />
                       ) : (
@@ -155,7 +155,7 @@ export default function TechTeamPage() {
                     <h3 className="text-2xl font-black uppercase tracking-tight text-black dark:text-white">
                       {member.name}
                     </h3>
-                    <p className="mt-1 inline-block border border-black dark:border-white/30 bg-neo-cream dark:bg-[#1a1a1e] px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-black dark:text-zinc-300">
+                    <p className="mt-1 inline-block border border-black dark:border-white/30 bg-neo-cream dark:bg-neo-card px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-black dark:text-zinc-300">
                       {member.role}
                     </p>
                     {member.bio && (
@@ -173,7 +173,7 @@ export default function TechTeamPage() {
                     href={member.linkedin.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between border-2 border-black dark:border-white/40 bg-white dark:bg-[#18181b] px-3 py-2 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs transition-all duration-100 hover:bg-[#0077b5] hover:text-white hover:border-black dark:hover:bg-[#0077b5] dark:hover:text-white dark:hover:border-white"
+                    className="flex items-center justify-between border-2 border-black dark:border-white/40 bg-white dark:bg-neo-surface px-3 py-2 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs transition-all duration-100 hover:bg-[#0077b5] hover:text-white hover:border-black dark:hover:bg-[#0077b5] dark:hover:text-white dark:hover:border-white"
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <LinkedinIcon className="h-4 w-4 shrink-0 text-[#0077b5] group-hover:text-white" />
@@ -188,7 +188,7 @@ export default function TechTeamPage() {
                       href={member.instagram.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between border-2 border-black dark:border-white/40 bg-white dark:bg-[#18181b] px-3 py-2 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs transition-all duration-100 hover:bg-gradient-to-r hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:text-white hover:border-black dark:hover:from-[#f09433] dark:hover:via-[#dc2743] dark:hover:to-[#bc1888] dark:hover:text-white dark:hover:border-white"
+                      className="flex items-center justify-between border-2 border-black dark:border-white/40 bg-white dark:bg-neo-surface px-3 py-2 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs transition-all duration-100 hover:bg-gradient-to-r hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:text-white hover:border-black dark:hover:from-[#f09433] dark:hover:via-[#dc2743] dark:hover:to-[#bc1888] dark:hover:text-white dark:hover:border-white"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <InstagramIcon className="h-4 w-4 shrink-0 text-[#e1306c] group-hover:text-white" />
@@ -203,7 +203,7 @@ export default function TechTeamPage() {
           </div>
 
           {/* Bottom Actions Banner */}
-          <div className="mt-14 border-4 border-black dark:border-white/20 bg-white dark:bg-[#121214] p-6 text-center shadow-neo sm:p-8 max-w-3xl mx-auto">
+          <div className="mt-14 border-4 border-black dark:border-white/20 bg-white dark:bg-neo-card p-6 text-center shadow-neo sm:p-8 max-w-3xl mx-auto">
             <p className="text-sm font-black uppercase tracking-widest text-black dark:text-white">
               Platform Engineering · TARANG 2026 · AIIMS New Delhi
             </p>

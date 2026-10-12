@@ -8,7 +8,7 @@ const COLOR_BG: Record<string, string> = {
   accent: "bg-neo-accent text-black",
   secondary: "bg-neo-secondary text-black",
   muted: "bg-neo-muted text-black",
-  white: "bg-white text-black dark:bg-[#121214] dark:text-white",
+  white: "bg-white text-black dark:bg-neo-card dark:text-white",
 };
 
 export function ProShowCard({ event }: { event: EventRead }) {
@@ -19,7 +19,7 @@ export function ProShowCard({ event }: { event: EventRead }) {
       : `${formatPaise(event.amountPaise)} entry fee`;
 
   return (
-    <article className="relative flex h-full flex-col border-4 border-black bg-black text-white shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg">
+    <article className="kit-rise relative flex h-full flex-col border-4 border-black bg-black text-white shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg">
       {/* Night badge */}
       <Badge
         variant="black"

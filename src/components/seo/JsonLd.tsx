@@ -42,8 +42,8 @@ export function FestivalEventJsonLd({ baseUrl }: { baseUrl: string }) {
       }
     },
     "image": [
-      `${baseUrl}/pulse-logo.png`,
-      `${baseUrl}/apple-icon.png`
+      `${baseUrl}/tarang/og.jpg`,
+      `${baseUrl}/icon-512.png`
     ],
     "organizer": {
       "@type": "Organization",
@@ -81,7 +81,7 @@ export function OrganizationJsonLd({ baseUrl }: { baseUrl: string }) {
     "@type": "EducationalOrganization",
     "name": "AIIMS Student Association (ASA) — TARANG",
     "url": baseUrl,
-    "logo": `${baseUrl}/pulse-logo.png`,
+    "logo": `${baseUrl}/icon-512.png`,
     "sameAs": [
       FEST.instagram
     ],

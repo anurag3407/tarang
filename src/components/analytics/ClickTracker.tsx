@@ -42,7 +42,7 @@ export function ClickTracker() {
 
   if (clicks === null) {
     return (
-      <div className="inline-flex items-center gap-2 border-2 border-black dark:border-white/30 bg-white dark:bg-[#18181b] px-3 py-1 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs opacity-75">
+      <div className="inline-flex items-center gap-2 border-2 border-black dark:border-white/30 bg-white dark:bg-neo-surface px-3 py-1 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs opacity-75">
         <span className="h-2 w-2 rounded-full bg-zinc-400" />
         <span>Tracking...</span>
       </div>
@@ -51,7 +51,7 @@ export function ClickTracker() {
 
   return (
     <div
-      className="inline-flex items-center gap-2 border-2 border-black dark:border-white/40 bg-white dark:bg-[#18181b] px-3 py-1 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs transition-transform hover:-translate-y-0.5"
+      className="inline-flex items-center gap-2 border-2 border-black dark:border-white/40 bg-white dark:bg-neo-surface px-3 py-1 text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-xs transition-transform hover:-translate-y-0.5"
       title="Total verified website clicks & visits"
     >
       <span className="relative flex h-2 w-2">

@@ -12,7 +12,7 @@ const COLOR_BG: Record<string, string> = {
   accent: "bg-neo-accent text-black",
   secondary: "bg-neo-secondary text-black",
   muted: "bg-neo-muted text-black",
-  white: "bg-white text-black dark:bg-[#121214] dark:text-white",
+  white: "bg-white text-black dark:bg-neo-card dark:text-white",
 };
 
 export default function EventsExplorer({
@@ -62,7 +62,7 @@ export default function EventsExplorer({
             className={`border-4 border-black px-4 py-2 text-sm font-black uppercase tracking-widest shadow-neo-sm transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer ${
               active === "all"
                 ? "bg-black text-white"
-                : "bg-white text-black dark:bg-[#121214] dark:text-white hover:-translate-y-0.5"
+                : "bg-white text-black dark:bg-neo-card dark:text-white hover:-translate-y-0.5"
             }`}
           >
             All ({events.length})
@@ -99,7 +99,7 @@ export default function EventsExplorer({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search events…"
             aria-label="Search events"
-            className="h-14 w-full border-4 border-black bg-white dark:bg-[#09090b] pl-14 pr-4 text-lg font-bold text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-[#18181b] focus-visible:shadow-neo-sm focus-visible:outline-none"
+            className="h-14 w-full border-4 border-black bg-white dark:bg-neo-surface pl-14 pr-4 text-lg font-bold text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-zinc-500 focus-visible:bg-neo-secondary dark:focus-visible:bg-neo-surface focus-visible:shadow-neo-sm focus-visible:outline-none"
           />
         </div>
       </div>

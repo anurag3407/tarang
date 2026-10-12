@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Space_Grotesk, Bungee, Yatra_One, Inter_Tight, Geist_Mono } from "next/font/google";
+import { Bungee, Yatra_One, Inter_Tight, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -12,12 +12,6 @@ const baseUrl =
   process.env.PUBLIC_SITE_URL ||
   process.env.APP_BASE_URL ||
   "https://pulseasa.org";
-
-const grotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-grotesk",
-  display: "swap",
-});
 
 // Blocky cut-out display face — closest match to the poster lettering.
 const display = Bungee({
@@ -88,7 +82,7 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/pulse-logo.png", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon-32x32.png",
     apple: [
@@ -105,9 +99,9 @@ export const metadata: Metadata = {
       "South Asia's largest medical college cultural, literary, and sports festival — five days of pro shows, 250+ competitions, and 10k+ footfall at AIIMS New Delhi. 17–21 September 2026.",
     images: [
       {
-        url: "/pulse-logo.png",
-        width: 1062,
-        height: 1062,
+        url: "/tarang/og.jpg",
+        width: 1200,
+        height: 630,
         alt: "Tarang ’26",
       },
     ],
@@ -117,32 +111,17 @@ export const metadata: Metadata = {
     title: "Tarang ’26 — Annual Cultural Fest | AIIMS New Delhi",
     description:
       "South Asia's largest medical college cultural, literary, and sports fest at AIIMS New Delhi. 17–21 September 2026.",
-    images: ["/pulse-logo.png"],
+    images: ["/tarang/og.jpg"],
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
   },
 };
 
-const THEME_SCRIPT = `
-(function() {
-  try {
-    var stored = localStorage.getItem('pulse-theme');
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (stored === 'dark' || (!stored && prefersDark)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  } catch (e) {}
-})();
-`;
-
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${grotesk.variable} ${display.variable} ${deva.variable} ${body.variable} ${mono.variable} h-full`}>
+    <html lang="en" suppressHydrationWarning className={`dark ${display.variable} ${deva.variable} ${body.variable} ${mono.variable} h-full`}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <FestivalEventJsonLd baseUrl={baseUrl} />
         <OrganizationJsonLd baseUrl={baseUrl} />
         <Script
@@ -151,7 +130,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           id="razorpay-sdk"
         />
       </head>
-      <body className="min-h-full flex flex-col antialiased">
+      <body className="t-grain min-h-full flex flex-col antialiased">
         <ThemeProvider>
           <Navbar />
           <main className="flex-1">{children}</main>

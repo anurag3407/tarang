@@ -42,7 +42,7 @@ const AIIMS_STATS = [
     icon: GraduationCap,
     stat: "1956",
     label: "Established as India's Apex Institute",
-    accent: "bg-white text-black dark:bg-[#121214] dark:text-white",
+    accent: "bg-white text-black dark:bg-neo-card dark:text-white",
   },
   {
     icon: Landmark,
@@ -106,7 +106,7 @@ export default function AboutPage() {
                 <p>
                   With <strong>42 teaching and research disciplines</strong>, it is home to some of the country’s brightest medical minds. For generations of medical aspirants, AIIMS has been far more than a college — <strong>it has been a dream</strong>.
                 </p>
-                <p className="border-l-4 border-neo-accent bg-white dark:bg-[#121214] text-black dark:text-white p-4 shadow-neo-sm">
+                <p className="border-l-4 border-neo-accent bg-white dark:bg-neo-card text-black dark:text-white p-4 shadow-neo-sm">
                   And once a year, that dream comes alive as <strong>TARANG</strong>, bringing together the brightest medical minds from across the country.
                   <br />
                   <span className="mt-1 block text-sm font-black uppercase tracking-wider text-neo-accent">
@@ -134,7 +134,7 @@ export default function AboutPage() {
                     key={idx}
                     className={`border-4 border-black p-6 shadow-neo transition-transform hover:-translate-y-1 ${item.accent}`}
                   >
-                    <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-white dark:bg-[#121214] shadow-neo-xs">
+                    <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-white dark:bg-neo-card shadow-neo-xs">
                       <Icon className="h-6 w-6 text-black dark:text-white" strokeWidth={2.5} />
                     </div>
                     <p className="mt-4 font-mono text-3xl font-black tracking-tight text-black dark:text-white">
@@ -152,29 +152,22 @@ export default function AboutPage() {
       </section>
 
       {/* Section 2: About TARANG & ASA */}
-      <section className="border-b-8 border-black bg-neo-secondary dark:bg-[#000000] py-16 sm:py-24 transition-colors">
+      <section className="border-b-8 border-black bg-neo-secondary dark:bg-neo-cream py-16 sm:py-24 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid gap-12 lg:grid-cols-12 items-center">
             {/* Right / Top Card on Mobile */}
             <div className="lg:col-span-5 order-2 lg:order-1">
-              <div className="border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-8 shadow-neo-xl">
+              <div className="border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-8 shadow-neo-xl">
                 <div className="flex items-center gap-4">
-                  <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden border-4 border-black bg-neo-secondary p-1 shadow-neo-xs">
-                    <Image
-                      src="/pulse-logo.png"
-                      alt="TARANG Mascot Logo"
-                      width={56}
-                      height={56}
-                      unoptimized
-                      className="h-full w-full object-contain"
-                    />
+                  <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[4px] border-[3px] border-black shadow-neo-xs">
+                    <Image src="/tarang/mark.png" alt="TARANG mark" width={64} height={64} className="h-full w-full object-cover" />
                   </div>
                   <div>
                     <span className="border-2 border-black bg-neo-accent px-2 py-0.5 text-[10px] font-black uppercase text-black shadow-neo-xs">
                       Official Symbol
                     </span>
                     <h3 className="text-2xl font-black uppercase tracking-tight text-black dark:text-white">
-                      The Tarang Fox
+                      The Tarang Mudra
                     </h3>
                   </div>
                 </div>
@@ -201,7 +194,7 @@ export default function AboutPage() {
             {/* Left Story Text */}
             <div className="lg:col-span-7 order-1 lg:order-2 space-y-6">
               <div>
-                <span className="border-2 border-black bg-white dark:bg-[#121214] text-black dark:text-white px-3 py-1 text-xs font-black uppercase tracking-wider">
+                <span className="border-2 border-black bg-white dark:bg-neo-card text-black dark:text-white px-3 py-1 text-xs font-black uppercase tracking-wider">
                   The Story of TARANG
                 </span>
                 <h2 className="mt-3 text-4xl font-black uppercase tracking-tight sm:text-5xl text-black dark:text-white">
@@ -229,7 +222,7 @@ export default function AboutPage() {
       </section>
 
       {/* Section 3: Tarang Key Venues */}
-      <section className="border-b-8 border-black bg-neo-muted dark:bg-[#000000] py-16 sm:py-24 transition-colors">
+      <section className="border-b-8 border-black bg-neo-muted dark:bg-neo-cream py-16 sm:py-24 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b-4 border-black pb-6">
             <div>
@@ -255,7 +248,7 @@ export default function AboutPage() {
             {PULSE_VENUES.map((venue, idx) => (
               <div
                 key={venue.id}
-                className={`flex flex-col justify-between border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-6 shadow-neo transition-all duration-200 hover:-translate-y-1.5 hover:shadow-neo-lg ${
+                className={`flex flex-col justify-between border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white p-6 shadow-neo transition-all duration-200 hover:-translate-y-1.5 hover:shadow-neo-lg ${
                   idx === 0 ? "sm:col-span-2 lg:col-span-2" : ""
                 }`}
               >

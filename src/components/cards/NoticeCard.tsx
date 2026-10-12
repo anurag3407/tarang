@@ -11,7 +11,7 @@ const TAG_VARIANT: Record<NoticeRead["tag"], "accent" | "secondary" | "muted" | 
 
 export function NoticeCard({ notice }: { notice: NoticeRead }) {
   return (
-    <article className="flex gap-4 border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-5 shadow-neo transition-all duration-200 hover:-translate-y-1 hover:shadow-neo-lg">
+    <article className="kit-rise flex gap-4 border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white p-5 shadow-neo transition-all duration-200 hover:-translate-y-1 hover:shadow-neo-lg">
       <div className="flex h-14 w-14 shrink-0 items-center justify-center border-4 border-black bg-neo-secondary text-black shadow-neo-sm">
         <Megaphone className="h-7 w-7 text-black" strokeWidth={3} />
       </div>

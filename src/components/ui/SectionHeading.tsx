@@ -1,56 +1,30 @@
-import { Badge } from "./Badge";
-
+/** Section header for inner pages: a slugline, then the title with its accent as a red cut-out. */
 export function SectionHeading({
   kicker,
   title,
   accent,
   description,
   align = "left",
-  dark = false,
 }: {
   kicker: string;
   title: string;
   accent?: string;
   description?: string;
   align?: "left" | "center";
+  /** Kept for existing callers — every surface is ink now. */
   dark?: boolean;
 }) {
+  const center = align === "center";
   return (
-    <div
-      className={`mb-12 flex flex-col gap-4 md:mb-16 ${
-        align === "center" ? "items-center text-center" : "items-start"
-      }`}
-    >
-      <Badge variant={dark ? "secondary" : "accent"} className="-rotate-2">
+    <div className={`kit-rise mb-12 flex flex-col gap-5 md:mb-16 ${center ? "items-center text-center" : "items-start"}`}>
+      <p className={`t-label flex items-center gap-3 text-bone/55 ${center ? "justify-center" : ""}`}>
+        <span className="inline-block h-px w-8 bg-signal" />
         {kicker}
-      </Badge>
-      <h2
-        className={`text-4xl font-black uppercase leading-[0.9] tracking-tighter sm:text-6xl md:text-7xl ${
-          dark ? "text-white" : "text-black dark:text-white"
-        }`}
-      >
-        {title}{" "}
-        {accent && (
-          <span
-            className={
-              dark
-                ? "text-stroke-white"
-                : "inline-block bg-neo-secondary px-3 text-black dark:text-black font-black"
-            }
-          >
-            {accent}
-          </span>
-        )}
+      </p>
+      <h2 className="t-display text-[clamp(2.4rem,6vw,5.2rem)] leading-[0.9] text-bone">
+        {title} {accent && <span className="t-cut-red">{accent}</span>}
       </h2>
-      {description && (
-        <p
-          className={`max-w-2xl text-lg font-bold leading-snug md:text-xl ${
-            dark ? "text-white" : "text-black dark:text-zinc-300"
-          }`}
-        >
-          {description}
-        </p>
-      )}
+      {description && <p className="max-w-2xl text-lg leading-relaxed text-bone/65 md:text-xl">{description}</p>}
     </div>
   );
 }

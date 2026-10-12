@@ -32,11 +32,11 @@ const MODE_ICON = {
 };
 
 const MODE_ACCENT = {
-  metro: "bg-yellow-300",
-  cab: "bg-blue-300",
-  bus: "bg-emerald-300",
-  train: "bg-purple-300",
-  flight: "bg-cyan-300",
+  metro: "t-halftone",
+  cab: "bg-neo-secondary",
+  bus: "bg-ink-3",
+  train: "bg-[#5c1a10]",
+  flight: "bg-neo-accent",
 };
 
 export default function ReachPage() {
@@ -64,7 +64,7 @@ export default function ReachPage() {
 
       {/* Main Destination Showcase Banner */}
       <section className="relative overflow-hidden border-b-8 border-black bg-black py-10 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(#ff6b6b_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
+        <div className="absolute inset-0 bg-[radial-gradient(#d4190f_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
         <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 sm:px-6 lg:flex-row lg:items-center">
           <div className="flex items-start gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center border-4 border-white bg-neo-accent text-black shadow-neo-white">
@@ -176,7 +176,7 @@ export default function ReachPage() {
               return (
                 <article
                   key={route.id}
-                  className={`flex flex-col border-4 border-black bg-white dark:bg-[#121214] text-black dark:text-white shadow-neo transition-all duration-200 hover:-translate-y-1 hover:shadow-neo-lg ${
+                  className={`flex flex-col border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white shadow-neo transition-all duration-200 hover:-translate-y-1 hover:shadow-neo-lg ${
                     i % 2 === 0 ? "lg:-rotate-0.5" : "lg:rotate-0.5"
                   }`}
                 >
@@ -225,7 +225,7 @@ export default function ReachPage() {
                     </ol>
 
                     {/* Tip Bar */}
-                    <div className="mt-auto flex items-start gap-3 border-4 border-black bg-neo-cream dark:bg-[#0c0c0e] p-4 shadow-neo-xs">
+                    <div className="mt-auto flex items-start gap-3 border-4 border-black bg-neo-cream dark:bg-neo-surface p-4 shadow-neo-xs">
                       <Lightbulb className="h-5 w-5 shrink-0 text-amber-500" strokeWidth={3} />
                       <p className="text-xs font-bold leading-snug text-black/90 dark:text-zinc-300">
                         <strong className="uppercase tracking-wider text-black dark:text-white">Pro Tip: </strong>
@@ -267,7 +267,7 @@ export default function ReachPage() {
           {/* Landmarks & First-Time Visitor Grid */}
           <div className="mt-12 grid gap-8 lg:grid-cols-12">
             {/* Nearby Landmarks */}
-            <div className="lg:col-span-6 border-8 border-black bg-white dark:bg-[#121214] text-black dark:text-white p-8 shadow-neo-lg">
+            <div className="lg:col-span-6 border-8 border-black bg-white dark:bg-neo-card text-black dark:text-white p-8 shadow-neo-lg">
               <div className="flex items-center gap-3 border-b-4 border-black pb-4 mb-6">
                 <Compass className="h-7 w-7 text-black dark:text-white" strokeWidth={2.5} />
                 <h3 className="text-2xl font-black uppercase tracking-tight sm:text-3xl text-black dark:text-white">
@@ -276,7 +276,7 @@ export default function ReachPage() {
               </div>
               <ul className="space-y-3.5">
                 {LANDMARKS.map((landmark, idx) => (
-                  <li key={idx} className="flex items-center gap-3 border-2 border-black bg-neo-cream dark:bg-[#0c0c0e] text-black dark:text-white p-3 shadow-neo-xs font-bold text-sm">
+                  <li key={idx} className="flex items-center gap-3 border-2 border-black bg-neo-cream dark:bg-neo-surface text-black dark:text-white p-3 shadow-neo-xs font-bold text-sm">
                     <ArrowRight className="h-4 w-4 shrink-0 text-neo-accent" strokeWidth={3} />
                     <span>{landmark}</span>
                   </li>
