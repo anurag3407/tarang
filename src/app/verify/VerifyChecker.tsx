@@ -181,7 +181,7 @@ export default function VerifyChecker() {
                       : "Authentic Pass — Revoked / Inactive"}
                   </p>
                   <p className="text-xs font-bold uppercase tracking-wider opacity-80">
-                    Official PULSE 2026 Database Record
+                    Official TARANG 2026 Database Record
                   </p>
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function VerifyChecker() {
                     {result.data.productName}
                   </h3>
                   <p className="text-sm font-bold text-black/70 mt-1">
-                    {result.data.festivalName || "PULSE 2026"} · {result.data.venue || "AIIMS New Delhi"}
+                    {result.data.festivalName || "TARANG 2026"} · {result.data.venue || "AIIMS New Delhi"}
                   </p>
                 </div>
 
@@ -275,7 +275,7 @@ export default function VerifyChecker() {
                   <p className="text-[11px] font-bold text-black/50 mt-1">
                     {result.data.expiresAt
                       ? `Valid through ${formatDateIST(result.data.expiresAt)}`
-                      : "Valid for PULSE 2026 (17–21 Sep 2026)"}
+                      : "Valid for TARANG 2026 (17–21 Sep 2026)"}
                   </p>
                 </div>
 
@@ -364,7 +364,7 @@ export default function VerifyChecker() {
               <span className="border-2 border-black bg-white px-2 py-0.5 font-mono font-black">
                 {result.query}
               </span>{" "}
-              in the official PULSE 2026 database.
+              in the official TARANG 2026 database.
             </p>
 
             <div className="mt-6 border-4 border-black bg-white p-5 space-y-3 text-left">
@@ -381,8 +381,8 @@ export default function VerifyChecker() {
               <div className="border-t-2 border-black/10 pt-3 text-xs font-bold text-black/80 space-y-1.5">
                 <p className="font-black uppercase text-black">Recommended steps:</p>
                 <ul className="list-disc list-inside space-y-1 text-black/70">
-                  <li>Check your confirmation email from PULSE 2026 for the exact pass code.</li>
-                  <li>Log in to your <Link href="/dashboard" className="font-black underline">PULSE Dashboard</Link> to view all passes issued to your account.</li>
+                  <li>Check your confirmation email from TARANG 2026 for the exact pass code.</li>
+                  <li>Log in to your <Link href="/dashboard" className="font-black underline">TARANG Dashboard</Link> to view all passes issued to your account.</li>
                   <li>If you need assistance, visit the Help Desk at the AIIMS Student Centre with your payment receipt.</li>
                 </ul>
               </div>

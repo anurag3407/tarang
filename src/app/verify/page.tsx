@@ -14,7 +14,7 @@ import VerifyChecker from "./VerifyChecker";
 export const metadata: Metadata = {
   title: "Verify Pass",
   description:
-    "Verify your PULSE fest pass or event registration ID before you arrive at the venue.",
+    "Verify your TARANG fest pass or event registration ID before you arrive at the venue.",
 };
 
 export function VerifyPageOriginal() {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Space_Grotesk } from "next/font/google";
+import { Space_Grotesk, Instrument_Serif, Inter_Tight, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -19,24 +19,45 @@ const grotesk = Space_Grotesk({
   display: "swap",
 });
 
+const display = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--nf-display",
+  display: "swap",
+});
+
+const body = Inter_Tight({
+  subsets: ["latin"],
+  variable: "--nf-body",
+  display: "swap",
+});
+
+const mono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--nf-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "PULSE 2026 — Annual Cultural Fest | AIIMS New Delhi",
-    template: "%s | PULSE 2026 — AIIMS New Delhi",
+    default: "Tarang ’26 — Annual Cultural Fest | AIIMS New Delhi",
+    template: "%s | Tarang ’26",
   },
   description:
-    "PULSE 2026 is South Asia's largest medical college cultural, literary, and sports fest at AIIMS New Delhi. Five days of star pro shows, 250+ events, and campus glory from 17–21 September 2026.",
+    "Tarang ’26 is South Asia's largest medical college cultural, literary, and sports fest at AIIMS New Delhi. Five days of star pro shows, 250+ events, and campus glory from 17–21 September 2026.",
   keywords: [
-    "PULSE",
-    "PULSE 2026",
+    "TARANG",
+    "TARANG 2026",
+    "Tarang 26",
     "AIIMS Delhi",
-    "AIIMS Pulse 2026",
+    "AIIMS Tarang 2026",
     "AIIMS cultural fest",
     "college fest New Delhi",
     "medical college fest",
-    "PULSE delegate card",
-    "PULSE BR card",
+    "TARANG delegate card",
+    "TARANG BR card",
     "pro shows AIIMS",
     "AIIMS Student Association",
     "Delhi collegiate fest",
@@ -70,8 +91,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: baseUrl,
-    siteName: "PULSE 2026 — AIIMS New Delhi",
-    title: "PULSE 2026 — Annual Cultural Fest | AIIMS New Delhi",
+    siteName: "Tarang ’26 — AIIMS New Delhi",
+    title: "Tarang ’26 — Annual Cultural Fest | AIIMS New Delhi",
     description:
       "South Asia's largest medical college cultural, literary, and sports festival — five days of pro shows, 250+ competitions, and 10k+ footfall at AIIMS New Delhi. 17–21 September 2026.",
     images: [
@@ -79,13 +100,13 @@ export const metadata: Metadata = {
         url: "/pulse-logo.png",
         width: 1062,
         height: 1062,
-        alt: "PULSE 2026 Mascot Logo",
+        alt: "Tarang ’26",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PULSE 2026 — Annual Cultural Fest | AIIMS New Delhi",
+    title: "Tarang ’26 — Annual Cultural Fest | AIIMS New Delhi",
     description:
       "South Asia's largest medical college cultural, literary, and sports fest at AIIMS New Delhi. 17–21 September 2026.",
     images: ["/pulse-logo.png"],
@@ -111,7 +132,7 @@ const THEME_SCRIPT = `
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${grotesk.variable} h-full`}>
+    <html lang="en" suppressHydrationWarning className={`${grotesk.variable} ${display.variable} ${body.variable} ${mono.variable} h-full`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <FestivalEventJsonLd baseUrl={baseUrl} />

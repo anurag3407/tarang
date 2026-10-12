@@ -226,7 +226,7 @@ export default function CheckoutFlow() {
         order_id: data.razorpayOrderId,
         amount: data.amountPaise,
         currency: data.currency,
-        name: "PULSE 2026",
+        name: "TARANG 2026",
         description: "Base Delegate Pass",
         prefill: {},
         theme: { color: "#ff6b6b" },

@@ -656,7 +656,7 @@ export default function AdminMissionControl() {
           <div className="flex items-center gap-2">
             <span className="inline-block h-3 w-3 animate-pulse bg-green-500 rounded-full border border-black" />
             <span className="font-mono text-xs font-black uppercase tracking-wider text-black/60">
-              Pulse 2026 · AIIMS New Delhi
+              Tarang 2026 · AIIMS New Delhi
             </span>
           </div>
           <h1 className="mt-1 text-3xl font-black uppercase tracking-tight text-black sm:text-4xl">

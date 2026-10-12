@@ -59,7 +59,7 @@ export default function ReachPage() {
         kicker="Campus Transit & Navigation"
         title="How to Reach"
         accent="AIIMS"
-        description="Getting to AIIMS New Delhi for PULSE — Yellow & Pink Line metros, direct cab drop-offs, inter-state bus hubs, railway stations, and airport connections."
+        description="Getting to AIIMS New Delhi for TARANG — Yellow & Pink Line metros, direct cab drop-offs, inter-state bus hubs, railway stations, and airport connections."
       />
 
       {/* Main Destination Showcase Banner */}
@@ -76,7 +76,7 @@ export default function ReachPage() {
                   Official Fest Destination
                 </span>
                 <span className="border border-white/40 bg-zinc-900 px-2 py-0.5 text-[11px] font-mono font-bold text-white">
-                  PULSE 2026
+                  TARANG 2026
                 </span>
               </div>
               <h2 className="mt-1 text-2xl font-black uppercase tracking-tight sm:text-3xl md:text-4xl text-white">
@@ -297,7 +297,7 @@ export default function ReachPage() {
                   Tell any cab, auto, or bus conductor <strong>&quot;AIIMS Quadrangle, Ansari Nagar&quot;</strong> — it is one of the most recognizable landmarks in the capital.
                 </p>
                 <p className="mt-3 text-sm font-bold text-neo-secondary leading-relaxed">
-                  Inside campus, look for the neon yellow PULSE signage and student coordinators at Gate 1 and Gate 2 who will direct you straight to the venues.
+                  Inside campus, look for the neon yellow TARANG signage and student coordinators at Gate 1 and Gate 2 who will direct you straight to the venues.
                 </p>
               </div>
 

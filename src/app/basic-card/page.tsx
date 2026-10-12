@@ -4,9 +4,9 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import BasicCardClient from "./BasicCardClient";
 
 export const metadata: Metadata = {
-  title: "PULSE BR Card — AIIMS New Delhi",
+  title: "TARANG BR Card — AIIMS New Delhi",
   description:
-    "Official mandatory 5-day participant BR Card for PULSE 2026 at AIIMS New Delhi. Campus entry, competition registrations, and unlocked informal events.",
+    "Official mandatory 5-day participant BR Card for TARANG 2026 at AIIMS New Delhi. Campus entry, competition registrations, and unlocked informal events.",
 };
 
 export const dynamic = "force-dynamic";
@@ -67,7 +67,7 @@ export default async function BasicCardPage() {
 
     if (basicPass) {
       const product = Array.isArray(basicPass.pass_products) ? basicPass.pass_products[0] : basicPass.pass_products;
-      const prodName = product?.name ?? "PULSE BR Card";
+      const prodName = product?.name ?? "TARANG BR Card";
 
       activePass = {
         id: basicPass.id,

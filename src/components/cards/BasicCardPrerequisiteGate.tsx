@@ -33,7 +33,7 @@ export default function BasicCardPrerequisiteGate({
               Card Prerequisite Requirement
             </h3>
             <p className="text-xs font-bold text-black/60">
-              PULSE 2026 Multi-Tier Card Policy
+              TARANG 2026 Multi-Tier Card Policy
             </p>
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function BasicCardPrerequisiteGate({
               <span className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-black bg-black text-xs font-black text-white">
                 1
               </span>
-              <h4 className="text-sm font-black uppercase">PULSE BR Card (₹200)</h4>
+              <h4 className="text-sm font-black uppercase">TARANG BR Card (₹200)</h4>
             </div>
             {hasBasicCard ? (
               <span className="flex items-center gap-1 text-xs font-black text-green-700">
@@ -87,7 +87,7 @@ export default function BasicCardPrerequisiteGate({
                 variant="primary"
                 className="w-full text-center text-xs py-2"
               >
-                Get PULSE BR Card (₹200) First <ArrowRight className="h-3.5 w-3.5" />
+                Get TARANG BR Card (₹200) First <ArrowRight className="h-3.5 w-3.5" />
               </ButtonLink>
             </div>
           )}
@@ -136,7 +136,7 @@ export default function BasicCardPrerequisiteGate({
       {!hasBasicCard && (
         <div className="mt-5 border-2 border-black bg-neo-accent/20 p-3 text-xs font-bold text-black flex items-center justify-between gap-3">
           <p>
-            👉 <strong>Step 1 is mandatory:</strong> Please register for your PULSE BR Card (₹200) first to enable the Delegate Card checkout.
+            👉 <strong>Step 1 is mandatory:</strong> Please register for your TARANG BR Card (₹200) first to enable the Delegate Card checkout.
           </p>
           <Link
             href="/basic-card"

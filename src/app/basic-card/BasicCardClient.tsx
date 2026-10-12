@@ -108,7 +108,7 @@ const RECOMMENDED_EVENTS = [
 const FREE_INFORMALS = [
   { name: "Cupid Waltz", desc: "The iconic AIIMS ballroom partner dance", icon: Heart },
   { name: "Musical Chairs", desc: "High-stakes campus madness & spot prizes", icon: Smile },
-  { name: "Mr. & Miss PULSE", desc: "The ultimate charisma & personality pageant", icon: Sparkles },
+  { name: "Mr. & Miss TARANG", desc: "The ultimate charisma & personality pageant", icon: Sparkles },
   { name: "Water Balloon Fights", desc: "Midday carnival lawn water showdown", icon: Flame },
 ];
 
@@ -332,7 +332,7 @@ export default function BasicCardClient({
         order_id: data.razorpayOrderId,
         amount: data.amountPaise,
         currency: data.currency,
-        name: "PULSE 2026",
+        name: "TARANG 2026",
         description: "Basic Festival Entry Card",
         prefill: {
           name: userProfile?.displayName ?? "",
@@ -485,10 +485,10 @@ export default function BasicCardClient({
 
           <div className="mt-8 max-w-3xl">
             <span className="text-xs font-black uppercase tracking-[0.25em] text-neo-secondary">
-              PULSE 2026 · AIIMS New Delhi
+              TARANG 2026 · AIIMS New Delhi
             </span>
             <h1 className="mt-2 text-5xl font-black uppercase leading-[0.9] tracking-tighter sm:text-6xl md:text-7xl">
-              PULSE <span className="text-neo-accent">BR Card</span>
+              TARANG <span className="text-neo-accent">BR Card</span>
             </h1>
             <p className="mt-4 text-lg font-bold text-white/85 sm:text-xl leading-relaxed">
               Your key to South Asia’s largest medical fest. Mandatory for campus entry and participating in all competitions across 5 electric days.
@@ -526,7 +526,7 @@ export default function BasicCardClient({
                   Recommended Festival Events
                 </h2>
                 <p className="mt-2 text-sm font-bold text-black/75 leading-relaxed">
-                  Your BR Card gives you access to the AIIMS campus throughout PULSE and lets you live the experience of all competitions and showcases:
+                  Your BR Card gives you access to the AIIMS campus throughout TARANG and lets you live the experience of all competitions and showcases:
                 </p>
               </div>
 
@@ -633,7 +633,7 @@ export default function BasicCardClient({
                     Official Participant Pass
                   </span>
                   <h2 className="text-3xl font-black uppercase tracking-tight">
-                    PULSE BR Card
+                    TARANG BR Card
                   </h2>
                 </div>
                 <div className="text-right">
@@ -658,7 +658,7 @@ export default function BasicCardClient({
                 </div>
                 <div className="flex items-start gap-2.5 text-xs font-bold text-black">
                   <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" strokeWidth={3} />
-                  <span>Free entry to informal events (Cupid Waltz, Mr/Miss PULSE, etc.)</span>
+                  <span>Free entry to informal events (Cupid Waltz, Mr/Miss TARANG, etc.)</span>
                 </div>
                 <div className="flex items-start gap-2.5 text-xs font-bold text-black">
                   <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" strokeWidth={3} />

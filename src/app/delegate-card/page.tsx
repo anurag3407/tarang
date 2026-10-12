@@ -4,7 +4,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import DelegatePassClient from "@/app/delegate-pass/DelegatePassClient";
 
 export const metadata: Metadata = {
-  title: "VIP All-Access Delegate Card — PULSE 2026",
+  title: "VIP All-Access Delegate Card — TARANG 2026",
   description:
     "Get full 5-day festival access, all star pro shows, front-row concert arena, and fast-track gate entry.",
 };

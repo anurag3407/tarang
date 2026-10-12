@@ -54,7 +54,7 @@ export function EmailLayout({
                 color: EMAIL_COLORS.black,
               }}
             >
-              PULSE 2026
+              TARANG 2026
             </span>
           </td>
         </tr>
@@ -111,7 +111,7 @@ export function EmailLayout({
               textAlign: "center",
             }}
           >
-            PULSE 2026 · Student Centre, Campus · This is an automated
+            TARANG 2026 · Student Centre, Campus · This is an automated
             transactional message. If you did not make this request, contact the
             help desk immediately.
           </td>

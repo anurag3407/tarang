@@ -234,7 +234,7 @@ export default function VenueMap() {
               </span>
             </div>
             <h2 className="text-xl font-black uppercase tracking-tight text-black sm:text-2xl">
-              PULSE 2026 Venue Navigator
+              TARANG 2026 Venue Navigator
             </h2>
           </div>
         </div>

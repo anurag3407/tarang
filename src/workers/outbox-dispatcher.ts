@@ -295,7 +295,7 @@ export async function enqueueOrderEmails(orderId: string, kind: string): Promise
 
     const ven = (Array.isArray(ev?.venues) ? ev?.venues[0] : ev?.venues) as { name?: string; short_name?: string } | null;
 
-    eventName = ev?.name ?? line?.description_snapshot ?? "PULSE Event";
+    eventName = ev?.name ?? line?.description_snapshot ?? "TARANG Event";
     venue = ven?.name ?? ven?.short_name ?? undefined;
 
     if (ev?.starts_at) {

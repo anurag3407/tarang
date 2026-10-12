@@ -241,7 +241,7 @@ export async function POST(req: NextRequest) {
         expiresAt: passRecord.expires_at ? new Date(passRecord.expires_at).toISOString() : null,
         maskedName: maskName(profileRecord?.display_name ?? null),
         maskedCollege: maskCollege(profileRecord?.college_name ?? null),
-        festivalName: fest?.name ? `${fest.name} ${fest.year || ""}`.trim() : "PULSE 2026",
+        festivalName: fest?.name ? `${fest.name} ${fest.year || ""}`.trim() : "TARANG 2026",
         venue: "AIIMS New Delhi",
       });
     }
@@ -335,7 +335,7 @@ export async function POST(req: NextRequest) {
         maskedName: maskName(profileRecord?.display_name ?? null),
         maskedCollege: maskCollege(profileRecord?.college_name ?? null),
         teamName: regRecord.team_name ?? null,
-        festivalName: "PULSE 2026",
+        festivalName: "TARANG 2026",
         venue: "AIIMS New Delhi",
       });
     }
@@ -424,7 +424,7 @@ export async function POST(req: NextRequest) {
           firstRow(line?.pass_products)?.name ||
           firstRow(line?.events)?.title ||
           "Festival Order",
-        description: "Official PULSE purchase order",
+        description: "Official TARANG purchase order",
         accessSummary: isFulfilled
           ? "Order fulfilled and verified"
           : "Order placed but not yet confirmed",
@@ -432,7 +432,7 @@ export async function POST(req: NextRequest) {
         expiresAt: null,
         maskedName: maskName(profileRecord?.display_name ?? null),
         maskedCollege: maskCollege(profileRecord?.college_name ?? null),
-        festivalName: "PULSE 2026",
+        festivalName: "TARANG 2026",
         venue: "AIIMS New Delhi",
       });
     }
@@ -446,7 +446,7 @@ export async function POST(req: NextRequest) {
       status: "FAKE_OR_UNRECOGNIZED",
       statusLabel: "FAKE / UNVERIFIED",
       passCode: cleanCode,
-      message: `The pass code "${cleanCode}" was not found in the official PULSE 2026 database. This code is invalid or counterfeit.`,
+      message: `The pass code "${cleanCode}" was not found in the official TARANG 2026 database. This code is invalid or counterfeit.`,
     });
   } catch (err) {
     return apiFromError(req, err);

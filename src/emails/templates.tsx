@@ -85,14 +85,14 @@ export function renderTemplate(
   switch (name) {
     case "delegate-pass-confirmation":
       return {
-        subject: `Your PULSE 2026 Delegate Card & Gate QR is confirmed (${d.publicPassCode ?? d.publicOrderCode ?? ""})`,
+        subject: `Your TARANG 2026 Delegate Card & Gate QR is confirmed (${d.publicPassCode ?? d.publicOrderCode ?? ""})`,
         element: (
           <EmailLayout title="Delegate Card Confirmed">
             <StatusBanner text="Payment Confirmed — Delegate Card Active" color={EMAIL_COLORS.secondary} />
             <Spacer />
             <p>Hi {d.displayName},</p>
             <p>
-              Your <b>{d.productName ?? "All-Access Delegate Card"}</b> for PULSE 2026 is confirmed.
+              Your <b>{d.productName ?? "All-Access Delegate Card"}</b> for TARANG 2026 is confirmed.
               Below is your official Gate Entry QR Code. Present this QR at the campus gates for entry.
             </p>
             <Spacer height={8} />
@@ -161,14 +161,14 @@ export function renderTemplate(
     case "event-registration-confirmation": {
       const codeSuffix = d.publicRegistrationCode ?? d.publicOrderCode;
       return {
-        subject: `Registration Confirmed: ${d.eventName ?? "PULSE 2026 Event"}${codeSuffix ? ` (${codeSuffix})` : ""}`,
+        subject: `Registration Confirmed: ${d.eventName ?? "TARANG 2026 Event"}${codeSuffix ? ` (${codeSuffix})` : ""}`,
         element: (
           <EmailLayout title="Registration Confirmed">
             <StatusBanner text="Payment Confirmed — You're Registered!" color={EMAIL_COLORS.secondary} />
             <Spacer />
             <p>Hi {d.displayName},</p>
             <p>
-              Your registration for <b>{d.eventName ?? "the event"}</b> at PULSE 2026 is confirmed.
+              Your registration for <b>{d.eventName ?? "the event"}</b> at TARANG 2026 is confirmed.
               {d.teamName ? <> Registered under team <b>{d.teamName}</b>.</> : null}
             </p>
             <Spacer height={8} />
@@ -202,7 +202,7 @@ export function renderTemplate(
     case "team-member-registration": {
       const codeSuffix = d.publicRegistrationCode ?? d.teamName;
       return {
-        subject: `You're registered for ${d.eventName ?? "a PULSE event"}${codeSuffix ? ` (${codeSuffix})` : ""}`,
+        subject: `You're registered for ${d.eventName ?? "a TARANG event"}${codeSuffix ? ` (${codeSuffix})` : ""}`,
         element: (
           <EmailLayout title="Team Registration" accent={EMAIL_COLORS.muted}>
             <StatusBanner text="Team Registration Confirmed" color={EMAIL_COLORS.secondary} />
@@ -296,12 +296,12 @@ export function renderTemplate(
 
     case "admin-invite":
       return {
-        subject: "You've been invited to the PULSE 2026 staff panel",
+        subject: "You've been invited to the TARANG 2026 staff panel",
         element: (
           <EmailLayout title="Staff Invitation" accent={EMAIL_COLORS.muted}>
             <p>Hi {d.displayName},</p>
             <p>
-              You have been invited to join the PULSE 2026 organizing panel
+              You have been invited to join the TARANG 2026 organizing panel
               {d.roleName ? <> as <b>{d.roleName}</b></> : null}. Sign in with
               this email and complete onboarding (including two-factor
               authentication) to activate your access.
@@ -412,10 +412,10 @@ export function renderTemplate(
     default:
       // Exhaustiveness guard — unknown templates render a minimal notice.
       return {
-        subject: "PULSE 2026 update",
+        subject: "TARANG 2026 update",
         element: (
           <EmailLayout title="Update">
-            <p>Hi {d.displayName}, there is an update on your PULSE 2026 account.</p>
+            <p>Hi {d.displayName}, there is an update on your TARANG 2026 account.</p>
             <CtaButton href={d.dashboardUrl} label="Open dashboard" />
           </EmailLayout>
         ),

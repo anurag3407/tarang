@@ -290,7 +290,7 @@ export default function BulkImportManager() {
                 Admin Automation
               </span>
               <span className="text-xs font-bold text-black/70">
-                AIIMS PULSE 2026
+                AIIMS TARANG 2026
               </span>
             </div>
             <h1 className="mt-1 text-2xl sm:text-3xl font-black uppercase tracking-tight text-black">

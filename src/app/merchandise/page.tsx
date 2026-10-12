@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Official Merchandise",
   description:
-    "Explore the official PULSE 2026 festival merchandise collection — limited edition streetwear hoodies, oversized tees, and accessories.",
+    "Explore the official TARANG 2026 festival merchandise collection — limited edition streetwear hoodies, oversized tees, and accessories.",
 };
 
 export default async function MerchandisePage() {

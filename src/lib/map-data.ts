@@ -1,5 +1,5 @@
 /**
- * AIIMS New Delhi — PULSE 2026 Venue Map Dataset
+ * AIIMS New Delhi — TARANG 2026 Venue Map Dataset
  *
  * Provides structured geometry, road network, gate information,
  * building footprints, and GPS-free wayfinding directions.
@@ -322,7 +322,7 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     textColor: "#000000",
     nearestRoad: "Road No. 1 / Road No. 4",
     nearestGate: "Gate No. 1 (Sri Aurobindo Marg)",
-    description: "The electric epicenter of PULSE. Massive open-air lawn hosting 5,000+ attendees for Star Nights, Pro Concerts, Battle of the Bands, and grand opening/closing spectacles.",
+    description: "The electric epicenter of TARANG. Massive open-air lawn hosting 5,000+ attendees for Star Nights, Pro Concerts, Battle of the Bands, and grand opening/closing spectacles.",
     capacity: "5,000+ Standing / Seated",
     eventsHosted: [
       "Star Night Finale",
@@ -535,7 +535,7 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     textColor: "#000000",
     nearestRoad: "Road No. 3 (Gymkhana Boulevard)",
     nearestGate: "Gate No. 1 or Gate No. 5",
-    description: "Mandatory check-in hub for all festival delegates. Collect physical PULSE BR Cards, Delegate Passes, wristbands, and festival merchandise right beside the Olympic-size swimming pool.",
+    description: "Mandatory check-in hub for all festival delegates. Collect physical TARANG BR Cards, Delegate Passes, wristbands, and festival merchandise right beside the Olympic-size swimming pool.",
     capacity: "10 Dedicated Counters",
     eventsHosted: [
       "Physical BR Card Pickup & Verification",
@@ -604,7 +604,7 @@ export const CAMPUS_BUILDINGS: CampusBuilding[] = [
     textColor: "#000000",
     nearestRoad: "Road No. 2 / Road No. 4",
     nearestGate: "Gate No. 2 (Main Academic Gate)",
-    description: "Iconic 4-storey medical research library housing over 100,000 journals and volumes. Serves as a quiet study area and orientation lounge during PULSE.",
+    description: "Iconic 4-storey medical research library housing over 100,000 journals and volumes. Serves as a quiet study area and orientation lounge during TARANG.",
     capacity: "500 Readers",
     eventsHosted: [
       "Literary Quiz Preliminary Rounds",
@@ -819,7 +819,7 @@ export const PRESET_ROUTES: WayfindingRoute[] = [
       "Enter through Gate No. 1 from Sri Aurobindo Marg (AIIMS Metro Exit 1).",
       "Walk straight east down Road No. 1 (Director's Avenue) past JL Auditorium on your right.",
       "At the Road No. 4 intersection, look straight ahead into the Quadrangle Main Stage arena.",
-      "Follow the neon yellow PULSE banners to the festival entrance arch.",
+      "Follow the neon yellow TARANG banners to the festival entrance arch.",
     ],
   },
   {

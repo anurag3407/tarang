@@ -5,7 +5,7 @@ import LoginForm from "./LoginForm";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Sign In & Register | PULSE 2026",
+  title: "Sign In & Register | TARANG 2026",
   description:
     "Sign in or register to buy your delegate pass, register for events, and get your gate ticket.",
 };

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Schedule",
   description:
-    "The complete 5-day schedule of PULSE 2026 — day-wise events with timings and venues, and night pro shows highlighted.",
+    "The complete 5-day schedule of TARANG 2026 — day-wise events with timings and venues, and night pro shows highlighted.",
 };
 
 export default async function SchedulePage() {

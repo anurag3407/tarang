@@ -65,7 +65,7 @@ export default function CampusAmbassadorForm() {
             <span className="bg-neo-secondary text-black px-2 font-black tracking-widest">
               {entryCode}
             </span>
-            . The PULSE 2026 Core Team will review your application and contact you over email and phone with onboarding details.
+            . The TARANG 2026 Core Team will review your application and contact you over email and phone with onboarding details.
           </p>
           <div className="mt-8">
             <Button variant="primary" onClick={handleReset}>
@@ -90,7 +90,7 @@ export default function CampusAmbassadorForm() {
               ⚡ Ambassador Application Form
             </h2>
             <p className="text-xs font-bold text-black/70 dark:text-zinc-400 mt-1">
-              Fill in your details below to become the official PULSE 2026 Ambassador for your campus.
+              Fill in your details below to become the official TARANG 2026 Ambassador for your campus.
             </p>
           </div>
 
@@ -240,7 +240,7 @@ export default function CampusAmbassadorForm() {
             <ul className="mt-4 space-y-3 text-base font-bold leading-snug text-black">
               <li>✨ Official Certificate of Leadership from AIIMS New Delhi.</li>
               <li>🎟️ Free VIP / All-Access Pro Night Delegate Cards based on contingent size.</li>
-              <li>👕 Exclusive PULSE Merchandise &amp; Welcome Kit.</li>
+              <li>👕 Exclusive TARANG Merchandise &amp; Welcome Kit.</li>
               <li>🤝 Direct networking with medical &amp; student leaders nationwide.</li>
             </ul>
           </div>
@@ -250,7 +250,7 @@ export default function CampusAmbassadorForm() {
               <Sparkles className="h-6 w-6" /> Your Role
             </h2>
             <p className="mt-3 text-base font-bold leading-snug">
-              As a Campus Ambassador, you will be the official face of PULSE 2026 at your institution — spreading the word, coordinating team registrations, and leading your college contingent.
+              As a Campus Ambassador, you will be the official face of TARANG 2026 at your institution — spreading the word, coordinating team registrations, and leading your college contingent.
             </p>
           </div>
 

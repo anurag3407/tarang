@@ -802,7 +802,7 @@ export async function GET(req: NextRequest) {
         },
         festival: {
           slug: festival?.slug ?? "unknown",
-          name: festival?.name ?? "PULSE",
+          name: festival?.name ?? "TARANG",
           dates:
             festival?.starts_at && festival?.ends_at
               ? `${new Intl.DateTimeFormat("en-IN", {

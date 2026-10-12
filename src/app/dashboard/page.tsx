@@ -13,7 +13,7 @@ import ConcertPassCard from "@/components/cards/ConcertPassCard";
 import BasicCardView from "@/components/cards/BasicCardView";
 
 export const metadata: Metadata = {
-  title: "My Dashboard — PULSE 2026",
+  title: "My Dashboard — TARANG 2026",
   robots: { index: false },
 };
 

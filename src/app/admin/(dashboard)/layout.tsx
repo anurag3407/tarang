@@ -80,7 +80,7 @@ export default async function AdminLayout({
               href="/admin"
               className="font-mono text-lg font-black uppercase tracking-tighter text-neo-secondary hover:text-white transition-colors"
             >
-              ⚡ PULSE ADMIN
+              ⚡ TARANG ADMIN
             </Link>
             <span className="hidden sm:inline-block font-mono text-[10px] uppercase tracking-wider text-white/50 border-l border-white/20 pl-3">
               AIIMS 2026

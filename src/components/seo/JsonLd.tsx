@@ -18,8 +18,8 @@ export function FestivalEventJsonLd({ baseUrl }: { baseUrl: string }) {
     "@context": "https://schema.org",
     "@type": "Festival",
     "name": `${FEST.name} ${FEST.year} — AIIMS New Delhi Cultural Fest`,
-    "alternateName": ["PULSE AIIMS", "AIIMS Pulse 2026", "Pulse Festival AIIMS Delhi"],
-    "description": "PULSE is the annual cultural, literary, and sports fest of AIIMS New Delhi — South Asia's largest medical college festival featuring 250+ events and 5 star pro shows.",
+    "alternateName": ["TARANG AIIMS", "AIIMS Tarang 2026", "Tarang Festival AIIMS Delhi"],
+    "description": "TARANG is the annual cultural, literary, and sports fest of AIIMS New Delhi — South Asia's largest medical college festival featuring 250+ events and 5 star pro shows.",
     "startDate": "2026-09-17T09:00:00+05:30",
     "endDate": "2026-09-21T23:59:59+05:30",
     "eventStatus": "https://schema.org/EventScheduled",
@@ -79,7 +79,7 @@ export function OrganizationJsonLd({ baseUrl }: { baseUrl: string }) {
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
-    "name": "AIIMS Student Association (ASA) — PULSE",
+    "name": "AIIMS Student Association (ASA) — TARANG",
     "url": baseUrl,
     "logo": `${baseUrl}/pulse-logo.png`,
     "sameAs": [

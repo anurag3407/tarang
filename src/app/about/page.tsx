@@ -20,9 +20,9 @@ import { ButtonLink } from "@/components/ui/Button";
 import { FEST, PULSE_VENUES } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "About AIIMS & PULSE — The Legacy",
+  title: "About AIIMS & TARANG — The Legacy",
   description:
-    "The story of AIIMS New Delhi and PULSE — South Asia's largest medical college cultural, literary, and sports festival since 1973.",
+    "The story of AIIMS New Delhi and TARANG — South Asia's largest medical college cultural, literary, and sports festival since 1973.",
 };
 
 const AIIMS_STATS = [
@@ -58,7 +58,7 @@ export default function AboutPage() {
       <PageHeader
         kicker="The Institution & The Festival"
         title="ABOUT"
-        accent="AIIMS & PULSE"
+        accent="AIIMS & TARANG"
         description="South Asia’s largest medical college cultural, literary, and sports festival — envisioned, created, and managed entirely by the AIIMS Student Association."
       />
 
@@ -107,10 +107,10 @@ export default function AboutPage() {
                   With <strong>42 teaching and research disciplines</strong>, it is home to some of the country’s brightest medical minds. For generations of medical aspirants, AIIMS has been far more than a college — <strong>it has been a dream</strong>.
                 </p>
                 <p className="border-l-4 border-neo-accent bg-white dark:bg-[#121214] text-black dark:text-white p-4 shadow-neo-sm">
-                  And once a year, that dream comes alive as <strong>PULSE</strong>, bringing together the brightest medical minds from across the country.
+                  And once a year, that dream comes alive as <strong>TARANG</strong>, bringing together the brightest medical minds from across the country.
                   <br />
                   <span className="mt-1 block text-sm font-black uppercase tracking-wider text-neo-accent">
-                    Come to AIIMS. Experience the legacy. Be a part of PULSE.
+                    Come to AIIMS. Experience the legacy. Be a part of TARANG.
                   </span>
                 </p>
               </div>
@@ -151,7 +151,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Section 2: About PULSE & ASA */}
+      {/* Section 2: About TARANG & ASA */}
       <section className="border-b-8 border-black bg-neo-secondary dark:bg-[#000000] py-16 sm:py-24 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid gap-12 lg:grid-cols-12 items-center">
@@ -162,7 +162,7 @@ export default function AboutPage() {
                   <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden border-4 border-black bg-neo-secondary p-1 shadow-neo-xs">
                     <Image
                       src="/pulse-logo.png"
-                      alt="PULSE Mascot Logo"
+                      alt="TARANG Mascot Logo"
                       width={56}
                       height={56}
                       unoptimized
@@ -174,7 +174,7 @@ export default function AboutPage() {
                       Official Symbol
                     </span>
                     <h3 className="text-2xl font-black uppercase tracking-tight text-black dark:text-white">
-                      The Pulse Fox
+                      The Tarang Fox
                     </h3>
                   </div>
                 </div>
@@ -202,25 +202,25 @@ export default function AboutPage() {
             <div className="lg:col-span-7 order-1 lg:order-2 space-y-6">
               <div>
                 <span className="border-2 border-black bg-white dark:bg-[#121214] text-black dark:text-white px-3 py-1 text-xs font-black uppercase tracking-wider">
-                  The Story of PULSE
+                  The Story of TARANG
                 </span>
                 <h2 className="mt-3 text-4xl font-black uppercase tracking-tight sm:text-5xl text-black dark:text-white">
-                  Five Decades of Pulse
+                  Five Decades of Tarang
                 </h2>
               </div>
 
               <div className="space-y-4 text-base sm:text-lg font-bold leading-relaxed text-black/85 dark:text-zinc-300">
                 <p>
-                  <strong>PULSE</strong> is the cultural heartbeat of student life at AIIMS, envisioned, created, and managed entirely by the <strong>AIIMS Student Association (ASA)</strong> — the official undergraduate student body of AIIMS New Delhi.
+                  <strong>TARANG</strong> is the cultural heartbeat of student life at AIIMS, envisioned, created, and managed entirely by the <strong>AIIMS Student Association (ASA)</strong> — the official undergraduate student body of AIIMS New Delhi.
                 </p>
                 <p>
                   Far more than an event, it is an enduring legacy that unites thousands of students, alumni, and delegates in a shared celebration of talent, sportsmanship, creativity, and community.
                 </p>
                 <p>
-                  What began in <strong>1973</strong> as a modest sports meet has grown over five decades into South Asia’s largest medical college cultural, literary, and sports festival, attracting over <strong>450 participating institutions</strong> from across India and abroad. Year after year, PULSE transforms the AIIMS campus into a sprawling arena of competitions, exhibitions, performances, and festivities.
+                  What began in <strong>1973</strong> as a modest sports meet has grown over five decades into South Asia’s largest medical college cultural, literary, and sports festival, attracting over <strong>450 participating institutions</strong> from across India and abroad. Year after year, TARANG transforms the AIIMS campus into a sprawling arena of competitions, exhibitions, performances, and festivities.
                 </p>
                 <p>
-                  During PULSE, the entire AIIMS campus transforms into an electric arena of activity. From sports fields roaring with competitive spirit and packed halls hosting intense intellectual showdowns, to open-air stages pulsing with music late into the night, creativity flourishes and lifelong friendships are forged in every heartbeat of the festival.
+                  During TARANG, the entire AIIMS campus transforms into an electric arena of activity. From sports fields roaring with competitive spirit and packed halls hosting intense intellectual showdowns, to open-air stages pulsing with music late into the night, creativity flourishes and lifelong friendships are forged in every heartbeat of the festival.
                 </p>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Section 3: Pulse Key Venues */}
+      {/* Section 3: Tarang Key Venues */}
       <section className="border-b-8 border-black bg-neo-muted dark:bg-[#000000] py-16 sm:py-24 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b-4 border-black pb-6">
@@ -237,7 +237,7 @@ export default function AboutPage() {
                 Festival Grounds
               </span>
               <h2 className="mt-3 text-3xl font-black uppercase tracking-tight sm:text-4xl md:text-5xl text-black dark:text-white">
-                Pulse Key Venues
+                Tarang Key Venues
               </h2>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -292,7 +292,7 @@ export default function AboutPage() {
           "AIIMS Est. 1956",
           "Rank #1 Medical Institution in India",
           "Rank #6 Globally (Brand Finance)",
-          "PULSE Est. 1973",
+          "TARANG Est. 1973",
           "AIIMS Student Association (ASA)",
           "450+ Institutions",
         ]}

@@ -8,9 +8,9 @@ import { ButtonLink } from "@/components/ui/Button";
 import { TEAM, FEST } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "Our Team & Leadership — PULSE 2026",
+  title: "Our Team & Leadership — TARANG 2026",
   description:
-    "Meet the Chief Coordinators and AIIMS Student Association (ASA) leadership running PULSE 2026 at AIIMS New Delhi.",
+    "Meet the Chief Coordinators and AIIMS Student Association (ASA) leadership running TARANG 2026 at AIIMS New Delhi.",
 };
 
 export default function TeamPage() {
@@ -23,7 +23,7 @@ export default function TeamPage() {
         kicker="Student Leadership & Administration"
         title="OUR"
         accent="TEAM"
-        description="PULSE is envisioned, organized, and executed by the undergraduate students of AIIMS New Delhi under the AIIMS Student Association (ASA)."
+        description="TARANG is envisioned, organized, and executed by the undergraduate students of AIIMS New Delhi under the AIIMS Student Association (ASA)."
       />
 
       <section className="bg-neo-cream py-16 sm:py-20">
@@ -125,7 +125,7 @@ export default function TeamPage() {
           "AIIMS Student Association (ASA)",
           "Envisioned & Managed by Students",
           "Since 1973",
-          "50+ Years of PULSE Legacy",
+          "50+ Years of TARANG Legacy",
           "South Asia's Largest Medical Fest",
         ]}
         variant="black"

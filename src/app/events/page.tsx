@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "All events at PULSE 2026 — entry fees, prize pools, timings, venues and team sizes for every competition across 8 categories.",
+    "All events at TARANG 2026 — entry fees, prize pools, timings, venues and team sizes for every competition across 8 categories.",
 };
 
 export default async function EventsPage() {

@@ -5,8 +5,8 @@ import ResetPasswordForm from "./ResetPasswordForm";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Set New Password | PULSE 2026",
-  description: "Set a new password for your PULSE 2026 account.",
+  title: "Set New Password | TARANG 2026",
+  description: "Set a new password for your TARANG 2026 account.",
   robots: { index: false },
 };
 

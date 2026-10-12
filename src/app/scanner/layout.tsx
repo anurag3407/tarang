@@ -67,7 +67,7 @@ export default async function ScannerLayout({
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-lg font-black uppercase tracking-tighter text-neo-secondary">
-              PULSE Gate Scanner
+              TARANG Gate Scanner
             </span>
             <Link
               href="/admin"

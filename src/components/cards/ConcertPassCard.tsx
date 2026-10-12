@@ -65,7 +65,7 @@ export default function ConcertPassCard({
                 {productName}
               </h3>
               <p className="mt-1 text-sm font-bold text-white/70">
-                PULSE 2026 · AIIMS New Delhi · 17–21 Sep 2026
+                TARANG 2026 · AIIMS New Delhi · 17–21 Sep 2026
               </p>
             </div>
 

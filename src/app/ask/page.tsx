@@ -6,7 +6,7 @@ import AskForm from "./AskForm";
 export const metadata: Metadata = {
   title: "Ask a Question",
   description:
-    "Send a question to the PULSE 2026 help desk — registration, passes, sponsorship, volunteering or anything else.",
+    "Send a question to the TARANG 2026 help desk — registration, passes, sponsorship, volunteering or anything else.",
 };
 
 export default function AskPage() {

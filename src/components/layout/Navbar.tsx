@@ -1,46 +1,51 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
 import { FEST } from "@/lib/data";
 import { createClient } from "@/lib/supabase/browser";
 import type { User } from "@supabase/supabase-js";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const PRIMARY_LINKS = [
-  { href: "/", label: "Home" },
   { href: "/events", label: "Events" },
   { href: "/schedule", label: "Schedule" },
+  { href: "/#lineup", label: "Lineup" },
+  { href: "/delegate-card", label: "Passes" },
   { href: "/merchandise", label: "Merch" },
-  { href: "/basic-card", label: "BR Card" },
-  { href: "/delegate-card", label: "Delegate Card" },
   { href: "/about", label: "About" },
 ];
 
 const MORE_LINKS = [
-  { href: "/merchandise", label: "Merchandise Store", tag: "Official" },
-  // { href: "/map", label: "Campus Venue Map", tag: "Interactive" },
-  { href: "/sponsors", label: "Sponsors & Partners", tag: "Featured" },
+  { href: "/basic-card", label: "BR Card" },
+  { href: "/delegate-card", label: "Delegate Card" },
+  { href: "/sponsors", label: "Sponsors & Partners" },
   { href: "/gallery", label: "Gallery" },
   { href: "/notices", label: "Notices & Updates" },
   { href: "/team", label: "Organizing Team" },
   { href: "/reach", label: "How to Reach" },
   { href: "/faqs", label: "FAQs" },
   { href: "/ask", label: "Ask a Question" },
-  { href: "/campus-ambassador", label: "Campus Ambassador", tag: "Join" },
+  { href: "/campus-ambassador", label: "Campus Ambassador" },
 ];
+
+function Wordmark() {
+  return (
+    <span className="t-display text-[1.6rem] leading-none tracking-tight text-bone">
+      Tarang<span className="ml-0.5 align-top text-[0.55em] italic text-brass">’{FEST.year.slice(2)}</span>
+    </span>
+  );
+}
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const isMoreActive = MORE_LINKS.some((l) => pathname === l.href);
+  const isHome = pathname === "/";
 
   // Close dropdown on click outside or escape key
   useEffect(() => {
@@ -52,6 +57,7 @@ export default function Navbar() {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setMoreOpen(false);
+        setOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -67,6 +73,21 @@ export default function Navbar() {
     setOpen(false);
     setMoreOpen(false);
   }, [pathname]);
+
+  // Lock page scroll behind the full-screen mobile menu
+  useEffect(() => {
+    document.documentElement.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.documentElement.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     try {
@@ -85,248 +106,168 @@ export default function Navbar() {
     }
   }, []);
 
+  const solid = !isHome || scrolled || open;
+
   return (
-    <header className="sticky top-0 z-50 border-b-4 border-black bg-neo-cream">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link
-          href="/"
-          className="group flex items-center gap-2.5 border-4 border-black bg-neo-accent px-2.5 py-1.5 shadow-neo-sm transition-all duration-100 hover:-translate-y-0.5 hover:shadow-neo active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-          onClick={() => {
-            setOpen(false);
-            setMoreOpen(false);
-          }}
-        >
-          <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded border-2 border-black bg-white p-0.5 shadow-[2px_2px_0px_0px_#000]">
-            <Image
-              src="/pulse-logo.png"
-              alt="PULSE 2026 Logo"
-              width={32}
-              height={32}
-              unoptimized
-              className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110"
-              priority
-            />
-          </div>
-          <span className="text-xl font-black uppercase tracking-tighter text-black">
-            {FEST.name}
-            <span className="text-sm align-super font-black">’{FEST.year.slice(2)}</span>
-          </span>
+    <header
+      className={`${isHome ? "fixed" : "sticky"} inset-x-0 top-0 z-50 font-[family-name:var(--font-body)] font-normal text-bone transition-[background-color,border-color,backdrop-filter] duration-500 ${
+        !isHome
+          ? "border-b border-bone/10 bg-ink"
+          : solid
+          ? "border-b border-bone/10 bg-ink/80 backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent"
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-6 px-6 md:h-[4.5rem] md:px-12">
+        <Link href="/" aria-label={`${FEST.short} — home`} onClick={() => setOpen(false)}>
+          <Wordmark />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1.5 lg:flex" aria-label="Main">
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Main">
           {PRIMARY_LINKS.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`border-2 px-3 py-1.5 text-sm font-bold uppercase tracking-wide transition-all duration-100 ${
-                  active
-                    ? "border-black bg-neo-secondary shadow-neo-sm text-black"
-                    : "border-transparent hover:border-black hover:bg-neo-accent hover:text-black hover:shadow-neo-sm text-black dark:text-white"
-                }`}
+                className={`t-label t-link transition-colors duration-300 ${active ? "text-bone" : "text-bone/60 hover:text-bone"}`}
               >
                 {link.label}
               </Link>
             );
           })}
 
-          {/* More Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               type="button"
               onClick={() => setMoreOpen((v) => !v)}
               aria-expanded={moreOpen}
               aria-haspopup="true"
-              className={`flex items-center gap-1 border-2 px-3 py-1.5 text-sm font-bold uppercase tracking-wide transition-all duration-100 cursor-pointer ${
-                moreOpen || isMoreActive
-                  ? "border-black bg-neo-accent text-black shadow-neo-sm"
-                  : "border-transparent hover:border-black hover:bg-neo-accent hover:text-black hover:shadow-neo-sm text-black dark:text-white"
+              className={`t-label flex cursor-pointer items-center gap-1.5 transition-colors duration-300 ${moreOpen ? "text-bone" : "text-bone/60 hover:text-bone"}`}
+            >
+              More
+              <span className={`inline-block transition-transform duration-300 ${moreOpen ? "rotate-45" : ""}`}>+</span>
+            </button>
+
+            <div
+              className={`absolute right-0 top-full mt-5 w-64 origin-top-right rounded-[10px] border border-bone/10 bg-ink-2/95 p-2 shadow-2xl backdrop-blur-xl transition-all duration-300 ${
+                moreOpen ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0"
               }`}
             >
-              <span>More</span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform duration-150 ${
-                  moreOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {moreOpen && (
-              <div className="absolute right-0 top-full mt-2 w-64 border-4 border-black bg-white p-2 shadow-neo-md z-50">
-                <div className="space-y-1">
-                  {MORE_LINKS.map((item) => {
-                    const active = pathname === item.href;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMoreOpen(false)}
-                        className={`flex items-center justify-between border-2 px-3 py-2 text-xs font-black uppercase tracking-wider transition-colors ${
-                          active
-                            ? "border-black bg-neo-secondary text-black shadow-neo-xs"
-                            : "border-transparent hover:border-black hover:bg-neo-cream"
-                        }`}
-                      >
-                        <span>{item.label}</span>
-                        {item.tag && (
-                          <span className="border border-black bg-neo-accent px-1.5 py-0.5 text-[9px] font-black uppercase text-black">
-                            {item.tag}
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+              {MORE_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMoreOpen(false)}
+                  className={`block rounded-md px-3 py-2.5 text-sm transition-colors ${
+                    pathname === item.href ? "bg-bone/10 text-bone" : "text-bone/70 hover:bg-bone/5 hover:text-bone"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
-
-          {/* Theme Toggle Button */}
-          <div className="ml-1">
-            <ThemeToggle />
-          </div>
-
-          {/* User Auth / Dashboard CTA */}
-          {user ? (
-            <Link
-              href="/dashboard"
-              className="ml-2 border-4 border-black bg-neo-secondary px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-black shadow-neo-sm transition-transform duration-100 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-            >
-              My Dashboard
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="ml-2 border-4 border-black bg-black px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-white shadow-neo-sm transition-transform duration-100 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-            >
-              Register / Sign In
-            </Link>
-          )}
         </nav>
 
-        {/* Mobile items: Theme Toggle + Menu Button */}
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="hidden items-center gap-5 lg:flex">
+          {!isHome && <ThemeToggle variant="studio" />}
           {user ? (
-            <button
-              onClick={async () => {
-                const supabase = createClient();
-                await supabase.auth.signOut();
-                window.location.reload();
-              }}
-              className="flex items-center justify-center border-[3px] border-black bg-neo-accent px-2 py-1.5 text-[10px] sm:text-xs font-black uppercase tracking-wide text-black shadow-neo-sm transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
-            >
-              Sign Out
-            </button>
+            <Link href="/dashboard" className="t-label t-link text-bone/70 hover:text-bone">
+              Dashboard
+            </Link>
           ) : (
-            <Link
-              href="/login"
-              className="flex items-center justify-center border-[3px] border-black bg-black px-2 py-1.5 text-[10px] sm:text-xs font-black uppercase tracking-wide text-white shadow-neo-sm transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
-            >
-              Sign In
+            <Link href="/login" className="t-label t-link text-bone/70 hover:text-bone">
+              Sign in
             </Link>
           )}
-          <ThemeToggle />
-          <button
-            type="button"
-            className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center border-[3px] sm:border-4 border-black bg-neo-secondary text-black shadow-neo-sm transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
-            aria-expanded={open}
-            aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? (
-              <X className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={3} />
-            ) : (
-              <Menu className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={3} />
-            )}
-          </button>
+          <Link href={isHome ? "#passes" : "/delegate-card"} className="t-btn t-btn-solid !py-2.5 !px-5">
+            Get passes
+          </Link>
         </div>
+
+        {/* Mobile trigger */}
+        <button
+          type="button"
+          className="t-label flex cursor-pointer items-center gap-3 text-bone lg:hidden"
+          aria-expanded={open}
+          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? "Close" : "Menu"}
+          <span className="relative block h-2.5 w-6">
+            <span className={`absolute left-0 h-px w-full bg-current transition-transform duration-500 ${open ? "top-1/2 rotate-45" : "top-0"}`} />
+            <span className={`absolute left-0 h-px w-full bg-current transition-transform duration-500 ${open ? "top-1/2 -rotate-45" : "bottom-0"}`} />
+          </span>
+        </button>
       </div>
 
       {/* Mobile menu */}
-      {open && (
-        <nav
-          className="max-h-[85vh] overflow-y-auto border-t-4 border-black bg-neo-cream px-4 pb-8 pt-4 lg:hidden"
-          aria-label="Mobile"
-        >
-          {/* Main Links */}
-          <div className="grid grid-cols-2 gap-2.5">
-            {PRIMARY_LINKS.map((link) => {
-              const active = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className={`border-4 border-black px-3 py-2.5 text-center text-xs font-black uppercase tracking-wider shadow-neo-xs transition-transform duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
-                    active ? "bg-neo-secondary text-black" : "bg-white text-black dark:bg-[#121214] dark:text-white"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* More Links Section */}
-          <div className="mt-5 border-t-2 border-black/30 pt-4">
-            <p className="mb-2.5 text-[11px] font-black uppercase tracking-widest opacity-60">
-              More Festival Links
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {MORE_LINKS.map((link) => {
-                const active = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className={`flex items-center justify-between border-2 border-black px-2.5 py-2 text-xs font-bold uppercase tracking-tight shadow-neo-xs ${
-                      active ? "bg-neo-accent text-black" : "bg-white text-black dark:bg-[#121214] dark:text-white"
-                    }`}
-                  >
-                    <span>{link.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Action CTAs & Theme Toggle */}
-          <div className="mt-5 space-y-2.5">
-            <div className="flex items-center justify-between border-2 border-black bg-white dark:bg-[#121214] p-2.5 shadow-neo-xs">
-              <span className="text-xs font-black uppercase tracking-wider">Appearance</span>
-              <ThemeToggle showLabel />
-            </div>
-
-            {user ? (
-              <Link
-                href="/dashboard"
-                onClick={() => setOpen(false)}
-                className="block border-4 border-black bg-neo-secondary px-4 py-3 text-center text-sm font-black uppercase tracking-wide text-black shadow-neo-sm"
-              >
-                My Dashboard
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="block border-4 border-black bg-black px-4 py-3 text-center text-sm font-black uppercase tracking-wide text-white shadow-neo-sm"
-              >
-                Register / Sign In
-              </Link>
-            )}
+      <div
+        className={`fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-ink px-6 pb-10 pt-6 transition-[opacity,visibility] duration-500 lg:hidden ${
+          open ? "visible opacity-100" : "invisible opacity-0"
+        }`}
+      >
+        <nav aria-label="Mobile" className="flex flex-col">
+          {[{ href: "/", label: "Home" }, ...PRIMARY_LINKS].map((link, i) => (
             <Link
-              href="/ask"
+              key={link.href}
+              href={link.href}
               onClick={() => setOpen(false)}
-              className="block border-4 border-black bg-neo-accent px-4 py-2.5 text-center text-xs font-black uppercase tracking-wider text-black shadow-neo-sm"
+              className="t-display flex items-baseline justify-between border-b border-bone/10 py-4 text-[2.6rem] leading-none transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              style={{
+                transform: open ? "none" : "translateY(24px)",
+                opacity: open ? 1 : 0,
+                transitionDelay: open ? `${80 + i * 50}ms` : "0ms",
+              }}
             >
-              Ask a Question / Help Desk
+              {link.label}
+              <span className="t-label text-bone/35">0{i + 1}</span>
             </Link>
-          </div>
+          ))}
         </nav>
-      )}
+
+        <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-3">
+          {MORE_LINKS.map((link) => (
+            <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="text-sm text-bone/60">
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-10 flex flex-col gap-3">
+          <Link href="/delegate-card" onClick={() => setOpen(false)} className="t-btn t-btn-solid justify-between">
+            Get passes <span>→</span>
+          </Link>
+          {user ? (
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/dashboard" onClick={() => setOpen(false)} className="t-btn t-btn-ghost justify-center">
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={async () => {
+                  const supabase = createClient();
+                  await supabase.auth.signOut();
+                  window.location.reload();
+                }}
+                className="t-btn t-btn-ghost cursor-pointer justify-center"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" onClick={() => setOpen(false)} className="t-btn t-btn-ghost justify-center">
+              Register / Sign in
+            </Link>
+          )}
+          <div className="mt-4 flex items-center justify-between border-t border-bone/10 pt-5">
+            <span className="t-label text-bone/50">Appearance</span>
+            <ThemeToggle variant="studio" />
+          </div>
+        </div>
+      </div>
     </header>
   );
 }

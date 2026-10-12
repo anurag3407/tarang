@@ -1,5 +1,5 @@
 /**
- * Date and time formatting utilities for PULSE.
+ * Date and time formatting utilities for TARANG.
  * All user-facing times are formatted in Indian Standard Time (IST - Asia/Kolkata).
  */
 

@@ -6,13 +6,31 @@ import { useTheme } from "./ThemeProvider";
 interface ThemeToggleProps {
   showLabel?: boolean;
   className?: string;
+  /** Minimal outline style for the dark Tarang navbar. */
+  variant?: "neo" | "studio";
 }
 
 export default function ThemeToggle({
   showLabel = false,
   className = "",
+  variant = "neo",
 }: ThemeToggleProps) {
   const { toggleTheme } = useTheme();
+
+  if (variant === "studio") {
+    return (
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-label="Toggle dark and light mode"
+        title="Toggle dark/light mode"
+        className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-current/20 text-current opacity-70 transition-opacity hover:opacity-100 ${className}`}
+      >
+        <Sun className="hidden h-4 w-4 dark:block" strokeWidth={1.5} aria-hidden="true" />
+        <Moon className="block h-4 w-4 dark:hidden" strokeWidth={1.5} aria-hidden="true" />
+      </button>
+    );
+  }
 
   return (
     <button

@@ -70,7 +70,7 @@ const schema = z.object({
   // Resend
   RESEND_API_KEY: z.string().optional(),
   RESEND_WEBHOOK_SECRET: z.string().optional(),
-  EMAIL_FROM: z.string().default("PULSE 2026 <no-reply@pulseasa.org>"),
+  EMAIL_FROM: z.string().default("TARANG 2026 <no-reply@pulseasa.org>"),
   EMAIL_REPLY_TO: z.string().optional(),
 
   // QR signing

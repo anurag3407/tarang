@@ -8,7 +8,7 @@ import { GALLERY, type GalleryItem } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Gallery",
   description:
-    "Moments from past editions of PULSE — battle of bands, pro shows, flash mobs and everything in between.",
+    "Moments from past editions of TARANG — battle of bands, pro shows, flash mobs and everything in between.",
 };
 
 const COLOR_BG: Record<GalleryItem["color"], string> = {
@@ -69,7 +69,7 @@ export default function GalleryPage() {
         kicker="Through the lens"
         title="The"
         accent="gallery"
-        description="Moments from past editions. Photo uploads from PULSE 2026 go live during the fest — tagged by the media team."
+        description="Moments from past editions. Photo uploads from TARANG 2026 go live during the fest — tagged by the media team."
       />
       <section className="bg-neo-cream">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
@@ -81,18 +81,18 @@ export default function GalleryPage() {
 
           <div className="mt-16 border-8 border-black bg-neo-secondary p-8 text-center text-black shadow-neo-lg md:p-12">
             <p className="text-3xl font-black uppercase tracking-tighter text-black md:text-4xl">
-              Shot something at PULSE?
+              Shot something at TARANG?
             </p>
             <p className="mx-auto mt-3 max-w-xl text-lg font-bold leading-snug text-black">
               Tag <span className="bg-white dark:bg-black text-black dark:text-white px-1">@pulse.aiims</span> on
-              Instagram with #PULSE2026 — the best frames make it to this wall
+              Instagram with #TARANG26 — the best frames make it to this wall
               and the closing film.
             </p>
           </div>
         </div>
       </section>
       <Marquee
-        items={["#PULSE2026", "Feel The Beat", "Live The Pulse", "Tag Us"]}
+        items={["#TARANG26", "Feel The Beat", "Live The Wave", "Tag Us"]}
         variant="secondary"
       />
     </>

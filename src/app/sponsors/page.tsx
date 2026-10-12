@@ -7,9 +7,9 @@ import { loadPublicContent } from "@/lib/content-loader";
 import { Sparkles, Mail, Phone, Award, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Sponsors & Partners — PULSE 2026",
+  title: "Sponsors & Partners — TARANG 2026",
   description:
-    "Meet our title partners, category associates, audio pioneers, and media partners powering PULSE 2026 at AIIMS New Delhi.",
+    "Meet our title partners, category associates, audio pioneers, and media partners powering TARANG 2026 at AIIMS New Delhi.",
 };
 
 export const dynamic = "force-dynamic";
@@ -35,11 +35,11 @@ export default async function SponsorsPage() {
     sponsors.length > 0
       ? sponsors.map((s) => s.name)
       : [
-          "PULSE 2026",
+          "TARANG 2026",
           "AIIMS NEW DELHI",
           "SEPTEMBER 17–21",
           "FEEL THE BEAT",
-          "LIVE THE PULSE",
+          "LIVE THE WAVE",
           "INDIA'S LARGEST MED FEST",
         ];
 
@@ -49,7 +49,7 @@ export default async function SponsorsPage() {
         kicker="Powering the Beat"
         title="Our"
         accent="Sponsors"
-        description="The brands, medical pioneers, audio innovators, and media partners making PULSE 2026 possible."
+        description="The brands, medical pioneers, audio innovators, and media partners making TARANG 2026 possible."
       />
 
       <section className="bg-neo-cream py-16 sm:py-20">
@@ -65,7 +65,7 @@ export default async function SponsorsPage() {
                   </span>
                 </div>
                 <span className="border-2 border-white bg-neo-accent px-3 py-1 text-xs font-black uppercase tracking-wider text-black">
-                  PULSE 2026 Headline
+                  TARANG 2026 Headline
                 </span>
               </div>
 
@@ -224,7 +224,7 @@ export default async function SponsorsPage() {
                           </a>
                         ) : (
                           <span className="text-[10px] font-bold uppercase text-black/40">
-                            AIIMS PULSE
+                            AIIMS TARANG
                           </span>
                         )}
                       </div>
@@ -243,7 +243,7 @@ export default async function SponsorsPage() {
                 Sponsors &amp; Partners Announcing Soon
               </h3>
               <p className="mx-auto mt-2 max-w-lg text-sm font-bold text-black/70">
-                We are actively curating the official partner and sponsor lineup for PULSE 2026. All confirmed brand collaborations will appear here once published from the admin control room.
+                We are actively curating the official partner and sponsor lineup for TARANG 2026. All confirmed brand collaborations will appear here once published from the admin control room.
               </p>
             </div>
           )}
@@ -256,7 +256,7 @@ export default async function SponsorsPage() {
                   Official Sponsorship Desk
                 </span>
                 <h3 className="mt-4 text-3xl font-black uppercase tracking-tight sm:text-4xl md:text-5xl text-white">
-                  Partner With PULSE 2026
+                  Partner With TARANG 2026
                 </h3>
                 <p className="mt-3 max-w-2xl text-base font-bold text-white/85">
                   Showcase your brand across 5 electric days to over 10,000+ medical delegates, students, and doctors from 450+ colleges across India.
@@ -265,7 +265,7 @@ export default async function SponsorsPage() {
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <a
-                  href="mailto:studentsunion@aiims.edu?subject=PULSE 2026 Sponsorship Inquiry"
+                  href="mailto:studentsunion@aiims.edu?subject=TARANG 2026 Sponsorship Inquiry"
                   className="inline-flex items-center justify-center gap-2 border-4 border-black bg-neo-secondary px-6 py-3.5 text-sm font-black uppercase tracking-wider text-black shadow-neo-white transition-transform hover:-translate-y-0.5"
                 >
                   <Mail className="h-5 w-5" />
@@ -282,7 +282,7 @@ export default async function SponsorsPage() {
               <div className="flex items-center justify-between gap-4 mb-6">
                 <div>
                   <h4 className="text-xl font-black uppercase tracking-tight text-neo-secondary">
-                    Chief Coordinators — PULSE 2026
+                    Chief Coordinators — TARANG 2026
                   </h4>
                   <p className="text-xs font-bold text-white/70">
                     Reach out directly for brand integration packages, title sponsorships, and stall bookings:

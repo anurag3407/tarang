@@ -291,7 +291,7 @@ export default function DelegatePassClient({
         order_id: data.razorpayOrderId,
         amount: data.amountPaise,
         currency: data.currency,
-        name: "PULSE 2026",
+        name: "TARANG 2026",
         description: "VIP All-Access Delegate Card",
         prefill: {
           name: userProfile?.displayName ?? "",
@@ -439,7 +439,7 @@ export default function DelegatePassClient({
               All-Access <span className="text-neo-secondary">Delegate Card</span> &amp; Concert Card
             </h1>
             <p className="mt-4 text-lg font-bold text-white/80 sm:text-xl">
-              Experience the pinnacle of PULSE 2026. Full 5-day festival access, all star pro shows,
+              Experience the pinnacle of TARANG 2026. Full 5-day festival access, all star pro shows,
               front-row VIP concert arena, and exclusive backstage perks.
             </p>
           </div>
@@ -558,7 +558,7 @@ export default function DelegatePassClient({
               {/* Poster Right of Entry Footnote */}
               <div className="relative z-10 mt-6 border-t-2 border-white/20 pt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400">
                 <span>*RIGHT OF ENTRY RESERVED</span>
-                <span className="text-neo-secondary">PULSE 2026 · AIIMS NEW DELHI</span>
+                <span className="text-neo-secondary">TARANG 2026 · AIIMS NEW DELHI</span>
               </div>
             </div>
           </div>

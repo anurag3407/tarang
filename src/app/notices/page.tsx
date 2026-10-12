@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Notices",
   description:
-    "Official notices from the PULSE 2026 organizing committee — registrations, deadlines, venue changes and updates.",
+    "Official notices from the TARANG 2026 organizing committee — registrations, deadlines, venue changes and updates.",
 };
 
 export default async function NoticesPage() {

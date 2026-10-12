@@ -28,9 +28,9 @@ import {
 import { FEST } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "Interactive Campus Venue Map — AIIMS PULSE 2026",
+  title: "Interactive Campus Venue Map — AIIMS TARANG 2026",
   description:
-    "Explore the official interactive venue map of AIIMS New Delhi for PULSE 2026. Find Quadrangle, JL Auditorium, Gymkhana, CR Desk, internal road numbers 1–6, and gates 1–6 with ease.",
+    "Explore the official interactive venue map of AIIMS New Delhi for TARANG 2026. Find Quadrangle, JL Auditorium, Gymkhana, CR Desk, internal road numbers 1–6, and gates 1–6 with ease.",
 };
 
 const MAP_STATS = [
@@ -225,7 +225,7 @@ export default function VenueMapPage() {
               </h2>
             </div>
             <p className="max-w-md text-sm font-bold text-black/75">
-              Everything happening across the 5 days of PULSE — from the grand Quadrangle stage to high-tech surgical workshops.
+              Everything happening across the 5 days of TARANG — from the grand Quadrangle stage to high-tech surgical workshops.
             </p>
           </div>
 

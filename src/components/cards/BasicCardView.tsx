@@ -19,7 +19,7 @@ interface BasicCardViewProps {
 export default function BasicCardView({
   passCode,
   state,
-  productName = "PULSE BR Card",
+  productName = "TARANG BR Card",
   userName,
   collegeName,
   email,
@@ -67,7 +67,7 @@ export default function BasicCardView({
                 {productName}
               </h3>
               <p className="text-xs font-bold text-black/70 mt-0.5">
-                PULSE 2026 · AIIMS New Delhi · 17–21 September 2026
+                TARANG 2026 · AIIMS New Delhi · 17–21 September 2026
               </p>
             </div>
 

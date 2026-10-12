@@ -238,7 +238,7 @@ export function MerchandiseCheckoutModal({
         key: checkoutData.razorpayKeyId,
         amount: checkoutData.amountPaise,
         currency: checkoutData.currency || "INR",
-        name: "PULSE 2026 Merchandise",
+        name: "TARANG 2026 Merchandise",
         description: `${item.name} (${selectedSize}) x ${quantity}`,
         order_id: checkoutData.razorpayOrderId,
         prefill: {
@@ -445,7 +445,7 @@ export function MerchandiseCheckoutModal({
                   <span>Official Festival Drop</span>
                 </div>
                 <p className="text-[11px] font-bold text-black/70 dark:text-zinc-300">
-                  Premium heavyweight construction. Guaranteed authentic PULSE ’27 merchandise.
+                  Premium heavyweight construction. Guaranteed authentic TARANG ’27 merchandise.
                 </p>
               </div>
             </div>

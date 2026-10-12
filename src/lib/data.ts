@@ -1,5 +1,5 @@
 /**
- * PULSE 2026 — centralized content layer.
+ * TARANG 2026 — centralized content layer.
  *
  * Everything the UI renders lives here. When the backend is ready,
  * replace these exports with fetch calls — the shapes are already
@@ -11,11 +11,12 @@
 /* ------------------------------------------------------------------ */
 
 export const FEST = {
-  name: "PULSE",
+  name: "TARANG",
+  short: "Tarang ’26",
   year: "2026",
   edition: "51st Edition",
   college: "AIIMS New Delhi",
-  tagline: "Feel The Beat. Live The Pulse.",
+  tagline: "Feel The Beat. Ride The Wave.",
   dates: "17 – 21 September 2026",
   datesShort: "17–21 SEP '26",
   days: 5,
@@ -260,7 +261,7 @@ export const TEAM: TeamGroup[] = [
   {
     id: "chief-coordinators",
     name: "Chief Coordinators",
-    blurb: "Leading operations, festival administration, and campus execution for PULSE.",
+    blurb: "Leading operations, festival administration, and campus execution for TARANG.",
     members: [
       {
         name: "Abdul Rafey Ansari",
@@ -307,7 +308,7 @@ export const TEAM: TeamGroup[] = [
   {
     id: "executive-council",
     name: "AIIMS Student Association (ASA) Leadership",
-    blurb: "The elected executive student council of AIIMS New Delhi behind PULSE.",
+    blurb: "The elected executive student council of AIIMS New Delhi behind TARANG.",
     members: [
       {
         name: "Prashant Yadav",
@@ -393,7 +394,7 @@ export const PULSE_VENUES: VenueInfo[] = [
     id: "quadrangle",
     name: "Quadrangle Main Stage",
     category: "Pro Nights & Grand Finals",
-    description: "The epic open-air epicenter of PULSE hosting prime night headliners, Star Nights, Battle of the Bands, and grand opening/closing spectacles.",
+    description: "The epic open-air epicenter of TARANG hosting prime night headliners, Star Nights, Battle of the Bands, and grand opening/closing spectacles.",
     tag: "Prime Stage",
   },
   {
@@ -454,17 +455,17 @@ export const FAQS: Faq[] = [
   {
     category: "Registration",
     q: "How do I register for events?",
-    a: "First, get your mandatory PULSE BR Card. Then register for individual or team events from the Events page. Team events need one captain to register the squad.",
+    a: "First, get your mandatory TARANG BR Card. Then register for individual or team events from the Events page. Team events need one captain to register the squad.",
   },
   {
     category: "Registration",
     q: "Can students from other colleges participate?",
-    a: "Yes! PULSE is South Asia's largest medical college festival and is open to students of all colleges for cultural, literary, sports, and informal events. Carry a valid college ID card at the venue.",
+    a: "Yes! TARANG is South Asia's largest medical college festival and is open to students of all colleges for cultural, literary, sports, and informal events. Carry a valid college ID card at the venue.",
   },
   {
     category: "Passes & Entry",
     q: "What is the difference between BR Card and Delegate Card?",
-    a: "The Delegate Card gives you access to Prime Events and covers everything included with the BR Card. The BR Card is mandatory for participating in all PULSE events other than Prime Events. If taking a Delegate Card, you do not need a BR Card. If not taking a Delegate Card, you need a BR Card to participate in other events.",
+    a: "The Delegate Card gives you access to Prime Events and covers everything included with the BR Card. The BR Card is mandatory for participating in all TARANG events other than Prime Events. If taking a Delegate Card, you do not need a BR Card. If not taking a Delegate Card, you need a BR Card to participate in other events.",
   },
   {
     category: "Passes & Entry",
@@ -535,7 +536,7 @@ export const ROUTES: RouteOption[] = [
     steps: [
       "Board the Yellow Line (Samaypur Badli ↔ Millennium City Centre Gurugram) to AIIMS Metro Station.",
       "Take Exit Gate 1 or Gate 2 for immediate direct access to the AIIMS campus.",
-      "Follow the vibrant PULSE signboards for Central Registration (CR) Desk and festival venues.",
+      "Follow the vibrant TARANG signboards for Central Registration (CR) Desk and festival venues.",
     ],
     tip: "Yellow Line connects directly with Rajiv Chowk (Connaught Place), Kashmere Gate, New Delhi Railway Station, and Huda City Centre.",
   },
@@ -568,7 +569,7 @@ export const ROUTES: RouteOption[] = [
       "Ask your cab or auto driver for 'AIIMS Quadrangle / Ansari Nagar'.",
       "Designated drop-off lanes operate at Gate 1 and Gate 2 along Sri Aurobindo Marg / Ring Road.",
     ],
-    tip: "Parking inside campus is limited during PULSE. We strongly recommend drop-and-go via Uber/Ola or Delhi Metro.",
+    tip: "Parking inside campus is limited during TARANG. We strongly recommend drop-and-go via Uber/Ola or Delhi Metro.",
   },
   {
     id: "bus",
@@ -627,7 +628,7 @@ export const LANDMARKS = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* Landing page flow (The Pulse Flow)                                  */
+/* Landing page flow (The Tarang Flow)                                  */
 /* ------------------------------------------------------------------ */
 
 export type FlowHighlight = {
@@ -740,7 +741,7 @@ export const FLOW: FlowStep[] = [
   },
   {
     step: "04",
-    title: "LIVE THE PULSE",
+    title: "LIVE THE WAVE",
     tag: "5 Days of Action",
     highlights: [
       {
@@ -797,12 +798,12 @@ export const FLOW: FlowStep[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* PULSE BR Card Perks & Inclusions                                    */
+/* TARANG BR Card Perks & Inclusions                                    */
 /* ------------------------------------------------------------------ */
 
 export const BR_CARD_PERKS = {
   mandatoryNotice:
-    "A BR Card is mandatory to participate in any event (except Star Nights - for which you will need delegate card) and also gives you access to the AIIMS campus throughout PULSE.",
+    "A BR Card is mandatory to participate in any event (except Star Nights - for which you will need delegate card) and also gives you access to the AIIMS campus throughout TARANG.",
   recommendations: [
     "Movie Nighters",
     "Literary Nighters",
@@ -819,12 +820,12 @@ export const BR_CARD_PERKS = {
   informals: [
     "Cupid Waltz",
     "Musical Chairs",
-    "Mr. & Miss PULSE",
+    "Mr. & Miss TARANG",
     "Water Balloon Fights, etc.",
   ],
-  tagline: "Get your BR Card. Live the Beat. Experience PULSE.",
+  tagline: "Get your BR Card. Live the Beat. Experience TARANG.",
   leadParagraph:
-    "From music and dance to literature, art, comedy, competitions and everything in between, these events form the heart and soul of PULSE.",
+    "From music and dance to literature, art, comedy, competitions and everything in between, these events form the heart and soul of TARANG.",
 };
 
 /* ------------------------------------------------------------------ */

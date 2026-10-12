@@ -9,7 +9,7 @@ import { FaqJsonLd } from "@/components/seo/JsonLd";
 export const metadata: Metadata = {
   title: "FAQs",
   description:
-    "Frequently asked questions about PULSE 2026 — registration, passes, entry, events and logistics.",
+    "Frequently asked questions about TARANG 2026 — registration, passes, entry, events and logistics.",
 };
 
 export default function FaqsPage() {

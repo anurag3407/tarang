@@ -194,7 +194,7 @@ export default function EventRegistrationModal({
         order_id: checkoutData.razorpayOrderId,
         amount: checkoutData.amountPaise,
         currency: checkoutData.currency || "INR",
-        name: "PULSE 2026",
+        name: "TARANG 2026",
         description: `Registration for ${event.name}`,
         theme: { color: "#ff6b6b" },
         handler: async (response: {

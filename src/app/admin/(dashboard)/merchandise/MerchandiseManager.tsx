@@ -476,7 +476,7 @@ export default function MerchandiseManager() {
                     value={form.name}
                     onChange={(e) => handleNameChange(e.target.value)}
                     className={inputClass}
-                    placeholder="e.g. PULSE ’27 Heavyweight Hoodie"
+                    placeholder="e.g. TARANG ’27 Heavyweight Hoodie"
                   />
                 </label>
 
