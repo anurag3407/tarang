@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Ring } from "./Icons";
 import { scrollVelocity, useScene } from "./motion";
 
@@ -55,15 +55,74 @@ export default function Marquee() {
     }
   });
 
+  // Lay the tapes corner to corner: each runs along a diagonal of the section,
+  // so its angle and length follow the section's own proportions.
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const fit = () => {
+      const { width, height } = el.getBoundingClientRect();
+      el.style.setProperty("--tape-len", `${Math.hypot(width, height) * 1.12}px`);
+      el.style.setProperty("--tape-ang", `${Math.atan2(height, width)}rad`);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const tape =
+    "absolute left-1/2 top-1/2 w-[var(--tape-len,140vw)] border-y-[3px] border-ink py-3 shadow-[0_24px_50px_-18px_rgba(0,0,0,0.85)] md:py-5";
+
   return (
-    <section ref={root} aria-label="Disciplines" className="relative flex h-[46vh] items-center overflow-hidden bg-ink md:h-[64vh]">
-      <div className="absolute inset-x-[-10%] top-1/2 -translate-y-[85%] rotate-[-5deg] border-y-[3px] border-ink bg-crimson py-3 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.8)] md:py-5">
+    <section
+      ref={root}
+      aria-label="Disciplines"
+      className="relative h-[72vh] overflow-hidden bg-ink md:h-[92vh]"
+      style={{
+        background:
+          "radial-gradient(55% 60% at 0% 0%, rgba(163,16,13,0.55), transparent 70%), radial-gradient(55% 60% at 100% 100%, rgba(163,16,13,0.5), transparent 70%), radial-gradient(40% 45% at 100% 0%, rgba(110,0,1,0.45), transparent 70%), radial-gradient(40% 45% at 0% 100%, rgba(110,0,1,0.45), transparent 70%), var(--color-ink)",
+      }}
+    >
+      {/* Halftone dots, densest where the tapes cross */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(196,24,18,0.5) 0 30%, transparent 33%)",
+          backgroundSize: "22px 22px",
+          WebkitMaskImage: "radial-gradient(70% 70% at 50% 50%, #000 0%, transparent 75%)",
+          maskImage: "radial-gradient(70% 70% at 50% 50%, #000 0%, transparent 75%)",
+        }}
+      />
+
+      {/* Ghost lettering behind the tapes */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center select-none">
+        <p className="t-display whitespace-nowrap text-[18vw] leading-[0.85] text-transparent [-webkit-text-stroke:1.5px_rgba(244,234,200,0.14)]">
+          Mute the
+        </p>
+        <p className="t-display whitespace-nowrap text-[18vw] leading-[0.85] text-transparent [-webkit-text-stroke:1.5px_rgba(255,59,31,0.22)]">
+          Mundane
+        </p>
+      </div>
+
+      {/* Studio slug lines in the free corners */}
+      <p className="t-label absolute left-1/2 top-6 -translate-x-1/2 text-bone/55 md:top-10">(—) Eight arenas</p>
+      <p className="t-label absolute bottom-6 left-1/2 -translate-x-1/2 text-bone/55 md:bottom-10">Five nights · one wave</p>
+
+      {/* Tape A: top-left corner to bottom-right */}
+      <div className={`${tape} bg-crimson`} style={{ transform: "translate(-50%, -50%) rotate(var(--tape-ang, 0.5rad))" }}>
         <div ref={a} className="flex w-max will-change-transform">
           <Row words={ARTS} tone="red" />
           <Row words={ARTS} tone="red" />
         </div>
       </div>
-      <div className="absolute inset-x-[-10%] top-1/2 -translate-y-[5%] rotate-[3.5deg] border-y-[3px] border-ink bg-bone py-3 md:py-5" aria-hidden>
+      {/* Tape B: bottom-left corner to top-right */}
+      <div
+        className={`${tape} bg-bone`}
+        style={{ transform: "translate(-50%, -50%) rotate(calc(var(--tape-ang, 0.5rad) * -1))" }}
+        aria-hidden
+      >
         <div ref={b} className="flex w-max will-change-transform">
           <Row words={CHANT} tone="cream" />
           <Row words={CHANT} tone="cream" />
