@@ -25,8 +25,8 @@
 
 const APP_ENV = process.env.APP_ENV || "local";
 const DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "dev";
-const KEY_PREFIX = `pulse:${APP_ENV}:next-cache:${DEPLOYMENT_ID}`;
-const TAG_PREFIX = `pulse:${APP_ENV}:next-cache-tags:${DEPLOYMENT_ID}`;
+const KEY_PREFIX = `tarang:${APP_ENV}:next-cache:${DEPLOYMENT_ID}`;
+const TAG_PREFIX = `tarang:${APP_ENV}:next-cache-tags:${DEPLOYMENT_ID}`;
 
 // Never push entries larger than this to Upstash (protects against image
 // buffers and huge RSC payloads). Oversized entries stay local-only.

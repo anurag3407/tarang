@@ -25,8 +25,8 @@ export default defineConfig({
       SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
       RAZORPAY_KEY_ID: "rzp_test_key",
       RAZORPAY_KEY_SECRET: "test_razorpay_secret_0123456789",
-      APP_BASE_URL: "https://pulse.example.com",
-      PUBLIC_SITE_URL: "https://pulse.example.com",
+      APP_BASE_URL: "https://tarang.example.com",
+      PUBLIC_SITE_URL: "https://tarang.example.com",
     },
   },
 });

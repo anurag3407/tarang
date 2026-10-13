@@ -82,8 +82,8 @@ function staticPassProducts() {
       amountPaise: 200000,
       currency: "INR",
       salesState: "OPEN",
-      validFrom: "2026-09-01T00:00:00+00:00",
-      validUntil: "2026-09-22T00:00:00+00:00",
+      validFrom: "2026-11-01T00:00:00+00:00",
+      validUntil: "2026-11-23T00:00:00+00:00",
     },
   ];
 }

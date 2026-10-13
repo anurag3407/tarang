@@ -100,7 +100,7 @@ interface ShiftLogItem {
 const GOOD_OUTCOMES = new Set(["accepted", "accepted_reentry", "manual_override"]);
 const WARN_OUTCOMES = new Set(["cooldown", "provisional_offline", "duplicate"]);
 
-const DEFAULT_SCANNER_CREDENTIAL = "pulse-web-scanner-default-credential";
+const DEFAULT_SCANNER_CREDENTIAL = "tarang-web-scanner-default-credential";
 const DEFAULT_GATE = {
   gateId: "00000000-0000-0000-0000-000000000001",
   gateName: "Main Gate",
@@ -165,7 +165,7 @@ export default function ScannerApp() {
   // Auto-init scanner session on mount
   useEffect(() => {
     let unmounted = false;
-    const stored = typeof window !== "undefined" ? sessionStorage.getItem("pulse-scanner-credential") : null;
+    const stored = typeof window !== "undefined" ? sessionStorage.getItem("tarang-scanner-credential") : null;
     const cred = stored || DEFAULT_SCANNER_CREDENTIAL;
     setDeviceCredential(cred);
 

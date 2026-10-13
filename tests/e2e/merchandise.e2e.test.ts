@@ -82,8 +82,8 @@ describe("GET /api/public/merchandise", () => {
       data: [
         {
           id: PRODUCT_ID,
-          slug: "pulse-hoodie",
-          name: "PULSE Hoodie",
+          slug: "tarang-hoodie",
+          name: "TARANG Hoodie",
           tagline: "Official Apparel",
           description: "380 GSM heavyweight cotton hoodie",
           details_markdown: "100% French Terry Cotton",
@@ -117,8 +117,8 @@ describe("GET /api/public/merchandise", () => {
     expect(body.data.merchandise).toHaveLength(1);
     expect(body.data.merchandise[0]).toMatchObject({
       id: PRODUCT_ID,
-      slug: "pulse-hoodie",
-      name: "PULSE Hoodie",
+      slug: "tarang-hoodie",
+      name: "TARANG Hoodie",
       pricePaise: 149900,
       stockUnits: 100,
       availableUnits: 80,
@@ -133,8 +133,8 @@ describe("GET /api/public/merchandise/:slug", () => {
     sb.onTable("merchandise_products", {
       data: {
         id: PRODUCT_ID,
-        slug: "pulse-hoodie",
-        name: "PULSE Hoodie",
+        slug: "tarang-hoodie",
+        name: "TARANG Hoodie",
         tagline: "Official Apparel",
         description: "380 GSM heavyweight cotton hoodie",
         details_markdown: "100% French Terry Cotton",
@@ -161,13 +161,13 @@ describe("GET /api/public/merchandise/:slug", () => {
     });
 
     const res = await publicMerchBySlug(
-      get("/api/public/merchandise/pulse-hoodie"),
-      ctx({ slug: "pulse-hoodie" })
+      get("/api/public/merchandise/tarang-hoodie"),
+      ctx({ slug: "tarang-hoodie" })
     );
     expect(res.status).toBe(200);
     const body = await json(res);
     expectOkEnvelope(body);
-    expect(body.data.merchandise.slug).toBe("pulse-hoodie");
+    expect(body.data.merchandise.slug).toBe("tarang-hoodie");
     expect(body.data.merchandise.images).toHaveLength(5);
   });
 
@@ -248,8 +248,8 @@ describe("Admin Merchandise API Routes", () => {
       data: [
         {
           id: PRODUCT_ID,
-          slug: "pulse-hoodie",
-          name: "PULSE Hoodie",
+          slug: "tarang-hoodie",
+          name: "TARANG Hoodie",
           tagline: "",
           description: "380 GSM fleece",
           details_markdown: null,
@@ -290,8 +290,8 @@ describe("Admin Merchandise API Routes", () => {
     const res = (await adminCreateMerch(
       post("/api/admin/merchandise", {
         body: {
-          name: "PULSE Bomber Jacket",
-          slug: "pulse-bomber-jacket",
+          name: "TARANG Bomber Jacket",
+          slug: "tarang-bomber-jacket",
           tagline: "Limited Drop",
           description: "Custom embroidered satin bomber jacket.",
           category: "Apparel",
@@ -328,8 +328,8 @@ describe("Admin Merchandise API Routes", () => {
     const res = (await adminPatchMerch(
       post(`/api/admin/merchandise/${PRODUCT_ID}`, {
         body: {
-          name: "PULSE Bomber Jacket Updated",
-          slug: "pulse-bomber-jacket",
+          name: "TARANG Bomber Jacket Updated",
+          slug: "tarang-bomber-jacket",
           tagline: "Limited Drop",
           description: "Updated description.",
           category: "Apparel",

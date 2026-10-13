@@ -1,15 +1,15 @@
-# pulse-compose.service — supervise docker compose on the VPS (plan §15.2).
+# tarang-compose.service — supervise docker compose on the VPS (plan §15.2).
 #
 # Docker is the primary supervisor; this unit only ensures the compose stack
 # comes up at boot and restarts if the whole stack dies. Individual container
 # restart policy is `unless-stopped` in docker-compose.yml.
 #
 # Install:
-#   sudo cp infra/systemd/pulse-compose.service /etc/systemd/system/
-#   sudo systemctl daemon-reload && sudo systemctl enable --now pulse-compose
+#   sudo cp infra/systemd/tarang-compose.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now tarang-compose
 
 [Unit]
-Description=PULSE 2026 docker compose stack (web + worker)
+Description=TARANG 2026 docker compose stack (web + worker)
 Requires=docker.service
 After=docker.service network-online.target
 Wants=network-online.target
@@ -17,12 +17,15 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=/opt/pulse
-# The local-build path records the exact image in /var/lib/pulse/current-image.
-# Docker compose parses /opt/pulse/.env internally; we avoid EnvironmentFile
+WorkingDirectory=/opt/tarang
+# The local-build path records the exact image in /var/lib/tarang/current-image.
+# Docker compose parses /opt/tarang/.env internally; we avoid EnvironmentFile
 # here so database/gateway secrets are not exposed to world-readable systemctl show.
-ExecStart=/bin/sh -c 'IMAGE="$${PULSE_IMAGE:-}"; if [ -z "$${IMAGE}" ] && [ -f /var/lib/pulse/current-image ]; then IMAGE=$$(cat /var/lib/pulse/current-image); fi; test -n "$${IMAGE}"; SLOT="blue"; if [ -f /var/lib/pulse/active-slot ]; then SLOT=$$(cat /var/lib/pulse/active-slot); fi; PULSE_IMAGE="$${IMAGE}" /usr/bin/docker compose -f /opt/pulse/docker-compose.yml up -d --remove-orphans "web-$${SLOT}" worker'
-ExecStop=/bin/sh -c '/usr/bin/docker compose -f /opt/pulse/docker-compose.yml stop'
+# Before the first deploy there is no current-image yet: exit 0 so boot stays
+# green; the first CI deploy brings the stack up itself.
+ExecStart=/bin/sh -c 'IMAGE="$${TARANG_IMAGE:-}"; if [ -z "$${IMAGE}" ] && [ -f /var/lib/tarang/current-image ]; then IMAGE=$$(cat /var/lib/tarang/current-image); fi; if [ -z "$${IMAGE}" ]; then echo "no release deployed yet"; exit 0; fi; SLOT="blue"; if [ -f /var/lib/tarang/active-slot ]; then SLOT=$$(cat /var/lib/tarang/active-slot); fi; TARANG_IMAGE="$${IMAGE}" exec /usr/bin/docker compose -f /opt/tarang/docker-compose.yml up -d "web-$${SLOT}" worker'
+# compose interpolates ${TARANG_IMAGE:?} even for `stop`, so supply it here too.
+ExecStop=/bin/sh -c 'IMAGE=$$(cat /var/lib/tarang/current-image 2>/dev/null); [ -n "$${IMAGE}" ] || exit 0; TARANG_IMAGE="$${IMAGE}" exec /usr/bin/docker compose -f /opt/tarang/docker-compose.yml stop'
 # Give containers their stop_grace_period before force-killing.
 TimeoutStopSec=60
 

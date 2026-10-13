@@ -114,7 +114,7 @@ export async function buildQrToken(
   const payload: QrPayload = {
     v: 1,
     jti: credential.jti,
-    fest: fest?.slug ?? "pulse",
+    fest: fest?.slug ?? "tarang",
     pass: pass?.public_pass_code ?? "",
     entv: credential.entitlement_version,
     nbf: Math.floor(new Date(credential.not_before).getTime() / 1000),

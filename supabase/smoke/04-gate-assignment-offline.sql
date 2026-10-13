@@ -16,7 +16,7 @@ begin
   return true;
 end $$;
 
-select id as fest_id from festivals where slug='pulse-2026' \gset
+select id as fest_id from festivals where slug='tarang-2026' \gset
 select id as gate_id from gates where name='Main Gate' \gset
 select id as cc_gate_id from gates where name='Convention Centre' \gset
 select id as ev_id from events order by starts_at limit 1 \gset

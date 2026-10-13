@@ -24,7 +24,7 @@ export function getRazorpay(): Razorpay | null {
  */
 export function receiptForOrder(localOrderId: string): string {
   const digest = createHash("sha1").update(localOrderId).digest("hex");
-  return `pulse-${digest}`.slice(0, 40);
+  return `tarang-${digest}`.slice(0, 40);
 }
 
 /** Verify the browser checkout callback HMAC (order_id|payment_id). */

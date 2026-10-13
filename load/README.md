@@ -1,6 +1,6 @@
 # Load & correctness tests (plan §16)
 
-k6 scripts for the PULSE 2026 platform. Run against a staging environment
+k6 scripts for the TARANG 2026 platform. Run against a staging environment
 that mirrors production (same image, Nginx, Cloudflare rules, Supabase
 compute, Upstash plan) with production-scale seed data (250 events, 10,000
 users) and **seeded auth tokens** — never real OTP/email or real participant
@@ -19,7 +19,7 @@ QRs.
 
 ```bash
 # Public reads (warm cache, 30 min)
-k6 run -e BASE_URL=https://staging.pulse.example load/public-burst.k6.ts
+k6 run -e BASE_URL=https://staging.tarang.example load/public-burst.k6.ts
 
 # Sudden ramp variant
 k6 run -e BASE_URL=... -e RAMP=1 load/public-burst.k6.ts

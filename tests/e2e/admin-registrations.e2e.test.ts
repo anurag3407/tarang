@@ -47,9 +47,9 @@ describe("Admin Registrations and Paginated Overview", () => {
     vi.advanceTimersByTime(31_000);
     resetWorld({ actor: { id: ADMIN_ID, email: "admin@example.com", confirmed: true } });
     userSb.setActor({ id: ADMIN_ID, email: "admin@example.com", confirmed: true });
-    sb.onTable("festivals", { data: { id: FESTIVAL_ID, slug: "pulse-2026", status: "PUBLISHED" }, error: null });
+    sb.onTable("festivals", { data: { id: FESTIVAL_ID, slug: "tarang-2026", status: "PUBLISHED" }, error: null });
     userSb.onTable("festivals", {
-      data: [{ id: FESTIVAL_ID, slug: "pulse-2026", status: "PUBLISHED" }],
+      data: [{ id: FESTIVAL_ID, slug: "tarang-2026", status: "PUBLISHED" }],
       error: null,
     });
   });

@@ -47,10 +47,10 @@ import `next/cache` so worker can call it).
 
 ## Cache keys
 
-All Redis keys follow `pulse:<APP_ENV>:...` (`src/lib/redis/keys.ts`):
-- `pulse:prod:content:events:<festivalId>:<version>`
-- `pulse:prod:availability:<festivalId>:<eventId>`
-- `pulse:prod:ratelimit:<class>:<identifier>`
+All Redis keys follow `tarang:<APP_ENV>:...` (`src/lib/redis/keys.ts`):
+- `tarang:prod:content:events:<festivalId>:<version>`
+- `tarang:prod:availability:<festivalId>:<eventId>`
+- `tarang:prod:ratelimit:<class>:<identifier>`
 - etc.
 
 Never store email/phone/raw IP/raw QR in keys.

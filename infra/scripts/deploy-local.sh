@@ -6,20 +6,20 @@
 # client bundle from repo *Variables*, and setting those requires GitHub admin
 # on the repo. Without them CI still builds, but the browser gets `undefined`
 # for the Supabase URL/key and every login dies. Building here reads the same
-# values from /opt/pulse/.env instead, so there is one source of truth.
+# values from /opt/tarang/.env instead, so there is one source of truth.
 #
 # Usage:
-#   cd /opt/pulse && git pull && ./infra/scripts/deploy-local.sh
+#   cd /opt/tarang && git pull && ./infra/scripts/deploy-local.sh
 #
 # Trade-offs versus the CI path (docs/11-vps-razorpay-golive.md Phase 6):
 #   - No SBOM and no Trivy CRITICAL/HIGH gate. Nothing scans this image.
 #   - Build load lands on the production box (see the swap note in docs/12).
 #   - The image exists only here, so a rebuilt VPS must rebuild it.
-# Prefer CI once someone with admin sets the three Variables and PROD_SSH_*.
+# Prefer CI (docs/13-lightsail-deployment.md): it builds off-box and is the normal path.
 #
-# Tagging: pulse:local-<sha> — immutable per commit, so /var/lib/pulse's
+# Tagging: tarang:local-<sha> — immutable per commit, so /var/lib/tarang's
 # previous-image still points at a genuinely different image and rollback.sh
-# keeps working. A single reused `pulse:local` tag would silently break that.
+# keeps working. A single reused `tarang:local` tag would silently break that.
 
 set -euo pipefail
 
@@ -66,7 +66,7 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   fi
 fi
 
-IMAGE="pulse:local-$SHA"
+IMAGE="tarang:local-$SHA"
 
 echo "==> Building $IMAGE"
 echo "    NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL"
@@ -82,4 +82,4 @@ docker build \
 echo "==> Handing off to deploy.sh"
 # Reuse deploy.sh for state recording, readiness, nginx validate/reload and drain
 # so the local path and the CI path stay behaviourally identical.
-PULSE_IMAGE="$IMAGE" PULSE_SKIP_PULL=1 exec "$REPO_ROOT/infra/scripts/deploy.sh"
+TARANG_IMAGE="$IMAGE" TARANG_SKIP_PULL=1 exec "$REPO_ROOT/infra/scripts/deploy.sh"

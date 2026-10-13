@@ -48,7 +48,7 @@ function nowPayload(overrides: Partial<QrPayload> = {}): QrPayload {
   return {
     v: 1,
     jti: "6f9b9a1c-1234-4a5b-8c9d-0e1f2a3b4c5d",
-    fest: "pulse-2026",
+    fest: "tarang-2026",
     pass: "PS-E2E-0001",
     entv: 1,
     nbf: now - 120,

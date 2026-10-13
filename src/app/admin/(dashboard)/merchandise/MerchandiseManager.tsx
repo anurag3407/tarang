@@ -488,7 +488,7 @@ export default function MerchandiseManager() {
                     value={form.slug}
                     onChange={(e) => setForm({ ...form, slug: e.target.value })}
                     className={inputClass}
-                    placeholder="e.g. pulse-27-heavyweight-hoodie"
+                    placeholder="e.g. tarang-27-heavyweight-hoodie"
                   />
                 </label>
               </div>

@@ -53,7 +53,7 @@ P1.<kid>.<base64url(payload)>.<base64url(Ed25519 signature)>
 - payload (canonical JSON, fixed key order):
   - `v`: 1
   - `jti`: credential UUID
-  - `fest`: festival slug (e.g. "pulse")
+  - `fest`: festival slug (e.g. "tarang")
   - `pass`: public pass code (e.g. "PP-XXXX")
   - `entv`: entitlement version (bumped on reissue)
   - `nbf` / `exp`: unix validity window

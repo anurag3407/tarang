@@ -1,13 +1,17 @@
 # 11 — VPS go-live & Razorpay webhook testing
 
-Goal: get PULSE onto a Hostinger VPS behind a real HTTPS domain, then register and
+> **Historical.** This describes the earlier Hostinger VPS path. Production now
+> runs on AWS Lightsail — follow [13 — Lightsail deployment](./13-lightsail-deployment.md).
+> Phases 7–8 here (Razorpay webhook registration and testing) still apply as-is.
+
+Goal: get TARANG onto a Hostinger VPS behind a real HTTPS domain, then register and
 test the Razorpay webhook. Chosen shape for this deploy:
 
 - **Edge/TLS:** Cloudflare Full (strict) + Authenticated Origin Pulls (repo default)
 - **Image delivery:** SSH to the VPS → local Docker build, tagged by commit via `deploy-local.sh`
 - **Hostnames:** single root domain (no subdomains)
 
-Throughout, `pulseasa.org` stands in for your domain — substitute yours.
+Throughout, `tarangfest.in` stands in for your domain — substitute yours.
 
 ---
 
@@ -44,13 +48,13 @@ this is what changed and why, so the diff makes sense.
 | Fix | Why it mattered |
 |-----|-----------------|
 | [`Dockerfile`](../Dockerfile) — added `NEXT_PUBLIC_*` build args | `next build` **inlines** `NEXT_PUBLIC_*` into the client bundle. Only `DEPLOYMENT_ID` was passed, so the browser got `undefined` for the Supabase URL/key and [`browser.ts:17`](../src/lib/supabase/browser.ts#L17) threw — all login and client data fetching dead, with a valid-looking `.env` on the host. |
-| [`docker-compose.yml`](../docker-compose.yml) — `expose` → loopback-only `ports` (`127.0.0.1:3001:3000` on `web-blue`, `127.0.0.1:3002:3000` on `web-green`) | Nginx runs on the **host**, not in compose. `expose` publishes nothing, so the loopback upstream and `deploy.sh`'s readiness probe could never connect — deploy would hang then fail. Blue/green slots each get their own loopback port; nginx's generated `pulse-upstream.conf` points at whichever slot is active. |
+| [`docker-compose.yml`](../docker-compose.yml) — `expose` → loopback-only `ports` (`127.0.0.1:3001:3000` on `web-blue`, `127.0.0.1:3002:3000` on `web-green`) | Nginx runs on the **host**, not in compose. `expose` publishes nothing, so the loopback upstream and `deploy.sh`'s readiness probe could never connect — deploy would hang then fail. Blue/green slots each get their own loopback port; nginx's generated `tarang-upstream.conf` points at whichever slot is active. |
 | [`ci.yml`](../.github/workflows/ci.yml) — digest job output | The `image` job tagged `sha-<12 chars>` but `deploy-staging` pulled `sha-<full 40-char sha>` — a tag that never exists. Now both use the build's real digest, which also matches `deploy.sh`'s "never a mutable tag" rule. |
 | [`.env.example`](../.env.example) — added `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Required in production by [`env.ts:147-148`](../src/lib/env.ts#L147-L148) but absent from the contract file, so a fresh `.env` copied from it would fail startup. |
 
 Because `NEXT_PUBLIC_*` is baked in at build time, **the image is now
 environment-specific.** Rebuild if the Supabase project or Razorpay key id changes.
-Setting them only in `/opt/pulse/.env` is not enough.
+Setting them only in `/opt/tarang/.env` is not enough.
 
 ---
 
@@ -110,8 +114,8 @@ On your computer, use a passphrase-protected personal key and a separate key for
 GitHub Actions (the CI key has no passphrase):
 
 ```powershell
-ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_ed25519 -C "pulse-admin"
-ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_pulse_deploy -N "" -C "github-actions-pulse"
+ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_ed25519 -C "tarang-admin"
+ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_tarang_deploy -N "" -C "github-actions-tarang"
 ```
 
 Paste both public keys, one per line, into the VPS file and secure it:
@@ -172,7 +176,7 @@ From the root session, add the hardening drop-in and validate it before restarti
 
 ```bash
 install -d -m 755 /etc/ssh/sshd_config.d
-cat >/etc/ssh/sshd_config.d/99-pulse-hardening.conf <<'EOF'
+cat >/etc/ssh/sshd_config.d/99-tarang-hardening.conf <<'EOF'
 PermitRootLogin no
 PasswordAuthentication no
 KbdInteractiveAuthentication no
@@ -244,7 +248,7 @@ ss -lntp
 
 Continue to Phase 2 only when Docker and nginx are active, UFW is enabled, key-only
 deploy login works, and no public listener exists on port 3000. Save the VPS IP and,
-once created in later phases, `/opt/pulse/.env` and `/etc/nginx/tls/origin.key` in a
+once created in later phases, `/opt/tarang/.env` and `/etc/nginx/tls/origin.key` in a
 password manager. Cloudflare CIDRs can change; schedule
 `infra/scripts/update-cloudflare-cidrs.sh` after the repository is cloned and refresh
 the UFW 443 rules when Cloudflare publishes new ranges.
@@ -258,11 +262,11 @@ None of them fit this architecture:
 |--------|----------|--------|
 | Malware scanner (free) | Skip | Aimed at shared PHP hosting. The app runs non-root in `read_only: true` containers, so there is no writable web root to scan — it just adds a root agent competing for RAM. Re-addable later from the dashboard. |
 | Daily auto-backups (paid) | Skip | See below. |
-| Docker manager | Skip | Installs a panel layer that wants to own Docker's lifecycle, conflicting with the compose stack and `pulse-compose.service`, and with the clean Docker install below. |
+| Docker manager | Skip | Installs a panel layer that wants to own Docker's lifecycle, conflicting with the compose stack and `tarang-compose.service`, and with the clean Docker install below. |
 
 **Why VPS snapshots are the wrong spend here: this box is nearly stateless.** The
 app is an immutable image in GHCR (re-pullable by digest), the config is in git, and
-the database is in Supabase. The only genuinely local state is `/opt/pulse/.env`,
+the database is in Supabase. The only genuinely local state is `/opt/tarang/.env`,
 the two files in `/etc/nginx/tls/`, and the `exports-data` volume. A lost VPS is a
 rebuild from this document, not a restore.
 
@@ -324,11 +328,11 @@ alone:
 | Key | Passphrase | Used by |
 |-----|-----------|---------|
 | `id_ed25519` | Yes | You, from your laptop |
-| `id_pulse_deploy` | **No** — CI cannot type one | GitHub Actions (`PROD_SSH_KEY`) |
+| `id_tarang_deploy` | **No** — CI cannot type one | GitHub Actions (`PROD_SSH_KEY`) |
 
 ```powershell
 # On your machine, for the CI key:
-ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_pulse_deploy -N '""' -C "github-actions-pulse"
+ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_tarang_deploy -N '""' -C "github-actions-tarang"
 ```
 
 Both `.pub` files go into `/home/deploy/.ssh/authorized_keys` (one per line). The CI
@@ -404,8 +408,8 @@ sudo mkdir -p /etc/nginx/tls && sudo chmod 700 /etc/nginx/tls
 ```
 
 **Origin certificate.** Cloudflare → SSL/TLS → Origin Server → *Create
-Certificate*. Accept the defaults (RSA, hostnames `pulseasa.org` and
-`*.pulseasa.org`, 15 years). Copy each block to the box:
+Certificate*. Accept the defaults (RSA, hostnames `tarangfest.in` and
+`*.tarangfest.in`, 15 years). Copy each block to the box:
 
 ```bash
 sudo nano /etc/nginx/tls/origin.pem   # paste the Origin Certificate
@@ -432,21 +436,21 @@ Pulls* → On (zone-level).
 ## Phase 4 — Install the nginx config
 
 You picked a single root domain, so install
-[`infra/nginx/conf.d/pulse-single-domain.conf`](../infra/nginx/conf.d/pulse-single-domain.conf)
-— **not** `pulse.conf`. Both declare `upstream next_app`, the
+[`infra/nginx/conf.d/tarang-single-domain.conf`](../infra/nginx/conf.d/tarang-single-domain.conf)
+— **not** `tarang.conf`. Both declare `upstream next_app`, the
 `$connection_upgrade` map, and a `default_server`; installing both makes
 `nginx -t` fail on duplicates.
 
 ```bash
-cd /opt/pulse   # created in Phase 5 — do this after cloning, or adjust the path
+cd /opt/tarang   # created in Phase 5 — do this after cloning, or adjust the path
 
 sudo cp infra/nginx/nginx.conf /etc/nginx/nginx.conf
 sudo cp infra/nginx/cloudflare-real-ip.conf /etc/nginx/conf.d/
 
-export PULSE_DOMAIN=pulseasa.org
-envsubst '${PULSE_DOMAIN}' \
-  < infra/nginx/conf.d/pulse-single-domain.conf \
-  | sudo tee /etc/nginx/conf.d/pulse.conf > /dev/null
+export TARANG_DOMAIN=tarangfest.in
+envsubst '${TARANG_DOMAIN}' \
+  < infra/nginx/conf.d/tarang-single-domain.conf \
+  | sudo tee /etc/nginx/conf.d/tarang.conf > /dev/null
 
 # nginx.org's package ships a sample server block that collides with ours
 sudo rm -f /etc/nginx/conf.d/default.conf
@@ -466,17 +470,17 @@ insert-then-`after()` design.
 ## Phase 5 — Application directory and `.env`
 
 ```bash
-sudo mkdir -p /opt/pulse /var/lib/pulse
-sudo chown -R deploy:deploy /opt/pulse /var/lib/pulse
-sudo -u deploy git clone https://github.com/anurag3407/fest.git /opt/pulse
-cd /opt/pulse
+sudo mkdir -p /opt/tarang /var/lib/tarang
+sudo chown -R deploy:deploy /opt/tarang /var/lib/tarang
+sudo -u deploy git clone https://github.com/anurag3407/fest.git /opt/tarang
+cd /opt/tarang
 ```
 
-`/var/lib/pulse` is where `deploy.sh` records `current-image`, `previous-image`,
+`/var/lib/tarang` is where `deploy.sh` records `current-image`, `previous-image`,
 and `active-slot` for rollback — without it, `rollback.sh` has nothing to fall
 back to and no idea which slot is live.
 
-Create `/opt/pulse/.env`. Start from your working local `.env`, then change these:
+Create `/opt/tarang/.env`. Start from your working local `.env`, then change these:
 
 ```ini
 NODE_ENV=production
@@ -485,12 +489,12 @@ APP_ENV=production
 # CSRF allowlist (src/lib/csrf.ts) — must be the exact https origin, no
 # trailing slash. Wrong values here make /api/checkout/razorpay/verify
 # return ORIGIN_NOT_ALLOWED and payments never confirm in the browser.
-APP_BASE_URL=https://pulseasa.org
-PUBLIC_SITE_URL=https://pulseasa.org
-REGISTRATION_SITE_URL=https://pulseasa.org
-ADMIN_SITE_URL=https://pulseasa.org
-SCANNER_SITE_URL=https://pulseasa.org
-HOOKS_BASE_URL=https://pulseasa.org
+APP_BASE_URL=https://tarangfest.in
+PUBLIC_SITE_URL=https://tarangfest.in
+REGISTRATION_SITE_URL=https://tarangfest.in
+ADMIN_SITE_URL=https://tarangfest.in
+SCANNER_SITE_URL=https://tarangfest.in
+HOOKS_BASE_URL=https://tarangfest.in
 
 # Must be identical across instances or server actions break on rolling deploys.
 # Generate once: openssl rand -base64 32
@@ -502,14 +506,14 @@ RAZORPAY_WEBHOOK_SECRET_PREVIOUS=
 ```
 
 ```bash
-chmod 600 /opt/pulse/.env
+chmod 600 /opt/tarang/.env
 ```
 
 Notes:
 
 - Leave `DEPLOYMENT_ID` commented out — it's baked into the image at build time,
   and an empty value in `.env` would override the baked one.
-- `APP_ENV=production` namespaces Redis keys as `pulse:production:*`. If this box
+- `APP_ENV=production` namespaces Redis keys as `tarang:production:*`. If this box
   shares an Upstash database with your local dev, this is what keeps the caches
   apart.
 - `.env` is read by both `web` and `worker` via `env_file`. If you edit it, restart
@@ -521,8 +525,8 @@ Login uses OAuth and email OTP, both redirecting to `${window.location.origin}/a
 ([`login/page.tsx:24`](../src/app/login/page.tsx#L24)). Supabase rejects redirects
 it doesn't know, so in the Supabase dashboard → Authentication → URL Configuration:
 
-- **Site URL:** `https://pulseasa.org`
-- **Redirect URLs:** add `https://pulseasa.org/**` (the wildcard covers the
+- **Site URL:** `https://tarangfest.in`
+- **Redirect URLs:** add `https://tarangfest.in/**` (the wildcard covers the
   `?next=` query the app appends)
 
 Skipping this is the usual cause of "login redirects back to the login page" on a
@@ -535,7 +539,7 @@ fresh domain.
 This phase intentionally does **not** use GitHub Actions, GHCR, a PAT, or a remote
 image registry. The VPS clones the source, builds the production image locally, and
 runs the `web` and `worker` containers with Docker Compose. Build time and RAM use
-are higher on the VPS, but this path needs only SSH access and `/opt/pulse/.env`.
+are higher on the VPS, but this path needs only SSH access and `/opt/tarang/.env`.
 
 ### 6a. Prepare the source checkout
 
@@ -543,20 +547,20 @@ The commands below are shown for the recommended `deploy` account. If you are
 deliberately operating the VPS from a root shell/Hostinger console, use the root
 variant immediately below instead.
 
-**Root-operated variant:** from your current `root@...:/opt/pulse#` prompt, make the
+**Root-operated variant:** from your current `root@...:/opt/tarang#` prompt, make the
 checkout consistently root-owned. This resolves Git's `detected dubious ownership`
 error without weakening Git's safety check:
 
 ```bash
-cd /opt/pulse
-chown -R root:root /opt/pulse
-chmod 600 /opt/pulse/.env
+cd /opt/tarang
+chown -R root:root /opt/tarang
+chmod 600 /opt/tarang/.env
 git status --short
 git pull --ff-only origin main
 ./infra/scripts/deploy-local.sh
 ```
 
-The root variant requires `/opt/pulse/.env` to exist. Root does not need `sudo` for
+The root variant requires `/opt/tarang/.env` to exist. Root does not need `sudo` for
 the build, Docker, or nginx commands. Root SSH login may still be disabled by Phase 1
 hardening; use the Hostinger console or log in as `deploy` and run `sudo -i` to obtain
 a root shell.
@@ -567,7 +571,7 @@ production fixes. The deployment repository used by this guide is
 still missing dependencies such as `@next/env`:
 
 ```bash
-cd /opt/pulse
+cd /opt/tarang
 git remote -v
 git remote set-url origin https://github.com/anurag3407/fest.git
 git fetch origin
@@ -587,11 +591,11 @@ remote URL and pull again.
 
 ```bash
 ssh -i ~/.ssh/id_ed25519 deploy@<VPS_IP>
-cd /opt/pulse
+cd /opt/tarang
 git status --short
 git pull --ff-only origin main
-test -s /opt/pulse/.env
-chmod 600 /opt/pulse/.env
+test -s /opt/tarang/.env
+chmod 600 /opt/tarang/.env
 ```
 
 If `git pull` reports local changes, stop and inspect them. Do not overwrite the
@@ -600,7 +604,7 @@ production `.env`; it is ignored by git and must remain on the host.
 Verify the build-time values exist:
 
 ```bash
-grep -E '^(NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY|NEXT_PUBLIC_RAZORPAY_KEY_ID)=' /opt/pulse/.env
+grep -E '^(NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY|NEXT_PUBLIC_RAZORPAY_KEY_ID)=' /opt/tarang/.env
 ```
 
 These public values are inlined during `next build`, so changing them requires a
@@ -629,30 +633,30 @@ build when any is missing, tags the image with the commit SHA, and then invokes 
 normal readiness/nginx/rollback orchestration:
 
 ```bash
-cd /opt/pulse
+cd /opt/tarang
 sudo ./infra/scripts/deploy-local.sh
 ```
 
-It builds `pulse:local-<commit>`, runs migrations, starts the new image on the
+It builds `tarang:local-<commit>`, runs migrations, starts the new image on the
 **idle** blue/green slot (web-blue @ 3001 / web-green @ 3002), waits for
 `/api/health/ready` on that slot's port, repoints and validates nginx
-(`pulse-upstream.conf` → `nginx -t` → reload), updates the worker, drains and stops
-the old slot, and records current/previous image + active slot under `/var/lib/pulse`
+(`tarang-upstream.conf` → `nginx -t` → reload), updates the worker, drains and stops
+the old slot, and records current/previous image + active slot under `/var/lib/tarang`
 for rollback. A failed candidate never takes traffic.
 
 ### 6d. Fully explicit manual equivalent
 
 Use this instead of `deploy-local.sh` when you want to see each operation. Set the
-three public build values to the same values in `/opt/pulse/.env`; never put private
+three public build values to the same values in `/opt/tarang/.env`; never put private
 server secrets in Docker build arguments:
 
 ```bash
-cd /opt/pulse
+cd /opt/tarang
 export RELEASE_ID="$(git rev-parse --short=12 HEAD)"
 export NEXT_PUBLIC_SUPABASE_URL='<your Supabase project URL>'
 export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY='<your Supabase publishable/anon key>'
 export NEXT_PUBLIC_RAZORPAY_KEY_ID='rzp_test_...'
-export IMAGE="pulse:local-${RELEASE_ID}"
+export IMAGE="tarang:local-${RELEASE_ID}"
 
 sudo docker build --pull \
   --build-arg "DEPLOYMENT_ID=${RELEASE_ID}" \
@@ -664,10 +668,10 @@ sudo docker build --pull \
 # Hand off to the same blue/green orchestration deploy-local.sh uses:
 # migrations → candidate slot on the idle port → readiness → nginx cutover
 # → worker update → drain old slot → state recording.
-sudo env PULSE_IMAGE="${IMAGE}" PULSE_SKIP_PULL=1 ./infra/scripts/deploy.sh
+sudo env TARANG_IMAGE="${IMAGE}" TARANG_SKIP_PULL=1 ./infra/scripts/deploy.sh
 ```
 
-`PULSE_SKIP_PULL=1` tells `deploy.sh` the image was built locally instead of pulled;
+`TARANG_SKIP_PULL=1` tells `deploy.sh` the image was built locally instead of pulled;
 everything after that step is identical to a registry deploy. If the build or
 readiness check fails, inspect the service logs:
 
@@ -681,7 +685,7 @@ When inspecting a locally built stack, Compose still needs the image variable fo
 interpolation. Set it from the deployment state first:
 
 ```bash
-export PULSE_IMAGE="$(cat /var/lib/pulse/current-image)"
+export TARANG_IMAGE="$(cat /var/lib/tarang/current-image)"
 docker compose ps
 ```
 
@@ -689,8 +693,8 @@ docker compose ps
 Docker dependency layer is stale. From the root shell, run:
 
 ```bash
-cd /opt/pulse
-chown -R root:root /opt/pulse
+cd /opt/tarang
+chown -R root:root /opt/tarang
 git pull --ff-only origin main
 git log -1 --oneline
 grep '"@next/env"' package.json
@@ -707,21 +711,21 @@ docker builder prune -af
 ```
 
 The prune removes unused build cache only; it does not remove running containers,
-images tagged `pulse:local-*`, volumes, or `/opt/pulse/.env`.
+images tagged `tarang:local-*`, volumes, or `/opt/tarang/.env`.
 
 ### 6e. Verify the running application
 
 Run local checks on the VPS first, then the public HTTPS check through Cloudflare.
 Web slots live on loopback ports 3001 (blue) and 3002 (green); query whichever
-`/var/lib/pulse/active-slot` names:
+`/var/lib/tarang/active-slot` names:
 
 ```bash
-ACTIVE_SLOT="$(cat /var/lib/pulse/active-slot 2>/dev/null || echo blue)"
+ACTIVE_SLOT="$(cat /var/lib/tarang/active-slot 2>/dev/null || echo blue)"
 ACTIVE_PORT=$([ "$ACTIVE_SLOT" = green ] && echo 3002 || echo 3001)
 curl -fsS "http://127.0.0.1:${ACTIVE_PORT}/api/health/live"
 curl -fsS "http://127.0.0.1:${ACTIVE_PORT}/api/health/ready"
 curl -fsS "http://127.0.0.1:${ACTIVE_PORT}/api/health/dependencies" | head -40
-curl -fsS https://pulseasa.org/api/health/live
+curl -fsS https://tarangfest.in/api/health/live
 ```
 
 The local checks must return HTTP 200. A readiness timeout normally means a missing
@@ -732,10 +736,10 @@ If OAuth or another dynamic route returns **502** and the web logs contain
 runtime-cache volume. Pull the version of this repository that defines
 `next-cache:/app/.next/cache` in `docker-compose.yml`, then rebuild and deploy:
 ```bash
-cd /opt/pulse
+cd /opt/tarang
 git pull --ff-only origin main
 ./infra/scripts/deploy-local.sh
-export PULSE_IMAGE="$(cat /var/lib/pulse/current-image)"
+export TARANG_IMAGE="$(cat /var/lib/tarang/current-image)"
 docker compose ps
 docker compose logs --tail=100 web
 ```
@@ -749,10 +753,10 @@ upstream`** on `/auth/callback`, increase the proxy response buffers. Supabase O
 can return several large `Set-Cookie` headers containing the session tokens:
 
 ```bash
-cd /opt/pulse
-export PULSE_DOMAIN=pulseasa.org
-envsubst '${PULSE_DOMAIN}' < infra/nginx/conf.d/pulse-single-domain.conf \
-  > /etc/nginx/conf.d/pulse.conf
+cd /opt/tarang
+export TARANG_DOMAIN=tarangfest.in
+envsubst '${TARANG_DOMAIN}' < infra/nginx/conf.d/tarang-single-domain.conf \
+  > /etc/nginx/conf.d/tarang.conf
 nginx -t
 systemctl reload nginx
 ```
@@ -784,7 +788,7 @@ After correcting the cause:
 
 ```bash
 nginx -t && systemctl restart nginx
-curl -I https://pulseasa.org/api/health/live
+curl -I https://tarangfest.in/api/health/live
 ```
 
 ### 6f. Rollback and reboot persistence
@@ -792,7 +796,7 @@ curl -I https://pulseasa.org/api/health/live
 If a new local build is unhealthy, restore the previous local image:
 
 ```bash
-cd /opt/pulse
+cd /opt/tarang
 sudo ./infra/scripts/rollback.sh
 sudo docker compose ps
 ```
@@ -800,13 +804,13 @@ sudo docker compose ps
 Install the boot supervisor after the first successful deploy:
 
 ```bash
-sudo cp infra/systemd/pulse-compose.service /etc/systemd/system/
+sudo cp infra/systemd/tarang-compose.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now pulse-compose
+sudo systemctl enable --now tarang-compose
 sudo systemctl enable nginx
 ```
 
-The systemd unit reads `/var/lib/pulse/current-image`, so a locally built image is
+The systemd unit reads `/var/lib/tarang/current-image`, so a locally built image is
 also restored after reboot. If that file is missing, run `deploy-local.sh` once before
 enabling the unit.
 
@@ -825,7 +829,7 @@ Dashboard → Settings → Webhooks → **Add New Webhook**:
 
 | Field | Value |
 |-------|-------|
-| Webhook URL | `https://pulseasa.org/api/webhooks/razorpay` |
+| Webhook URL | `https://tarangfest.in/api/webhooks/razorpay` |
 | Secret | the `openssl rand -hex 32` value, matching `RAZORPAY_WEBHOOK_SECRET_CURRENT` |
 | Alert Email | your address |
 
@@ -841,8 +845,8 @@ is read (the env module caches after first parse). Restart the **active** web sl
 plus the worker — never both slots at once:
 
 ```bash
-cd /opt/pulse
-ACTIVE_SLOT="$(cat /var/lib/pulse/active-slot 2>/dev/null || echo blue)"
+cd /opt/tarang
+ACTIVE_SLOT="$(cat /var/lib/tarang/active-slot 2>/dev/null || echo blue)"
 docker compose restart "web-${ACTIVE_SLOT}" worker
 ```
 
@@ -853,7 +857,7 @@ docker compose restart "web-${ACTIVE_SLOT}" worker
 ### 8a. Signature rejection (proves the endpoint is reachable and verifying)
 
 ```bash
-curl -i -X POST https://pulseasa.org/api/webhooks/razorpay \
+curl -i -X POST https://tarangfest.in/api/webhooks/razorpay \
   -H 'Content-Type: application/json' \
   -H 'X-Razorpay-Signature: deadbeef' \
   -d '{"event":"payment.captured"}'
@@ -871,7 +875,7 @@ Read the other outcomes precisely — they're distinct failures:
 | **503** | No secret in env ([`route.ts:42-45`](../src/app/api/webhooks/razorpay/route.ts#L42-L45)) — restart didn't pick up `.env`, or the var is blank |
 | **403** / HTML challenge | Cloudflare WAF or Bot Fight Mode — the Phase 2 skip rule is missing or too narrow |
 | **521** / **526** | Origin TLS: SSL mode isn't Full (strict), or the origin cert/AOP CA is wrong |
-| **502** | Active web slot container down or its loopback port (3001/3002) isn't published — check `/etc/nginx/conf.d/pulse-upstream.conf` vs `docker compose ps` |
+| **502** | Active web slot container down or its loopback port (3001/3002) isn't published — check `/etc/nginx/conf.d/tarang-upstream.conf` vs `docker compose ps` |
 | Timeout | `ufw` blocking Cloudflare, or the Hostinger hPanel firewall |
 
 ### 8b. Valid signature (proves HMAC + durable insert)
@@ -883,7 +887,7 @@ SECRET='<your webhook secret>'
 BODY='{"event":"payment.captured","payload":{}}'
 SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" -hex | sed 's/^.*= //')
 
-curl -i -X POST https://pulseasa.org/api/webhooks/razorpay \
+curl -i -X POST https://tarangfest.in/api/webhooks/razorpay \
   -H 'Content-Type: application/json' \
   -H "X-Razorpay-Signature: $SIG" \
   -H 'X-Razorpay-Event-Id: manual-test-001' \
@@ -926,7 +930,7 @@ The access log is JSON with `request_id`, `cf_ray`, `status`, and
 The webhook is one of two paths that confirm a payment; the browser callback is the
 other, and both converge on the same idempotent SQL function. Test the whole flow:
 
-1. Open `https://pulseasa.org`, log in, start a base-pass checkout.
+1. Open `https://tarangfest.in`, log in, start a base-pass checkout.
 2. Pay with a Razorpay **test** card: `4111 1111 1111 1111`, any future expiry, any
    CVV, and choose *Success* on the simulated bank page. (Current test
    instruments: [razorpay.com/docs/payments/payments/test-card-details](https://razorpay.com/docs/payments/payments/test-card-details/))
@@ -1050,7 +1054,7 @@ SECRET='<test webhook secret>'
 BODY='{"event":"payment.failed","payload":{"payment":{"entity":{"id":"pay_XXX","order_id":"order_XXX","amount":20000,"currency":"INR","status":"failed"}}}}'
 SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" -hex | sed 's/^.*= //')
 
-curl -s -X POST https://pulseasa.org/api/webhooks/razorpay \
+curl -s -X POST https://tarangfest.in/api/webhooks/razorpay \
   -H 'content-type: application/json' \
   -H "x-razorpay-signature: $SIG" \
   -H "x-razorpay-event-id: evt_manual_$(date +%s)" \
@@ -1300,7 +1304,7 @@ testing on the real domain, but it's better for iterating on handler code.
 
 ## Post-deploy checklist
 
-- [ ] `https://pulseasa.org/api/health/live` returns 200 through Cloudflare
+- [ ] `https://tarangfest.in/api/health/live` returns 200 through Cloudflare
 - [ ] `curl -k https://<VPS_IP>` is refused/dropped — AOP is actually enforcing
 - [ ] Unsigned POST to the webhook → 401 (not 403, 503, or a challenge)
 - [ ] Signed POST → `{"ok":true}`; replayed event id → `duplicate: true`
@@ -1331,7 +1335,7 @@ testing on the real domain, but it's better for iterating on handler code.
       `/delegate-pass` and the event checkout all show "we could not confirm"
       wording on a cancelled payment, and keep polling
 - [ ] Log alert configured on `reconciliation found payments needing manual attention`
-- [ ] `systemctl restart pulse-compose` brings the stack back
+- [ ] `systemctl restart tarang-compose` brings the stack back
 - [ ] `./infra/scripts/rollback.sh` works (needs one prior deploy recorded)
 - [ ] `infra/scripts/backup-db.sh` scheduled — uses the **direct** Postgres URL,
       not the pooler (`pg_dump` fails through poolers)

@@ -42,7 +42,7 @@ const EXPORT_JOB_ID = "3e9d3c30-4b4a-4cf0-a8f0-3e9d30b3c30f";
 let EXPORT_DIR: string;
 
 beforeAll(() => {
-  EXPORT_DIR = mkdtempSync(join(tmpdir(), "pulse-e2e-exports-"));
+  EXPORT_DIR = mkdtempSync(join(tmpdir(), "tarang-e2e-exports-"));
   // The worker resolves EXPORT_DIR at module load -> set before dynamic import.
   process.env.EXPORT_DIR = EXPORT_DIR;
 });

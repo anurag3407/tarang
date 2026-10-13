@@ -1,4 +1,4 @@
-# PULSE 2026 — Security Vulnerability Report (post-hardening)
+# TARANG 2026 — Security Vulnerability Report (post-hardening)
 
 **Date:** 2026-08-23
 **Baseline:** commit `9ce79de` (HEAD at audit time)
@@ -56,7 +56,7 @@ Severity legend: 🔴 launch blocker · 🟡 fix before tickets go live · 🟢 
 > **Status: FIXED (2026-08-24, uncommitted)** — every query is now scoped with
 > `.eq("festival_id", ctx.festivalId)` (`orders`, `delegate_passes`, `notices`,
 > `events`), and festival metadata is read from the DB instead of the hardcoded
-> `pulse-2027` slug/dates.
+> `tarang-2027` slug/dates.
 
 **Categories:** IDOR · Information Disclosure · Broken Access Control
 
@@ -245,14 +245,14 @@ typed-expression/column mismatch that mocks never catch.
 > `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`
 > (`camera=(self)` — the scanner PWA calls `getUserMedia`), and CSP
 > `frame-ancestors 'none'`; included in every server block of both
-> `pulse.conf` (5 blocks) and `pulse-single-domain.conf`. HSTS still depends on
+> `tarang.conf` (5 blocks) and `tarang-single-domain.conf`. HSTS still depends on
 > the Cloudflare zone (no in-repo TLS config).
 
 **Categories:** Clickjacking · Misconfigured Headers · CSP Bypass (by absence)
 
 **Locations:**
-- `infra/nginx/conf.d/pulse.conf:44-193` — five server blocks, **zero** `add_header` directives.
-- `infra/nginx/conf.d/pulse-single-domain.conf:76-133` — same.
+- `infra/nginx/conf.d/tarang.conf:44-193` — five server blocks, **zero** `add_header` directives.
+- `infra/nginx/conf.d/tarang-single-domain.conf:76-133` — same.
 - `next.config.ts` — only `poweredByHeader: false`; comment claims nginx/Cloudflare own transport security, but no config in-repo delivers it.
 
 **Missing:** `Content-Security-Policy`, `X-Frame-Options: DENY` / CSP `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`.

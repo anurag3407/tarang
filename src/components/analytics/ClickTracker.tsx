@@ -11,7 +11,7 @@ export function ClickTracker() {
 
     async function trackOrFetch() {
       try {
-        const hasTracked = typeof window !== "undefined" && sessionStorage.getItem("pulse_site_visited");
+        const hasTracked = typeof window !== "undefined" && sessionStorage.getItem("tarang_site_visited");
         const method = hasTracked ? "GET" : "POST";
 
         const res = await fetch("/api/stats/track", {
@@ -25,7 +25,7 @@ export function ClickTracker() {
         if (isMounted && typeof data.clicks === "number") {
           setClicks(data.clicks);
           if (!hasTracked && typeof window !== "undefined") {
-            sessionStorage.setItem("pulse_site_visited", "true");
+            sessionStorage.setItem("tarang_site_visited", "true");
           }
         }
       } catch {

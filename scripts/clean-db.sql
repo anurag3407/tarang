@@ -1,5 +1,5 @@
 -- ============================================================
--- PULSE 2026 — Database Cleanup Script
+-- TARANG 2026 — Database Cleanup Script
 -- Removes all user-generated data. Preserves system config.
 -- Run via: psql $SUPABASE_DB_SESSION_URL -f scripts/clean-db.sql
 -- ============================================================

@@ -31,7 +31,7 @@ exception when others then
   return true;
 end $$;
 
-select id as fest_id from festivals where slug='pulse-2026' \gset
+select id as fest_id from festivals where slug='tarang-2026' \gset
 select id as pronite_id from pass_products where slug='vip-delegate-pass' \gset
 select id as basic_id from pass_products where slug='base-delegate-pass' \gset
 
@@ -85,7 +85,7 @@ select create_base_pass_checkout(
   '77777777-7777-4777-8777-0000000000b2'::uuid, 'd2-hash-a', null) into temp d2_first;
 select assert_raises(
   $q$select create_base_pass_checkout('77777777-7777-4777-8777-777777777702'::uuid,
-     (select id from festivals where slug='pulse-2026'), (select id from pass_products where slug='vip-delegate-pass'),
+     (select id from festivals where slug='tarang-2026'), (select id from pass_products where slug='vip-delegate-pass'),
      '77777777-7777-4777-8777-0000000000b2'::uuid, 'd2-hash-b', 'FLAT100')$q$,
   'IDEMPOTENCY_MISMATCH', 'D2 mismatch not raised');
 \echo 'D2 PASS'
@@ -98,7 +98,7 @@ select (:'checkout'::jsonb->>'orderId')::uuid as d3_order \gset
 select assert_true( (select amount_paise from orders where id = :'d3_order'::uuid) = 40000, 'D3 20% off not 40000' );
 select assert_raises(
   $q$select create_base_pass_checkout('77777777-7777-4777-8777-777777777703'::uuid,
-     (select id from festivals where slug='pulse-2026'), (select id from pass_products where slug='vip-delegate-pass'),
+     (select id from festivals where slug='tarang-2026'), (select id from pass_products where slug='vip-delegate-pass'),
      '77777777-7777-4777-8777-0000000000c1'::uuid, 'd3-c', 'ONESHOT')$q$,
   'DISCOUNT_EXHAUSTED', 'D3 cap not enforced');
 select assert_true( (select count(*) from orders where purchaser_user_id = '77777777-7777-4777-8777-777777777703') = 0,
@@ -119,7 +119,7 @@ select create_base_pass_checkout(
 \echo '=== D4: per-user limit -> preview reports DISCOUNT_ALREADY_USED ==='
 select assert_raises(
   $q$select preview_pass_discount('77777777-7777-4777-8777-777777777703'::uuid,
-     (select id from festivals where slug='pulse-2026'), (select id from pass_products where slug='vip-delegate-pass'), 'ONESHOT')$q$,
+     (select id from festivals where slug='tarang-2026'), (select id from pass_products where slug='vip-delegate-pass'), 'ONESHOT')$q$,
   'DISCOUNT_ALREADY_USED', 'D4 limit not enforced in preview');
 select preview_pass_discount('77777777-7777-4777-8777-777777777704'::uuid, :'fest_id'::uuid, :'pronite_id'::uuid, 'flat100') as pv \gset
 select assert_true( (:'pv'::jsonb->>'finalAmountPaise')::bigint = 40000
@@ -128,7 +128,7 @@ select assert_true( (:'pv'::jsonb->>'finalAmountPaise')::bigint = 40000
 
 \echo '=== D5: invalid codes rejected, no order created ==='
 select assert_raises(format($q$select create_base_pass_checkout('77777777-7777-4777-8777-777777777704'::uuid,
-     (select id from festivals where slug='pulse-2026'), (select id from pass_products where slug='vip-delegate-pass'),
+     (select id from festivals where slug='tarang-2026'), (select id from pass_products where slug='vip-delegate-pass'),
      gen_random_uuid(), 'd5', %L)$q$, c), 'DISCOUNT_INVALID', 'D5 code accepted: ' || c)
 from unnest(array['NOPE1234', 'DISABLED', 'EXPIRED1', 'FUTURE1', 'BASICONLY', 'x', 'BAD CODE!']) c;
 select assert_true( (select count(*) from orders where purchaser_user_id = '77777777-7777-4777-8777-777777777704') = 0,
@@ -152,7 +152,7 @@ declare v_order uuid;
 begin
   insert into orders (festival_id, purchaser_user_id, kind, idempotency_key, request_hash, amount_paise,
                       discount_code_id, discount_paise, discount_code_snapshot)
-  values ((select id from festivals where slug='pulse-2026'), '77777777-7777-4777-8777-777777777701', 'BASE_PASS',
+  values ((select id from festivals where slug='tarang-2026'), '77777777-7777-4777-8777-777777777701', 'BASE_PASS',
           gen_random_uuid(), 'd7', 45000,
           (select id from discount_codes where code = 'FLAT100'), 10000, 'FLAT100')
   returning id into v_order;

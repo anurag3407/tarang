@@ -1,4 +1,7 @@
-# 12 — Migrating an existing Hostinger VPS to PULSE
+# 12 — Migrating an existing Hostinger VPS to TARANG
+
+> **Historical.** This describes the earlier Hostinger VPS path. Production now
+> runs on AWS Lightsail — follow [13 — Lightsail deployment](./13-lightsail-deployment.md).
 
 Companion to [`11-vps-razorpay-golive.md`](./11-vps-razorpay-golive.md), which assumes a
 **fresh** box. This one covers the case where the VPS already runs a different
@@ -11,17 +14,17 @@ project, and records the three decisions taken for this deploy:
 | GitHub rights on `anurag3407/fest` | **Collaborator, not admin** — no Actions Variables |
 
 Read this for the ordering and the deltas; follow doc 11 for the phase detail it
-points at. Substitute your domain for `pulseasa.org` throughout.
+points at. Substitute your domain for `tarangfest.in` throughout.
 
 ---
 
 ## Why "change the GitHub import and redeploy" isn't a path
 
 The old project was almost certainly code-on-the-box behind a process manager
-(PM2 or a panel) with distro nginx or Apache and certbot. PULSE is a different
+(PM2 or a panel) with distro nginx or Apache and certbot. TARANG is a different
 shape end to end:
 
-| | Old shape (typical) | PULSE |
+| | Old shape (typical) | TARANG |
 |---|---|---|
 | Artifact | source tree on the host | immutable OCI image, digest-addressed |
 | Install | `npm install` on the box | never — image is prebuilt |
@@ -32,14 +35,14 @@ shape end to end:
 There is no repo to re-point. The overlaps are all conflicts: whatever holds
 ports 80/443, a certbot renewal hook that reloads a config we replaced, a panel
 that wants to own Docker's lifecycle, and an nginx that rejects `http2 on;` at
-[`pulse-single-domain.conf:43`](../infra/nginx/conf.d/pulse-single-domain.conf#L43).
+[`tarang-single-domain.conf:43`](../infra/nginx/conf.d/tarang-single-domain.conf#L43).
 
 **So: reinstall the OS.** This costs nothing, because the box is deliberately
 almost stateless — image in GHCR (or rebuilt by
 [`deploy-local.sh`](../infra/scripts/deploy-local.sh)), config in git, database in
-Supabase. Local state is `/opt/pulse/.env`, two files in `/etc/nginx/tls/`, the
-`exports-data` + `next-cache` volumes, and `/var/lib/pulse` deploy state
-(current/previous image, active slot). Nothing on the old box belongs to PULSE.
+Supabase. Local state is `/opt/tarang/.env`, two files in `/etc/nginx/tls/`, the
+`exports-data` + `next-cache` volumes, and `/var/lib/tarang` deploy state
+(current/previous image, active slot). Nothing on the old box belongs to TARANG.
 
 > If you later need to migrate a VPS that *does* host something you must keep,
 > stop and do it in-place instead — see [In-place, if you ever can't wipe](#in-place-if-you-ever-cant-wipe).
@@ -61,7 +64,7 @@ them now; you'll prune them in Step 3.
 unpushed work simply doesn't exist to the deploy:
 
 - The Phase-0 fixes in `Dockerfile`, `docker-compose.yml`, `ci.yml`, `.env.example`
-- [`infra/nginx/conf.d/pulse-single-domain.conf`](../infra/nginx/conf.d/pulse-single-domain.conf)
+- [`infra/nginx/conf.d/tarang-single-domain.conf`](../infra/nginx/conf.d/tarang-single-domain.conf)
   — **was untracked.** Step 5 copies it out of the clone; on a fresh box an
   untracked file is simply absent.
 - [`.gitattributes`](../.gitattributes) — pins `*.sh` to LF. With
@@ -76,7 +79,7 @@ unpushed work simply doesn't exist to the deploy:
 hPanel → VPS → **OS & Panel → Reinstall OS** → plain **Ubuntu 24.04**.
 
 Not a panel template, not the Docker-preinstalled one. Doc 11 Phase 1 installs
-Docker and nginx itself, and a panel layer fights `pulse-compose.service` for
+Docker and nginx itself, and a panel layer fights `tarang-compose.service` for
 Docker's lifecycle.
 
 Decline all three add-ons (malware scanner, auto-backups, Docker manager) —
@@ -140,7 +143,7 @@ these:
 
 6. **Clear leftovers from the old site:** Page Rules, Redirect Rules, Workers
    routes, and Transform Rules on this zone. A stale redirect rule will happily
-   rewrite PULSE's paths.
+   rewrite TARANG's paths.
 
 ---
 
@@ -162,7 +165,7 @@ private key is shown only once either way.
 ## Step 5 — nginx config
 
 **[Doc 11 Phase 4](./11-vps-razorpay-golive.md#phase-4--install-the-nginx-config)**.
-Install `pulse-single-domain.conf` — **not** `pulse.conf`. Both declare
+Install `tarang-single-domain.conf` — **not** `tarang.conf`. Both declare
 `upstream next_app`, the `$connection_upgrade` map, and a `default_server`, so
 installing both fails `nginx -t` on duplicates.
 
@@ -184,7 +187,7 @@ The clone URL there is already this repository, so there is no "GitHub import" t
 change:
 
 ```bash
-sudo -u deploy git clone https://github.com/anurag3407/fest.git /opt/pulse
+sudo -u deploy git clone https://github.com/anurag3407/fest.git /opt/tarang
 ```
 
 Collaborator read access is enough to clone and pull. Set every `*_SITE_URL` and
@@ -233,25 +236,25 @@ with `read:packages` can read the package:
 
 ```bash
 echo '<your PAT>' | docker login ghcr.io -u <your-github-username> --password-stdin
-cd /opt/pulse
-export PULSE_IMAGE=ghcr.io/anurag3407/fest@sha256:<digest from the image job>
+cd /opt/tarang
+export TARANG_IMAGE=ghcr.io/anurag3407/fest@sha256:<digest from the image job>
 ./infra/scripts/deploy.sh
 ```
 
 ### Option B — build on the VPS (unblocked today)
 
 No dependency on anyone else. [`deploy-local.sh`](../infra/scripts/deploy-local.sh)
-reads the three `NEXT_PUBLIC_*` values from `/opt/pulse/.env`, builds, and hands
+reads the three `NEXT_PUBLIC_*` values from `/opt/tarang/.env`, builds, and hands
 off to `deploy.sh` for readiness, `nginx -t`, reload, and drain — so both paths
 behave identically after the build:
 
 ```bash
-cd /opt/pulse && git pull && ./infra/scripts/deploy-local.sh
+cd /opt/tarang && git pull && ./infra/scripts/deploy-local.sh
 ```
 
 It refuses to build if any of the three values is missing, rather than producing
 the silently-broken image described above. Images are tagged
-`pulse:local-<sha>` — immutable per commit, so `rollback.sh` still has a real
+`tarang:local-<sha>` — immutable per commit, so `rollback.sh` still has a real
 previous image to return to.
 
 **Add swap before the first build.** A Next 16 production build inside Docker
@@ -280,9 +283,9 @@ or ask Anurag to point the staging secrets at this same box.
 ## Step 8 — Survive reboots, then the webhook
 
 ```bash
-sudo cp infra/systemd/pulse-compose.service /etc/systemd/system/
+sudo cp infra/systemd/tarang-compose.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now pulse-compose
+sudo systemctl enable --now tarang-compose
 sudo systemctl enable nginx
 ```
 
@@ -296,7 +299,7 @@ handshake, nginx routing, the WAF skip, and a configured secret, all at once. Do
 11 §8a has a table decoding 503 / 403 / 521 / 502 / timeout, which are each a
 different failure.
 
-> `pulse-compose.service` has `EnvironmentFile=/opt/pulse/.env`, so it must exist
+> `tarang-compose.service` has `EnvironmentFile=/opt/tarang/.env`, so it must exist
 > before `systemctl enable --now` or the unit fails to start.
 
 ---
@@ -311,7 +314,7 @@ bite:
 2. **nginx version.** Distro 1.24 rejects `http2 on;`. Replacing it with
    nginx.org mainline while another site depends on its config is the ugly part.
 3. **certbot renewal hooks** that reload nginx and can clobber the config.
-4. **A panel owning Docker** — it will fight `pulse-compose.service`.
+4. **A panel owning Docker** — it will fight `tarang-compose.service`.
 5. **Port 3000** already taken by the old app — harmless: compose binds only
    `127.0.0.1:3001` (web-blue) and `127.0.0.1:3002` (web-green), both loopback-only.
 
@@ -333,7 +336,7 @@ ls /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ /var/www/ 2>/dev/null
 - [ ] SSL/TLS mode is **Full (strict)**, not Flexible
 - [ ] WAF skip rule covers `/api/webhooks/`
 - [ ] `nginx -v` ≥ 1.25.1
-- [ ] Only `pulse-single-domain.conf` installed; `default.conf` removed
+- [ ] Only `tarang-single-domain.conf` installed; `default.conf` removed
 - [ ] `.env` has the https origins, no trailing slashes; `chmod 600`
 - [ ] Supabase redirect allowlist includes the domain
 - [ ] Image path chosen (A: Variables set by owner / B: `deploy-local.sh` + swap)
@@ -341,5 +344,5 @@ ls /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ /var/www/ 2>/dev/null
 - [ ] `curl -k https://<VPS_IP>` refused — AOP actually enforcing
 - [ ] Unsigned webhook POST → 401; signed → `{"ok":true}`; replay → `duplicate`
 - [ ] Test payment reaches `FULFILLED` + `captured`, and survives closing the tab
-- [ ] `systemctl restart pulse-compose` brings the stack back
+- [ ] `systemctl restart tarang-compose` brings the stack back
 - [ ] Backups: `backup-db.sh` scheduled against the **direct** Postgres URL

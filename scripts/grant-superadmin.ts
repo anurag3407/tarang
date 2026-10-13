@@ -23,7 +23,7 @@ loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const FEST_SLUG = process.env.FEST_SLUG ?? "pulse-2026";
+const FEST_SLUG = process.env.FEST_SLUG ?? "tarang-2026";
 
 if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
   console.error(

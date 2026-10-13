@@ -233,7 +233,7 @@ export default function BulkImportManager() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "pulse_bulk_users_template.csv";
+    a.download = "tarang_bulk_users_template.csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

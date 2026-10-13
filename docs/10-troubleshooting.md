@@ -10,15 +10,15 @@ commands/queries to run.
 docker compose ps
 
 # Which slot is serving traffic?
-cat /var/lib/pulse/active-slot   # blue or green
+cat /var/lib/tarang/active-slot   # blue or green
 
 # Recent errors?
-ACTIVE=$([ "$(cat /var/lib/pulse/active-slot 2>/dev/null)" = green ] && echo web-green || echo web-blue)
+ACTIVE=$([ "$(cat /var/lib/tarang/active-slot 2>/dev/null)" = green ] && echo web-green || echo web-blue)
 docker compose logs "$ACTIVE" --tail 100 --since 10m | grep -i error
 docker compose logs worker --tail 100 --since 10m | grep -i error
 
 # Health endpoints (on the active slot's loopback port)
-PORT=$([ "$(cat /var/lib/pulse/active-slot 2>/dev/null)" = green ] && echo 3002 || echo 3001)
+PORT=$([ "$(cat /var/lib/tarang/active-slot 2>/dev/null)" = green ] && echo 3002 || echo 3001)
 curl -s "http://127.0.0.1:${PORT}/api/health/live"
 curl -s "http://127.0.0.1:${PORT}/api/health/ready"
 curl -s "http://127.0.0.1:${PORT}/api/health/dependencies"
@@ -26,7 +26,7 @@ curl -s "http://127.0.0.1:${PORT}/api/health/dependencies"
 
 If `ready` returns 503 → Supabase problem. If `live` fails → that slot's container is
 down (nginx should be pointing at the other slot; check
-`/etc/nginx/conf.d/pulse-upstream.conf`).
+`/etc/nginx/conf.d/tarang-upstream.conf`).
 
 ## Checkout & payments
 
@@ -176,11 +176,11 @@ ORDER BY received_at_server DESC LIMIT 50;
 
 | Symptom | Check |
 |---------|-------|
-| 502 Bad Gateway everywhere | Active web slot down — compare the port in `/etc/nginx/conf.d/pulse-upstream.conf` (3001=blue / 3002=green) against `docker compose ps`; restart that slot |
+| 502 Bad Gateway everywhere | Active web slot down — compare the port in `/etc/nginx/conf.d/tarang-upstream.conf` (3001=blue / 3002=green) against `docker compose ps`; restart that slot |
 | 502 only on one path/surface | Single domain, one upstream — if only some routes fail it's app-level, not nginx; check slot container logs |
 | Site works locally, 403/444 in prod | Direct-hit to origin (Cloudflare AOP rejects non-CF requests) — ensure traffic flows through Cloudflare |
 | Deploy fails ready check | Candidate auto-torn-down, old slot keeps serving; `docker compose logs web-blue` / `web-green` for the crash — often env or DB connectivity |
-| Need to revert fast | `./rollback.sh` on the origin — same blue/green path, previous digest from `/var/lib/pulse/previous-image` (doc 09) |
+| Need to revert fast | `./rollback.sh` on the origin — same blue/green path, previous digest from `/var/lib/tarang/previous-image` (doc 09) |
 | Stale content stuck | Redis del + `revalidateTag`; TTL guarantees fix within 60s anyway |
 
 ## Data-level sanity queries

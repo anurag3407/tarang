@@ -1,8 +1,8 @@
-# PULSE Fest Platform — Production Implementation Plan
+# TARANG Fest Platform — Production Implementation Plan
 
-> **Document purpose:** This is the implementation contract for the remaining PULSE fest platform. An implementation LLM or developer should be able to write the code by following this document without redesigning any critical system behavior.
+> **Document purpose:** This is the implementation contract for the remaining TARANG fest platform. An implementation LLM or developer should be able to write the code by following this document without redesigning any critical system behavior.
 >
-> **Project:** PULSE 2026 college fest website
+> **Project:** TARANG 2026 college fest website
 >
 > **Repository state reviewed:** Next.js `16.3.1`, React `19.2.8`, TypeScript, Tailwind CSS v4, pnpm. The existing repository is a frontend-only UI with mock data in `src/lib/data.ts`.
 >
@@ -167,7 +167,7 @@ Phase 5 infrastructure basics must exist in staging while Phases 1–4 are devel
 
 1. Store timestamps as `timestamptz` in UTC. Display in `Asia/Kolkata`.
 2. Generate internal IDs as UUIDs. Public pass/registration references are random, non-enumerable, and separate from internal IDs.
-3. The current `/verify` mock pattern such as `PULSE-2027-0001` MUST NOT expose real participant PII through public enumeration.
+3. The current `/verify` mock pattern such as `TARANG-2027-0001` MUST NOT expose real participant PII through public enumeration.
 4. Do not store card, CVV, UPI credential, bank account, or full payment-instrument data.
 5. Do not collect medical information or identity-document images unless separately approved.
 
@@ -345,9 +345,9 @@ fest/
 ├── infra/
 │   ├── nginx/
 │   │   ├── nginx.conf
-│   │   ├── conf.d/pulse.conf
+│   │   ├── conf.d/tarang.conf
 │   │   └── cloudflare-real-ip.conf
-│   ├── systemd/pulse-compose.service
+│   ├── systemd/tarang-compose.service
 │   ├── scripts/
 │   │   ├── deploy.sh
 │   │   ├── rollback.sh
@@ -1489,15 +1489,15 @@ One transaction/RPC:
 All keys include environment and festival IDs:
 
 ```text
-pulse:{env}:content:events:{festival}:{version}
-pulse:{env}:content:schedule:{festival}:{version}
-pulse:{env}:content:notices:{festival}:{version}
-pulse:{env}:availability:{festival}:{event}
-pulse:{env}:feature:{festival}:{key}
-pulse:{env}:authz:{festival}:{user}:{authzVersion}
-pulse:{env}:ratelimit:{class}:{identifier}
-pulse:{env}:lock:{purpose}:{id}
-pulse:{env}:next-cache:...
+tarang:{env}:content:events:{festival}:{version}
+tarang:{env}:content:schedule:{festival}:{version}
+tarang:{env}:content:notices:{festival}:{version}
+tarang:{env}:availability:{festival}:{event}
+tarang:{env}:feature:{festival}:{key}
+tarang:{env}:authz:{festival}:{user}:{authzVersion}
+tarang:{env}:ratelimit:{class}:{identifier}
+tarang:{env}:lock:{purpose}:{id}
+tarang:{env}:next-cache:...
 ```
 
 Do not place email, phone, raw IP, raw QR, webhook body, or access token directly in a Redis key. Hash identifiers when needed.

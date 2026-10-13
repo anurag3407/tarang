@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
 
       const exportRes = await fetch(exportUrl, {
         headers: {
-          "User-Agent": "Pulse-Admin-Importer/1.0",
+          "User-Agent": "Tarang-Admin-Importer/1.0",
         },
         redirect: "follow",
       });

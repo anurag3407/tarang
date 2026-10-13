@@ -3,34 +3,40 @@
 # deploy.sh — promote an immutable image digest to this origin (plan §15.9).
 #
 # Usage:
-#   PULSE_IMAGE=registry.example.com/pulse@sha256:... ./deploy.sh
+#   TARANG_IMAGE=registry.example.com/tarang@sha256:... ./deploy.sh
 #
 # Steps:
 #   1. Pull the exact digest (never a mutable tag).
-#   2. Start the candidate containers.
-#   3. Wait for web readiness via /api/health/ready.
-#   4. Validate nginx config, then atomic reload.
-#   5. Drain the previous containers after a grace period.
+#   2. Apply pending DB migrations from the image (`compose run migrate`).
+#   3. Start the candidate containers.
+#   4. Wait for web readiness via /api/health/ready.
+#   5. Validate nginx config, then atomic reload.
+#   6. Drain the previous containers after a grace period.
+#   7. Prune release images older than the last KEEP_IMAGES deploys.
 #
 # Rollback: ./rollback.sh (re-points compose at the previous digest).
 #
-# PULSE_SKIP_PULL=1 skips step 1 for an image built on this host rather than
+# On the Lightsail origin this is invoked by /usr/local/sbin/tarang-deploy
+# (infra/scripts/tarang-deploy.sh), which validates the request, checks out the
+# commit, and pulls the image before handing over with TARANG_SKIP_PULL=1.
+#
+# TARANG_SKIP_PULL=1 skips step 1 for an image built on this host rather than
 # pulled from a registry (see deploy-local.sh). The image must already exist
 # locally; everything after the pull is identical.
 
 set -euo pipefail
 
-IMAGE="${PULSE_IMAGE:?PULSE_IMAGE must be set to an image digest}"
+IMAGE="${TARANG_IMAGE:?TARANG_IMAGE must be set to an image digest}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
 READY_TIMEOUT="${READY_TIMEOUT:-60}"
 DRAIN_SECONDS="${DRAIN_SECONDS:-20}"
-STATE_DIR="${STATE_DIR:-/var/lib/pulse}"
-NGINX_UPSTREAM_CONF="${NGINX_UPSTREAM_CONF:-/etc/nginx/conf.d/pulse-upstream.conf}"
+STATE_DIR="${STATE_DIR:-/var/lib/tarang}"
+NGINX_UPSTREAM_CONF="${NGINX_UPSTREAM_CONF:-/etc/nginx/conf.d/tarang-upstream.conf}"
 
 mkdir -p "$STATE_DIR"
 
-if [ "${PULSE_SKIP_PULL:-0}" = "1" ]; then
-  echo "==> Skipping pull (PULSE_SKIP_PULL=1); using host-built $IMAGE"
+if [ "${TARANG_SKIP_PULL:-0}" = "1" ]; then
+  echo "==> Skipping pull (TARANG_SKIP_PULL=1); using host-built $IMAGE"
   # Fail fast rather than letting compose start a stale image.
   docker image inspect "$IMAGE" > /dev/null
 else
@@ -38,16 +44,27 @@ else
   docker pull "$IMAGE"
 fi
 
-# Run database migrations before starting new image containers if credentials exist
-if [ -f ".env" ] || [ -f ".env.local" ] || [ -n "${SUPABASE_DB_SESSION_URL:-}" ] || [ -n "${SUPABASE_DB_DIRECT_URL:-}" ]; then
+# Every `docker compose` call below interpolates ${TARANG_IMAGE:?} — including
+# `stop` — so export it once instead of prefixing individual commands.
+export TARANG_IMAGE="$IMAGE"
+
+if [ ! -f ".env" ]; then
+  echo "!! .env not found in $(pwd) — the app cannot start without it." >&2
+  exit 1
+fi
+
+# Migrations run from the release image itself (dist/migrate.cjs +
+# supabase/migrations), BEFORE the candidate starts, so schema never trails
+# code. Only files not yet recorded in supabase_migrations.schema_migrations
+# are applied. The old slot keeps serving meanwhile, so migrations must stay
+# backwards-compatible (expand first, contract in a later release).
+# SKIP_MIGRATIONS=1 is an operator escape hatch, never set by CI.
+if [ "${SKIP_MIGRATIONS:-0}" = "1" ]; then
+  echo "==> Skipping database migrations (SKIP_MIGRATIONS=1)"
+else
   echo "==> Running database migrations"
-  if ! command -v pnpm >/dev/null 2>&1; then
-    echo "!! Database credentials detected but 'pnpm' is not installed on this host." >&2
-    echo "!! Cannot apply migrations — aborting deploy to prevent schema drift." >&2
-    exit 1
-  fi
-  pnpm db:apply --migrations || {
-    echo "!! Database migrations failed — aborting deploy." >&2
+  docker compose -f "$COMPOSE_FILE" --profile tools run --rm --no-deps migrate || {
+    echo "!! Database migrations failed — aborting deploy. The live slot is untouched." >&2
     exit 1
   }
 fi
@@ -93,7 +110,7 @@ rollback_on_failure() {
 # ---------------------------------------------------------------------------
 DEPLOYMENT_ID="${DEPLOYMENT_ID:-$(echo "$IMAGE" | sed -E 's/.*[:@]//' | cut -c1-12)}"
 echo "==> Starting candidate container ($CANDIDATE_SERVICE) [DEPLOYMENT_ID: $DEPLOYMENT_ID]"
-DEPLOYMENT_ID="$DEPLOYMENT_ID" PULSE_IMAGE="$IMAGE" docker compose -f "$COMPOSE_FILE" up -d --no-deps "$CANDIDATE_SERVICE"
+DEPLOYMENT_ID="$DEPLOYMENT_ID" docker compose -f "$COMPOSE_FILE" up -d --no-deps "$CANDIDATE_SERVICE"
 
 echo "==> Waiting for candidate readiness ($CANDIDATE_READY_URL)"
 deadline=$(( $(date +%s) + READY_TIMEOUT ))
@@ -111,7 +128,7 @@ echo "==> Candidate $CANDIDATE_SERVICE is healthy and ready on port $CANDIDATE_P
 # ---------------------------------------------------------------------------
 UPSTREAM_TMP="$(mktemp)"
 cat <<EOF > "$UPSTREAM_TMP"
-# PULSE 2026 — dynamic blue/green upstream definition.
+# TARANG 2026 — dynamic blue/green upstream definition.
 # Auto-generated by deploy.sh on $(date -u +%Y-%m-%dT%H:%M:%SZ)
 # Active slot: $CANDIDATE_SLOT (port $CANDIDATE_PORT)
 
@@ -136,8 +153,8 @@ if command -v nginx >/dev/null 2>&1; then
   echo "==> Reloading Nginx (atomic cutover to $CANDIDATE_SLOT)"
   nginx -s reload
 else
-  echo "==> Nginx command not present; wrote upstream config to $(dirname "$0")/../nginx/conf.d/pulse-upstream.conf"
-  cp "$UPSTREAM_TMP" "$(dirname "$0")/../nginx/conf.d/pulse-upstream.conf"
+  echo "==> Nginx command not present; wrote upstream config to $(dirname "$0")/../nginx/conf.d/tarang-upstream.conf"
+  cp "$UPSTREAM_TMP" "$(dirname "$0")/../nginx/conf.d/tarang-upstream.conf"
   rm -f "$UPSTREAM_TMP"
 fi
 
@@ -145,7 +162,7 @@ fi
 # Start / Update background worker
 # ---------------------------------------------------------------------------
 echo "==> Updating background worker service"
-DEPLOYMENT_ID="$DEPLOYMENT_ID" PULSE_IMAGE="$IMAGE" docker compose -f "$COMPOSE_FILE" up -d --no-deps worker
+DEPLOYMENT_ID="$DEPLOYMENT_ID" docker compose -f "$COMPOSE_FILE" up -d --no-deps worker
 
 # ---------------------------------------------------------------------------
 # Graceful connection drain of old web slot
@@ -174,5 +191,24 @@ fi
 printf '%s' "$IMAGE" > "$STATE_DIR/current-image"
 printf '%s' "$CANDIDATE_SLOT" > "$STATE_DIR/active-slot"
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) DEPLOY slot=$CANDIDATE_SLOT image=$IMAGE" >> "$STATE_DIR/deploy-history.log"
+
+# ---------------------------------------------------------------------------
+# Image retention: keep the images of the last KEEP_IMAGES deploys (rollback
+# targets) and delete older release images so the disk never fills up.
+# ---------------------------------------------------------------------------
+KEEP_IMAGES="${KEEP_IMAGES:-5}"
+if [ "$KEEP_IMAGES" -gt 0 ] 2>/dev/null; then
+  KEEP_LIST="$(sed -n 's/.* image=//p' "$STATE_DIR/deploy-history.log" | tail -n "$KEEP_IMAGES")"
+  KEEP_IDS="$(for ref in $KEEP_LIST; do docker image inspect --format '{{.Id}}' "$ref" 2>/dev/null; done | sort -u)"
+  REPO="${IMAGE%%@*}"; REPO="${REPO%:*}"
+  docker image ls --no-trunc --format '{{.ID}} {{.Repository}}' \
+    | awk -v repo="$REPO" '$2 == repo { print $1 }' | sort -u \
+    | while read -r id; do
+        if ! printf '%s\n' "$KEEP_IDS" | grep -qx "$id"; then
+          docker image rm "$id" >/dev/null 2>&1 && echo "==> Pruned old release image $id" || true
+        fi
+      done
+  docker image prune -f >/dev/null 2>&1 || true
+fi
 
 echo "==> Deploy complete (Zero Downtime): $IMAGE active on slot $CANDIDATE_SLOT (port $CANDIDATE_PORT)"

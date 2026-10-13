@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #
-# PULSE 2026 production image (plan §15.3).
+# TARANG 2026 production image (plan §15.3).
 #
 # Multi-stage:
 #   deps    — pnpm frozen install (lockfile authoritative)
@@ -52,8 +52,18 @@ ENV NEXT_PUBLIC_RAZORPAY_KEY_ID=${NEXT_PUBLIC_RAZORPAY_KEY_ID}
 RUN pnpm typegen
 
 # Production Next build (standalone output) + worker bundle.
-RUN pnpm build
+# SENTRY_AUTH_TOKEN is an optional BuildKit secret (CI passes it to upload
+# source maps); it is never written to a layer. Without it the build is
+# identical minus the upload.
+RUN --mount=type=secret,id=sentry_auth_token,env=SENTRY_AUTH_TOKEN pnpm build
 RUN pnpm build:worker
+
+# Migration runner bundle: scripts/apply-sql.ts + pg in one file, so deploys
+# apply supabase/migrations from inside this image (`docker compose run
+# migrate`) and the production host never needs Node, pnpm or node_modules.
+RUN pnpm exec esbuild scripts/apply-sql.ts --bundle --platform=node \
+      --target=node20 --format=cjs --external:pg-native \
+      --outfile=dist/migrate.cjs --log-level=warning
 
 # ---------------------------------------------------------------------------
 FROM node:${NODE_VERSION}-alpine AS runner
@@ -76,12 +86,16 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Worker bundle (fully self-contained — no node_modules needed).
 COPY --from=builder --chown=nextjs:nodejs /app/dist/worker.cjs ./dist/worker.cjs
 
+# Migration runner + the SQL it applies (read-only, root-owned).
+COPY --from=builder /app/dist/migrate.cjs ./dist/migrate.cjs
+COPY --from=builder /app/supabase/migrations ./supabase/migrations
+
 # Writable mount points for exports, Next's runtime cache, and temporary files
 # under the read-only root filesystem. docker-compose mounts named volumes over
 # .exports and .next/cache; creating them here preserves uid/gid 1001 when each
 # volume is initialized for the first time.
-RUN mkdir -p /app/.exports /app/.next/cache /tmp/pulse \
- && chown -R nextjs:nodejs /app/.exports /app/.next/cache /tmp/pulse
+RUN mkdir -p /app/.exports /app/.next/cache /tmp/tarang \
+ && chown -R nextjs:nodejs /app/.exports /app/.next/cache /tmp/tarang
 ENV EXPORT_DIR=/app/.exports
 
 USER nextjs

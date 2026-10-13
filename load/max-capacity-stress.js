@@ -2,7 +2,7 @@ import http from "k6/http";
 import { check, sleep } from "k6";
 import { Rate, Trend, Counter } from "k6/metrics";
 
-const BASE_URL = __ENV.BASE_URL || "https://pulseasa.org";
+const BASE_URL = __ENV.BASE_URL || "https://tarangfest.in";
 
 const errors = new Rate("error_rate");
 const ttfb = new Trend("ttfb_duration", true);

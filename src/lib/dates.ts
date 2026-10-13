@@ -33,7 +33,7 @@ export function formatDateTimeIST(
 
 /**
  * Format only the date in Indian Standard Time (IST).
- * E.g., "24 Aug 2026" or "17 Sep 2026"
+ * E.g., "24 Aug 2026" or "21 Nov 2026"
  */
 export function formatDateIST(
   dateInput: string | number | Date | null | undefined,

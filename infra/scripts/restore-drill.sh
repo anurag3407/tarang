@@ -5,7 +5,7 @@
 #
 # Usage:
 #   RESTORE_URL=postgres://... AGE_IDENTITY=/path/to/key.txt \
-#   BACKUP_OBJECT=backups/pulse-20270101T000000Z.sql.age ./restore-drill.sh
+#   BACKUP_OBJECT=backups/tarang-20270101T000000Z.sql.age ./restore-drill.sh
 #
 # The target must be a throwaway project. The script refuses to run if
 # RESTORE_URL points at the production host (set PROD_HOST to guard).

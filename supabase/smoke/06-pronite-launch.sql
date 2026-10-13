@@ -17,7 +17,7 @@ begin
   return true;
 end $$;
 
-select id as fest_id from festivals where slug='pulse-2026' \gset
+select id as fest_id from festivals where slug='tarang-2026' \gset
 select id as basic_id from pass_products where slug='base-delegate-pass' \gset
 select id as pronite_id from pass_products where slug='vip-delegate-pass' \gset
 select id as gate_id from gates where name='Main Gate' \gset
@@ -26,7 +26,7 @@ select id as gate_id from gates where name='Main Gate' \gset
 update pass_products set status = 'ARCHIVED', sales_state = 'CLOSED' where slug = 'base-delegate-pass';
 -- Keep the pass valid relative to now, so this suite does not date-expire.
 update festivals set starts_at = now() - interval '1 day', ends_at = now() + interval '30 days'
-where slug = 'pulse-2026';
+where slug = 'tarang-2026';
 update pass_products set valid_from = now() - interval '30 days', valid_until = now() + interval '30 days'
 where slug = 'vip-delegate-pass';
 
@@ -46,7 +46,7 @@ do $$
 begin
   perform create_base_pass_checkout(
     '66666666-6666-4666-8666-666666666601'::uuid,
-    (select id from festivals where slug='pulse-2026'),
+    (select id from festivals where slug='tarang-2026'),
     (select id from pass_products where slug='base-delegate-pass'),
     '66666666-6666-4666-8666-0000000000b1'::uuid, 'p6-basic');
   raise exception 'ASSERT FAIL: P1 retired Basic Card checkout succeeded';

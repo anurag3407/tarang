@@ -1,8 +1,10 @@
 [Unit]
-Description=Update Cloudflare trusted CIDRs for Nginx real_ip
-After=network-online.target
+Description=Refresh Cloudflare CIDRs (nginx real_ip trust + UFW 443 allowlist)
+After=network-online.target nginx.service
 Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/opt/pulse/infra/scripts/update-cloudflare-cidrs.sh
+# Installed by bootstrap-lightsail.sh from infra/scripts/update-cloudflare-cidrs.sh
+# (not run from the app checkout, which deploys move between commits).
+ExecStart=/usr/local/sbin/tarang-update-cloudflare-cidrs

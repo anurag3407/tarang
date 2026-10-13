@@ -1,4 +1,4 @@
-# PULSE Codebase Documentation
+# TARANG Codebase Documentation
 
 Plain-language documentation for understanding every part of this project and diagnosing problems.
 
@@ -16,14 +16,15 @@ Read in order the first time. When something breaks, jump to the relevant doc �
 | 08 | [Caching & Rate Limiting](./08-caching-rate-limiting.md) | Redis, content cache, availability, feature flags, rate limits, health checks |
 | 09 | [Deployment & Operations](./09-deployment-operations.md) | Docker, nginx, deploy/rollback, env vars, monitoring |
 | 10 | [Troubleshooting Guide](./10-troubleshooting.md) | Symptom → likely cause → what to check |
-| 11 | [VPS Go-Live & Razorpay Webhooks](./11-vps-razorpay-golive.md) | Step-by-step first deploy: VPS, Cloudflare, TLS, GHCR, registering and testing the Razorpay webhook |
-| 12 | [Migrating an Existing VPS](./12-vps-migration.md) | Reusing a VPS that already runs another project: wipe vs in-place, Cloudflare cleanup, building without CI admin rights |
+| 11 | [VPS Go-Live & Razorpay Webhooks](./11-vps-razorpay-golive.md) | *(historical — Hostinger)* first deploy walkthrough; Phase 7–8 (Razorpay webhook registration/testing) still applies |
+| 12 | [Migrating an Existing VPS](./12-vps-migration.md) | *(historical — Hostinger)* reusing a VPS that already ran another project |
+| 13 | [**Lightsail Production Deployment**](./13-lightsail-deployment.md) | **Current production runbook:** tarangfest.in on AWS Lightsail — setup checklist, security model, CI/CD, rollback, operations, break-glass |
 
 ## Glossary (used throughout)
 
 | Term | Meaning |
 |------|---------|
-| Festival | One edition of PULSE (e.g. PULSE 2026). Most data belongs to a festival. |
+| Festival | One edition of TARANG (e.g. TARANG 2026). Most data belongs to a festival. |
 | Delegate | A participant (attendee) of the fest. |
 | Base pass | The entry ticket every delegate must buy first. Unlocks event registration. |
 | Event | A competition/workshop/show within the fest. |

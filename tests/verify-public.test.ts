@@ -54,7 +54,7 @@ describe("POST /api/public/verify — Pass Authenticity & Verification", () => {
           },
           festivals: {
             id: "fest-1",
-            name: "PULSE",
+            name: "TARANG",
             year: 2026,
           },
         },

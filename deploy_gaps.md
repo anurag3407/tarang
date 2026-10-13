@@ -1,4 +1,4 @@
-# PULSE 2026 — Deployment Gaps Report
+# TARANG 2026 — Deployment Gaps Report
 
 **Date:** 2026-08-23
 **Scope:** Deploy scripts, infra config, CI/CD, and production-readiness approximation at 3000 concurrent users. No load test executed (analysis only; prior measured data from `report.md` §2 used as baseline).
@@ -33,7 +33,7 @@
 | Zero-timeout upstream calls | `src/lib/supabase/server.ts`, `service-role.ts` — 15s AbortSignal default |
 | `getUser()` on every public page request (R18) | `src/proxy.ts:79–81` anonymous fast-path when no auth cookie present |
 | Anonymous PII via verify-card endpoint (C1 app half) | `src/app/api/scanner/verify-card/route.ts:24,42` — `requirePermission("scanner.use")` + device check + rate limit |
-| D1: deploy recreated containers stop→start (hard downtime) | `infra/scripts/deploy.sh:56-156` — true blue/green: candidate slot on idle loopback port (web-blue 3001 / web-green 3002), readiness on candidate port, generated `pulse-upstream.conf` + `nginx -t` + atomic reload, drain then stop old slot. Auto-teardown of a failed candidate keeps traffic on the old slot (`deploy.sh:82-89`) |
+| D1: deploy recreated containers stop→start (hard downtime) | `infra/scripts/deploy.sh:56-156` — true blue/green: candidate slot on idle loopback port (web-blue 3001 / web-green 3002), readiness on candidate port, generated `tarang-upstream.conf` + `nginx -t` + atomic reload, drain then stop old slot. Auto-teardown of a failed candidate keeps traffic on the old slot (`deploy.sh:82-89`) |
 | D2: migrations silently skipped when pnpm absent | `deploy.sh:42-53` — credentials present but pnpm missing now **hard-fails** the deploy instead of skipping |
 | D3: `DRAIN_SECONDS` sleep drained nothing | Now drains for real — old slot keeps serving during the sleep, then is stopped (`deploy.sh:152-156`); same pattern in `rollback.sh:106-109` |
 
@@ -57,11 +57,11 @@ fixed by the blue/green deployment work (commit `9ce79de`).
 
 | # | Resolution |
 |---|---|
-| D4 | ✅ Closed at HEAD (blue/green commit `9ce79de`): `pulse-compose.service` is `Type=oneshot` + `RemainAfterExit=yes` (docker is the primary supervisor; the unit only bootstraps/reboots the stack), **no** `Restart=on-failure`, **no** `EnvironmentFile` (compose parses `/opt/pulse/.env` itself, so secrets never appear in `systemctl show`/`/proc/<pid>/environ`). Remaining: confirm `systemctl enable --now pulse-compose` on the target host (Q1). |
+| D4 | ✅ Closed at HEAD (blue/green commit `9ce79de`): `tarang-compose.service` is `Type=oneshot` + `RemainAfterExit=yes` (docker is the primary supervisor; the unit only bootstraps/reboots the stack), **no** `Restart=on-failure`, **no** `EnvironmentFile` (compose parses `/opt/tarang/.env` itself, so secrets never appear in `systemctl show`/`/proc/<pid>/environ`). Remaining: confirm `systemctl enable --now tarang-compose` on the target host (Q1). |
 | D5 | ✅ Fixed: `rollback.sh` refuses a no-op flip-flop — if `$STATE_DIR/current-image` equals the requested image it exits 1 and requires an explicit digest, so a double rollback cannot land back on the broken image. Functionally verified 11/11 (no-op refusal, valid rollback to a different digest incl. state+history+nginx cutover, legacy path, usage error). |
 | D6 | ✅ Fixed + hardened: `restore-drill.sh` already required `CONFIRM_ISOLATED_TARGET=1`; the production guard now also does an exact-host comparison (scheme/userinfo stripped, port/path cut, IPv6 bracket hosts `[::1]` handled) on top of the substring check. Functionally verified 18/18 (refusals for exact host, subdomain-lookalike, IPv6 literal; pass-through for trusted isolated hosts; host-extraction unit cases). |
-| D7 | ✅ Closed at HEAD: `infra/systemd/pulse-cloudflare-cidrs.service` + `.timer` are committed (weekly `Sun *-*-* 03:00:00 UTC`, `Persistent=true`); `update-cloudflare-cidrs.sh` uses `mktemp -d` and tolerates a missing `$CONF` (`cp … || true`). Remaining: install/enable the timer on the VPS. |
-| D8 | ✅ Fixed: `backup-db.sh` gains `RETENTION_DAYS` (default 30; `0` disables) — `s3api list-objects-v2` → parse `pulse-<YYYYMMDDTHHMMSSZ>.sql.age` stamps → `s3 rm` older than cutoff, best-effort with `send_alert` on list/delete failures; GNU/BSD `date` handled; missing-CLI alerting already present. Functionally verified 30/30 (prune/keep/disable on both date branches, list-failure alert, object-lock refusal alert). |
+| D7 | ✅ Closed at HEAD: `infra/systemd/tarang-cloudflare-cidrs.service` + `.timer` are committed (weekly `Sun *-*-* 03:00:00 UTC`, `Persistent=true`); `update-cloudflare-cidrs.sh` uses `mktemp -d` and tolerates a missing `$CONF` (`cp … || true`). Remaining: install/enable the timer on the VPS. |
+| D8 | ✅ Fixed: `backup-db.sh` gains `RETENTION_DAYS` (default 30; `0` disables) — `s3api list-objects-v2` → parse `tarang-<YYYYMMDDTHHMMSSZ>.sql.age` stamps → `s3 rm` older than cutoff, best-effort with `send_alert` on list/delete failures; GNU/BSD `date` handled; missing-CLI alerting already present. Functionally verified 30/30 (prune/keep/disable on both date branches, list-failure alert, object-lock refusal alert). |
 | D10 | ✅ Fixed: `deploy.sh` inspects the candidate container after switch-over (`docker inspect` compose health) and warns on stderr when `unhealthy`; the deploy decision remains ready-endpoint-based. Verified with a mocked docker (unhealthy → WARN; healthy / no healthcheck → silent). |
 
 The CI "real-DB gate" item (gaps.md §6/§7) is also closed: `.github/workflows/ci.yml` gains a `db-smoke` job (postgres:15 service) that bootstraps the Supabase stand-ins, applies migrations `0001`–`0030` + seed, then runs `supabase/smoke/0[1-5]-*.sql` with `ON_ERROR_STOP=1` and an `ALL .*PASS` banner assertion on every push. Local-equivalent run verified green (migrations + seed + all five suites). The suites live in `supabase/smoke/` with a provenance header; they are not idempotent and must run on a fresh database.
@@ -70,7 +70,7 @@ The CI "real-DB gate" item (gaps.md §6/§7) is also closed: `.github/workflows/
 
 | # | Location | Question |
 |---|---|---|
-| Q1 | `pulse-single-domain.conf` | Does the target host run nginx ≥ 1.25.1? Older distro nginx rejects `http2 on;`, so `nginx -t` fails and **every deploy aborts**. Verify before first deploy. |
+| Q1 | `tarang-single-domain.conf` | Does the target host run nginx ≥ 1.25.1? Older distro nginx rejects `http2 on;`, so `nginx -t` fails and **every deploy aborts**. Verify before first deploy. |
 | Q2 | Working tree | Tree currently dirty: **50 modified + 18 new/untracked files + 1 deletion** (incl. migrations `0020`–`0030`, the auth-guard route/client, `infra/nginx/conf.d/security-headers.conf`, `supabase/smoke/`, infra-script fixes, and the deleted/replaced `0018` stub — see §6). `deploy-local.sh` correctly refuses it; CI path unaffected. Commit/stash before any local deploy. |
 
 ---
@@ -156,8 +156,8 @@ the exact row.
 
 - `infra/nginx/conf.d/security-headers.conf` — new shared block
   (`nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, CSP
-  `frame-ancestors`) included from every server block in `pulse.conf` (5×) and
-  `pulse-single-domain.conf` (V-07). The include target is
+  `frame-ancestors`) included from every server block in `tarang.conf` (5×) and
+  `tarang-single-domain.conf` (V-07). The include target is
   `/etc/nginx/conf.d/security-headers.conf` — verify the file lands on the
   host nginx (or is synced with the other conf files) and that `nginx -t`
   passes on both configs.

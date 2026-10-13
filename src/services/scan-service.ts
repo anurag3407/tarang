@@ -167,7 +167,7 @@ export function deviceCredentialHash(credential: string): string {
   return createHash("sha256").update(credential).digest("hex");
 }
 
-export const DEFAULT_SCANNER_CREDENTIAL = "pulse-web-scanner-default-credential";
+export const DEFAULT_SCANNER_CREDENTIAL = "tarang-web-scanner-default-credential";
 
 /** True when the shared default scanner credential is enabled (dev only). */
 export function defaultScannerCredentialEnabled(): boolean {

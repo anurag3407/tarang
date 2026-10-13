@@ -32,7 +32,7 @@ send_alert() {
   echo "!! ALERT: $msg" >&2
   if [ -n "$ALERT_WEBHOOK_URL" ]; then
     curl -fsS -X POST -H "Content-Type: application/json" \
-      -d "{\"content\": \"[PULSE DB BACKUP FAILED] $msg\"}" \
+      -d "{\"content\": \"[TARANG DB BACKUP FAILED] $msg\"}" \
       "$ALERT_WEBHOOK_URL" >/dev/null 2>&1 || true
   fi
 }
@@ -51,7 +51,7 @@ STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 WORKDIR="$(mktemp -d)"
 trap 'rm -rf "$WORKDIR"' EXIT
 
-DUMP="$WORKDIR/pulse-${STAMP}.sql"
+DUMP="$WORKDIR/tarang-${STAMP}.sql"
 ENC="${DUMP}.age"
 
 echo "==> Dumping schema + data"
@@ -95,7 +95,7 @@ prune_old_backups() {
 
   list="$WORKDIR/backup-list.txt"
   if ! aws --endpoint-url "$BACKUP_S3_ENDPOINT" s3api list-objects-v2 \
-       --bucket "$BACKUP_S3_BUCKET" --prefix "backups/pulse-" \
+       --bucket "$BACKUP_S3_BUCKET" --prefix "backups/tarang-" \
        --query "Contents[].Key" --output text > "$list" 2>/dev/null; then
     send_alert "Could not list backups for retention pruning (prune skipped this run)."
     return 0
@@ -103,8 +103,8 @@ prune_old_backups() {
 
   tr '\t' '\n' < "$list" | while read -r key; do
     [ -z "$key" ] && continue
-    # Parse pulse-<YYYYMMDDTHHMMSSZ>.sql.age; skip anything that does not match.
-    stamp="$(basename "$key" | sed -E 's/^pulse-([0-9]{8}T[0-9]{6}Z)\.sql\.age$/\1/')"
+    # Parse tarang-<YYYYMMDDTHHMMSSZ>.sql.age; skip anything that does not match.
+    stamp="$(basename "$key" | sed -E 's/^tarang-([0-9]{8}T[0-9]{6}Z)\.sql\.age$/\1/')"
     [ "$stamp" = "$key" ] && continue
     if [[ "$stamp" < "$cutoff" ]]; then
       echo "==> Pruning $key (older than ${RETENTION_DAYS}d retention)"
@@ -120,4 +120,4 @@ else
   echo "==> Retention pruning disabled (RETENTION_DAYS=$RETENTION_DAYS)"
 fi
 
-echo "==> Backup complete: pulse-${STAMP}"
+echo "==> Backup complete: tarang-${STAMP}"

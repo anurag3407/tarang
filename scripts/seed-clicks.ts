@@ -20,7 +20,7 @@ if (!url || !token) {
 }
 
 const redis = new Redis({ url, token });
-const key = `pulse:${appEnv}:stats:site_clicks`;
+const key = `tarang:${appEnv}:stats:site_clicks`;
 
 async function main() {
   try {

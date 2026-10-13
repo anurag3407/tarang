@@ -27,6 +27,13 @@ Lint:
 pnpm lint
 ```
 
+## Deployment
+
+Production runs at **https://tarangfest.in** on AWS Lightsail behind Cloudflare.
+Every push to `main` is verified, built into a Docker image on GitHub Actions,
+and deployed blue/green with zero downtime. Setup checklist, security model,
+rollback and operations: [`docs/13-lightsail-deployment.md`](docs/13-lightsail-deployment.md).
+
 ## Pages
 
 | Route       | What's on it                                                        |
@@ -75,7 +82,7 @@ from this file. **To add a backend later:**
   a DB) — the shapes are already API-friendly (stable `id`s, flat, serializable).
 - `AskForm` and `VerifyChecker` have clearly-marked `// Frontend-only for now`
   blocks where a `POST /api/questions` / `GET /api/verify` call should go.
-- Mock verification records live in `VERIFY_RECORDS` (try `PULSE-2026-0001`).
+- Mock verification records live in `VERIFY_RECORDS` (try `TARANG-2026-0001`).
 
 ## Design system — Neo-brutalism
 

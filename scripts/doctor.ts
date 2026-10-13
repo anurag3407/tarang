@@ -689,7 +689,7 @@ function checkQr(): void {
       format: "der",
       type: "spki",
     });
-    const msg = Buffer.from("pulse-doctor-probe");
+    const msg = Buffer.from("tarang-doctor-probe");
     const ok = verify(null, msg, pubKey, sign(null, msg, privKey));
     add(
       ok ? "PASS" : "FAIL",
@@ -753,7 +753,7 @@ function report(): number {
 }
 
 async function main(): Promise<void> {
-  console.log("PULSE configuration doctor\n" + "=".repeat(26));
+  console.log("TARANG configuration doctor\n" + "=".repeat(26));
   checkEnv();
   await checkSupabase();
   await checkRazorpay();

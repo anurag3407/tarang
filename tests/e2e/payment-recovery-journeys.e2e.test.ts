@@ -174,7 +174,7 @@ describe("A. the browser dies after Razorpay captured the payment", () => {
     sb.onTable("orders", {
       data: {
         id: ORDER_ID,
-        public_order_code: "PULSE-A1",
+        public_order_code: "TARANG-A1",
         purchaser_user_id: USER_ID,
         checkout_state: "FULFILLED",
         amount_paise: String(AMOUNT),
@@ -459,7 +459,7 @@ describe("H. a swept order the provider has a payment for", () => {
     sb.onTable("orders", {
       data: {
         id: ORDER_ID,
-        public_order_code: "PULSE-H1",
+        public_order_code: "TARANG-H1",
         purchaser_user_id: USER_ID,
         checkout_state: state,
         amount_paise: String(AMOUNT),

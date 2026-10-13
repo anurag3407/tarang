@@ -1,4 +1,4 @@
-# PULSE — Code Gaps Report (Scanner / Payments Review)
+# TARANG — Code Gaps Report (Scanner / Payments Review)
 
 **Date:** 2026-08-24
 **Scope:** Manual bug hunt across the current `main` tree (`4fd81c8`), prioritising recently changed scanner code (commits `4fd81c8`, `bffb6c7`, `36376bd`, `5f87529`), the payment pipeline, authz/CSRF, and the SQL migration chain.
@@ -93,14 +93,14 @@ if (error) logger().error({ err: error.message }, "audit insert failed");
 > **Status: FIXED (2026-08-24, uncommitted)** — `src/app/api/scanner/verify-card/route.ts`
 > now resolves `festival_id`/`expires_at` from the pass/festival rows and inserts
 > the required `key_id` ("lookup-backfill") and `expires_at`; the hardcoded
-> `slug: "pulse-2027"` lookup was removed. Also fixes M2 (single `requirePermission`).
+> `slug: "tarang-2027"` lookup was removed. Also fixes M2 (single `requirePermission`).
 
 **Location:** `src/app/api/scanner/verify-card/route.ts:123–146`
 
 ```ts
 const { data: newCred } = await sb.from("qr_credentials").insert({
   delegate_pass_id: result.passId,
-  festival_id: festival?.id,        // slug hardcoded to "pulse-2027", see G5
+  festival_id: festival?.id,        // slug hardcoded to "tarang-2027", see G5
   jti: crypto.randomUUID(),
   token_digest: "lookup-scan",
   state: "ACTIVE",
@@ -113,7 +113,7 @@ Schema (`0008_qr_scanning.sql:6–20`) requires, with **no defaults**:
 |---|---|
 | `key_id text not null` | ❌ missing |
 | `expires_at timestamptz not null` | ❌ missing |
-| `festival_id uuid not null` | ⚠️ provided only if the `pulse-2027` lookup matches |
+| `festival_id uuid not null` | ⚠️ provided only if the `tarang-2027` lookup matches |
 | `token_digest`, `jti`, `delegate_pass_id` | ✅ |
 
 The INSERT therefore fails with a not-null violation **100% of the time**. The error is not checked (`const { data: newCred }`), so:
@@ -251,20 +251,20 @@ Commit `cb88218` moved the displayed year to **2026** but the backend still says
 
 | Location | Value |
 |---|---|
-| `supabase/seed.sql:6` | slug `pulse-2027`, `year` column `2027`, but dates `2026-09-17…22` (self-contradictory row) |
+| `supabase/seed.sql:6` | slug `tarang-2027`, `year` column `2027`, but dates `2026-09-17…22` (self-contradictory row) |
 | `src/lib/data.ts:14–19` | UI shows `year: "2026"`, `dates: "17 – 21 September 2026"` |
-| `src/app/api/admin/overview/route.ts:222–226` | hardcodes `slug: "pulse-2027", name: "PULSE 2027"` next to `dates: "17–21 Sep 2026"` |
-| `src/app/api/scanner/verify-card/route.ts:127` | `.eq("slug", "pulse-2027")` hardcode feeding the G2 insert |
-| QR payload default (`qr-service.ts:105`) and e2e fixtures | `fest: "pulse-2027"` |
+| `src/app/api/admin/overview/route.ts:222–226` | hardcodes `slug: "tarang-2027", name: "TARANG 2027"` next to `dates: "17–21 Sep 2026"` |
+| `src/app/api/scanner/verify-card/route.ts:127` | `.eq("slug", "tarang-2027")` hardcode feeding the G2 insert |
+| QR payload default (`qr-service.ts:105`) and e2e fixtures | `fest: "tarang-2027"` |
 
 The verify-card hardcode works today only because the seed matches; if the slug ever changes (e.g. a real 2027 edition row appears), the festival lookup silently returns null → `festival_id: undefined` is dropped by supabase-js → another NOT NULL failure mode on top of G2. Recommended: resolve the festival via `getCurrentFestivalId()` (already used by `requireUser`) or from the pass row, and make `festivals.year` agree with the marketing dates.
 
 > **Status: RESOLVED (2026-08-24, uncommitted)** — the overview route now reads
 > festival metadata from the DB and verify-card resolves the festival from the
-> pass row; no API code hardcodes `pulse-2027` anymore. `src/lib/data.ts`
+> pass row; no API code hardcodes `tarang-2027` anymore. `src/lib/data.ts`
 > `year` was aligned to `"2027"` (nav/footer/homepage) to match the seed row,
 > emails, cards and QR payload. Calendar dates remain September 2026 by design
-> (brand "PULSE 2027", event dates 2026).
+> (brand "TARANG 2027", event dates 2026).
 
 ### G6 · Duplicate migration number `0018`
 
@@ -323,7 +323,7 @@ so completed rows and their on-disk files accumulated until manual cleanup.
 
 | ID | Location | Note |
 |---|---|---|
-| M1 | `ScannerApp.tsx:168` | Reads `sessionStorage["pulse-scanner-credential"]`, but nothing in the repo ever writes that key — dead leftover of a removed enrolment flow. |
+| M1 | `ScannerApp.tsx:168` | Reads `sessionStorage["tarang-scanner-credential"]`, but nothing in the repo ever writes that key — dead leftover of a removed enrolment flow. |
 | M2 | `verify-card/route.ts:28,173` | `requirePermission("scanner.use")` executed twice per request (second call inline in the scan-attempt insert). Reuse the context from the first call. |
 | M2a | `verify-card/route.ts:28` | M2 fixed 2026-08-24: the operator context is captured once (`op`) and reused for the scan-attempt insert. |
 | M3 | `verify-card/route.ts:151–155` | `.eq("id", validGateId ?? "")` queries gates with an empty-string UUID when no gateId was supplied; harmless but wasteful — branch instead. |

@@ -255,7 +255,7 @@ export default function AskForm() {
             </h2>
             <p className="mt-3 text-base font-bold leading-snug">
               Skip the form — walk up to the help desk near the Student Centre.
-              It&apos;s open 8 AM to 10 PM all five days, and someone in a
+              It&apos;s open 8 AM to 10 PM across both fest days, and someone in a
               yellow tee can answer almost anything on the spot.
             </p>
           </div>

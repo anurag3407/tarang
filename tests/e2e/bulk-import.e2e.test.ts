@@ -202,7 +202,7 @@ describe("POST /api/admin/bulk-import", () => {
     sb.onTable("events", {
       data: {
         id: EVENT_ID,
-        name: "Pulse Battle of the Bands",
+        name: "Tarang Battle of the Bands",
         slug: "battle-of-the-bands",
         starts_at: "2026-09-25T18:00:00Z",
         ends_at: "2026-09-25T21:00:00Z",

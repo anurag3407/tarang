@@ -275,7 +275,7 @@ export default function VerifyChecker() {
                   <p className="text-[11px] font-bold text-black/50 mt-1">
                     {result.data.expiresAt
                       ? `Valid through ${formatDateIST(result.data.expiresAt)}`
-                      : "Valid for TARANG 2026 (17–21 Sep 2026)"}
+                      : "Valid for TARANG 2026 (21–22 Nov 2026)"}
                   </p>
                 </div>
 

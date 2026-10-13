@@ -16,9 +16,9 @@ begin
   return true;
 end $$;
 
-select id as fest_a from festivals where slug='pulse-2026' \gset
+select id as fest_a from festivals where slug='tarang-2026' \gset
 insert into festivals (slug, name, year, starts_at, ends_at, status)
-values ('pulse-2025-archive', 'PULSE Archive', 2025,
+values ('tarang-2025-archive', 'TARANG Archive', 2025,
         now() - interval '12 months', now() - interval '11 months', 'ARCHIVED')
 returning id as fest_b \gset
 insert into categories (festival_id, slug, name)
@@ -56,10 +56,10 @@ create or replace function auth.uid() returns uuid language sql stable as $$
 $$;
 
 -- Stage festival ids for use inside plpgsql blocks.
-select set_config('pulse.fest_a', :'fest_a', false);
-select set_config('pulse.fest_b', :'fest_b', false);
-select set_config('pulse.cat_a', :'cat_a', false);
-select set_config('pulse.cat_b', :'cat_b', false);
+select set_config('tarang.fest_a', :'fest_a', false);
+select set_config('tarang.fest_b', :'fest_b', false);
+select set_config('tarang.cat_a', :'cat_a', false);
+select set_config('tarang.cat_b', :'cat_b', false);
 
 \echo '=== TEST 1: has_permission scopes to festival ==='
 select set_config('request.jwt.claim.sub', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', false);
@@ -84,10 +84,10 @@ select assert_true( :'sa_b' = 'f', 'TEST2 superadmin-A must NOT have access in B
 \echo '=== TEST 3: admin_upsert_event create denied in B for CA ==='
 select set_config('request.jwt.claim.sub', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', false);
 do $$
-declare v_fest_b uuid := current_setting('pulse.fest_b')::uuid;
+declare v_fest_b uuid := current_setting('tarang.fest_b')::uuid;
 begin
   begin
-    perform admin_upsert_event(null, v_fest_b, 'x', 'X', '', '', '', current_setting('pulse.cat_b')::uuid, null,
+    perform admin_upsert_event(null, v_fest_b, 'x', 'X', '', '', '', current_setting('tarang.cat_b')::uuid, null,
       now(), now() + interval '1 hour', false, false, 'INDIVIDUAL', 'PARTICIPANT'::capacity_basis,
       'PARTICIPANT'::price_basis, 1, 1, 10, 5000, '', now(), now() + interval '1 day', false, 0);
     raise exception 'TEST3 FAIL: create in B succeeded';
@@ -99,15 +99,15 @@ end; $$;
 
 \echo '=== TEST 4: create in A ok; cross-festival update denied ==='
 do $$
-declare v_fest_a uuid := current_setting('pulse.fest_a')::uuid;
-declare v_fest_b uuid := current_setting('pulse.fest_b')::uuid;
+declare v_fest_a uuid := current_setting('tarang.fest_a')::uuid;
+declare v_fest_b uuid := current_setting('tarang.fest_b')::uuid;
 declare v_ev events;
 begin
-  v_ev := admin_upsert_event(null, v_fest_a, 'a-slot', 'A Event', '', '', '', current_setting('pulse.cat_a')::uuid, null,
+  v_ev := admin_upsert_event(null, v_fest_a, 'a-slot', 'A Event', '', '', '', current_setting('tarang.cat_a')::uuid, null,
     now(), now() + interval '1 hour', false, false, 'INDIVIDUAL', 'PARTICIPANT'::capacity_basis,
     'PARTICIPANT'::price_basis, 1, 1, 10, 5000, '', now(), now() + interval '1 day', false, 0);
   begin
-    perform admin_upsert_event(v_ev.id, v_fest_b, 'a-slot', 'A Event Hacked', '', '', '', current_setting('pulse.cat_a')::uuid, null,
+    perform admin_upsert_event(v_ev.id, v_fest_b, 'a-slot', 'A Event Hacked', '', '', '', current_setting('tarang.cat_a')::uuid, null,
       now(), now() + interval '1 hour', false, false, 'INDIVIDUAL', 'PARTICIPANT'::capacity_basis,
       'PARTICIPANT'::price_basis, 1, 1, 10, 5000, '', now(), now() + interval '1 day', false, v_ev.version);
     raise exception 'TEST4 FAIL: cross-festival update succeeded';
@@ -120,15 +120,15 @@ end; $$;
 \echo '=== TEST 5: publish / capacity / sponsor guards ==='
 select set_config('request.jwt.claim.sub', 'cccccccc-cccc-4ccc-8ccc-ccccccccccc3', false);
 do $$
-declare v_fest_b uuid := current_setting('pulse.fest_b')::uuid;
+declare v_fest_b uuid := current_setting('tarang.fest_b')::uuid;
 declare v_ev events;
 begin
-  v_ev := admin_upsert_event(null, v_fest_b, 'b-slot', 'B Event', '', '', '', current_setting('pulse.cat_b')::uuid, null,
+  v_ev := admin_upsert_event(null, v_fest_b, 'b-slot', 'B Event', '', '', '', current_setting('tarang.cat_b')::uuid, null,
     now(), now() + interval '1 hour', false, false, 'INDIVIDUAL', 'PARTICIPANT'::capacity_basis,
     'PARTICIPANT'::price_basis, 1, 1, 10, 5000, '', now(), now() + interval '1 day', false, 0);
   perform admin_publish_event(v_ev.id);
   -- Second B event stays DRAFT so RLS scoping of unpublished rows is testable.
-  perform admin_upsert_event(null, v_fest_b, 'b-draft-slot', 'B Draft Event', '', '', '', current_setting('pulse.cat_b')::uuid, null,
+  perform admin_upsert_event(null, v_fest_b, 'b-draft-slot', 'B Draft Event', '', '', '', current_setting('tarang.cat_b')::uuid, null,
     now(), now() + interval '1 hour', false, false, 'INDIVIDUAL', 'PARTICIPANT'::capacity_basis,
     'PARTICIPANT'::price_basis, 1, 1, 10, 5000, '', now(), now() + interval '1 day', false, 0);
   -- Sponsor stays inactive (private) so CA cannot see it via RLS.
@@ -136,7 +136,7 @@ begin
 end; $$;
 select set_config('request.jwt.claim.sub', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', false);
 do $$
-declare v_fest_a uuid := current_setting('pulse.fest_a')::uuid;
+declare v_fest_a uuid := current_setting('tarang.fest_a')::uuid;
 declare v_ev events;
 declare v_sp sponsors;
 begin
@@ -170,21 +170,21 @@ values (:'fest_b'::uuid, 'b-notice', 'INFO', 'B Notice', 'body', 'PUBLISHED') re
 select id as b_slot_id from events where slug='b-slot' \gset
 insert into schedule_entries (festival_id, linked_event_id, title, starts_at, ends_at, category_key)
 values (:'fest_b'::uuid, :'b_slot_id'::uuid, 'B Entry', now(), now() + interval '1 hour', 'workshop') returning id as b_entry \gset
-select set_config('pulse.b_notice', :'b_notice', false);
-select set_config('pulse.b_entry', :'b_entry', false);
+select set_config('tarang.b_notice', :'b_notice', false);
+select set_config('tarang.b_entry', :'b_entry', false);
 select set_config('request.jwt.claim.sub', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', false);
 do $$
-declare v_fest_a uuid := current_setting('pulse.fest_a')::uuid;
+declare v_fest_a uuid := current_setting('tarang.fest_a')::uuid;
 begin
   begin
-    perform admin_upsert_notice(current_setting('pulse.b_notice')::uuid, v_fest_a, 'b-notice', 'INFO', 'B Notice Hacked', 'body',
+    perform admin_upsert_notice(current_setting('tarang.b_notice')::uuid, v_fest_a, 'b-notice', 'INFO', 'B Notice Hacked', 'body',
       now(), null, false, 1);
     raise exception 'TEST6 FAIL: cross-festival notice update succeeded';
   exception when others then
     if sqlstate <> '42501' then raise; end if;
   end;
   begin
-    perform admin_upsert_schedule_entry(current_setting('pulse.b_entry')::uuid, v_fest_a, null, 'B Entry Hacked', null,
+    perform admin_upsert_schedule_entry(current_setting('tarang.b_entry')::uuid, v_fest_a, null, 'B Entry Hacked', null,
       now(), now() + interval '1 hour', 'workshop', false, null, 1);
     raise exception 'TEST6 FAIL: cross-festival schedule update succeeded';
   exception when others then

@@ -246,8 +246,8 @@ describe("admin sponsor schema", () => {
 describe("merchandise schemas", () => {
   it("accepts a valid merchandise product with 5 images", () => {
     const valid = {
-      name: "PULSE ’27 Heavyweight Hoodie",
-      slug: "pulse-27-heavyweight-hoodie",
+      name: "TARANG ’27 Heavyweight Hoodie",
+      slug: "tarang-27-heavyweight-hoodie",
       tagline: "Official Festival Apparel",
       description: "Heavyweight 380 GSM fleece hoodie with custom puff-print typography.",
       detailsMarkdown: "100% French Terry Cotton · Preshrunk · Unisex Relaxed Fit",

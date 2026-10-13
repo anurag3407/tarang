@@ -132,7 +132,7 @@ describe("outbox dispatcher (plan §7.13)", () => {
       expires_at: "2099-01-01T00:00:00Z",
       state: "ACTIVE",
       festival_id: "fest-1",
-      delegate_passes: { public_pass_code: "PP-EMAIL00001", festivals: { slug: "pulse-2026" } },
+      delegate_passes: { public_pass_code: "PP-EMAIL00001", festivals: { slug: "tarang-2026" } },
     };
     sb.onTable(
       "qr_credentials",

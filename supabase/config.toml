@@ -2,7 +2,7 @@
 # Local development: `supabase start`, then `supabase db reset` applies
 # migrations + seed.sql.
 
-project_id = "pulse-fest"
+project_id = "tarang-fest"
 
 [api]
 enabled = true
@@ -36,9 +36,9 @@ enabled = true
 site_url = "http://localhost:3000"
 additional_redirect_urls = [
   "http://localhost:3000/auth/callback",
-  "https://pulseasa.org/auth/callback",
-  "https://register.pulseasa.org/auth/callback",
-  "https://admin.pulseasa.org/auth/callback",
+  "https://tarangfest.in/auth/callback",
+  "https://register.tarangfest.in/auth/callback",
+  "https://admin.tarangfest.in/auth/callback",
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true

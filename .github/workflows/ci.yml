@@ -1,11 +1,23 @@
-# PULSE — Automated CI/CD Pipeline (GitHub Actions -> Hostinger VPS)
+# TARANG — CI/CD (GitHub Actions -> GHCR -> AWS Lightsail)
 #
-# Pipeline:
-#   1. Quality Gates (Lint, Typecheck, Typegen) on GitHub Runners
-#   2. Continuous Deployment to Hostinger VPS on push to `main` (Zero-downtime blue/green cutover)
-#   3. Manual trigger support (workflow_dispatch)
+#   verify   lint, typecheck, unit tests            (every push + PR)
+#   build    Docker image -> ghcr.io/<owner>/<repo> (push to main / manual)
+#   deploy   blue/green on the Lightsail origin     (after build)
+#   rollback previous image                          (manual only)
+#
+# The image is built here, never on the 4 GB production box. The origin only
+# pulls an immutable digest. The deploy SSH key is pinned server-side to
+# /usr/local/sbin/tarang-deploy (forced command), which accepts only
+# `deploy <sha-on-main> <this-repo-image@sha256:...>`, `rollback`, `status`.
+#
+# Required repository configuration (docs/13-lightsail-deployment.md):
+#   Secrets:   LIGHTSAIL_HOST, LIGHTSAIL_SSH_KEY, LIGHTSAIL_KNOWN_HOSTS
+#              SENTRY_AUTH_TOKEN (optional, source-map upload)
+#   Variables: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+#              NEXT_PUBLIC_RAZORPAY_KEY_ID   (public; inlined at build time)
+#              PRODUCTION_URL (optional, default https://tarangfest.in)
 
-name: CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
@@ -13,24 +25,34 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      action:
+        description: "deploy = build + deploy main; rollback = previous image"
+        type: choice
+        options: [deploy, rollback]
+        default: deploy
+
+permissions:
+  contents: read
 
 concurrency:
-  group: production_deploy
-  cancel-in-progress: false
+  group: ci-${{ github.ref }}
+  # Superseded PR runs are cancelled; main runs always finish so every merged
+  # commit is built (deploys are serialised separately below).
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
-    name: Verify & Quality Gates
+    name: Verify (lint, typecheck, tests)
+    if: github.event_name != 'workflow_dispatch' || inputs.action == 'deploy'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
@@ -41,66 +63,196 @@ jobs:
       - name: Generate route types
         run: pnpm typegen
 
-      - name: Run linter
+      - name: Lint
         run: pnpm lint
 
-      - name: Run typecheck
+      - name: Typecheck
         run: pnpm typecheck
 
-  deploy:
-    name: Deploy to Hostinger VPS
+      - name: Unit tests
+        run: pnpm test
+
+  build:
+    name: Build & push image
     needs: verify
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' ||
+       (github.event_name == 'workflow_dispatch' && inputs.action == 'deploy'))
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.ref.outputs.image }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Deploy via SSH to Hostinger VPS
+      - name: Check build-time variables
         env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || '22' }}
-          DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH || '/opt/pulse' }}
+          SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          RAZORPAY_KEY: ${{ vars.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
         run: |
-          if [ -z "$VPS_HOST" ] || [ -z "$VPS_USER" ] || [ -z "$VPS_SSH_KEY" ]; then
-            echo "::error::Missing required GitHub Secrets: VPS_HOST, VPS_USER, and VPS_SSH_KEY must be set in Repository Settings -> Secrets and variables -> Actions."
+          # These are inlined into the browser bundle; a restart can't fix a
+          # missing one, so refuse to build a broken image.
+          missing=""
+          [ -n "$SUPABASE_URL" ] || missing="$missing NEXT_PUBLIC_SUPABASE_URL"
+          [ -n "$SUPABASE_KEY" ] || missing="$missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+          [ -n "$RAZORPAY_KEY" ] || missing="$missing NEXT_PUBLIC_RAZORPAY_KEY_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Set repository Variables (Settings -> Secrets and variables -> Actions -> Variables):$missing"
             exit 1
           fi
 
-          mkdir -p ~/.ssh
-          printf '%s\n' "$VPS_SSH_KEY" | tr -d '\r' > ~/.ssh/id_vps
-          chmod 600 ~/.ssh/id_vps
+      - name: Image name
+        id: name
+        run: echo "repo=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
-          echo "==> Verifying private key structure..."
-          if ! ssh-keygen -l -f ~/.ssh/id_vps >/dev/null 2>&1; then
-            echo "::error::The secret VPS_SSH_KEY is not a valid OpenSSH/RSA/ED25519 private key. Ensure it begins with '-----BEGIN ... PRIVATE KEY-----' and ends with '-----END ... PRIVATE KEY-----'."
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.name.outputs.repo }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          build-args: |
+            DEPLOYMENT_ID=${{ github.sha }}
+            NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+            NEXT_PUBLIC_RAZORPAY_KEY_ID=${{ vars.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
+          secrets: |
+            sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Immutable image reference
+        id: ref
+        run: |
+          image="${{ steps.name.outputs.repo }}@${{ steps.build.outputs.digest }}"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "### Image" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`$image\`" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    name: Deploy to Lightsail
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read   # the job token the origin uses to pull the image
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL || 'https://tarangfest.in' }}
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.LIGHTSAIL_KNOWN_HOSTS }}
+          HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        run: |
+          if [ -z "$SSH_KEY" ] || [ -z "$KNOWN_HOSTS" ] || [ -z "$HOST" ]; then
+            echo "::error::Set secrets LIGHTSAIL_HOST, LIGHTSAIL_SSH_KEY and LIGHTSAIL_KNOWN_HOSTS."
             exit 1
           fi
-
-          echo "==> Connecting to Hostinger VPS ($VPS_USER@$VPS_HOST:$VPS_SSH_PORT)..."
-          ssh -i ~/.ssh/id_vps -p "$VPS_SSH_PORT" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30 "$VPS_USER@$VPS_HOST" "bash -s" << 'EOF'
-            set -euo pipefail
-            
-            APP_DIR="${DEPLOY_PATH:-/opt/pulse}"
-            echo "==> Navigating to application directory: $APP_DIR"
-            cd "$APP_DIR"
-
-            if [ ! -f ".env" ]; then
-              echo "!! Missing .env file in $APP_DIR. Deployment aborted." >&2
-              exit 1
-            fi
-
-            echo "==> Fetching latest changes from git..."
-            git fetch origin main
-            git reset --hard origin/main
-
-            echo "==> Ensuring helper scripts are executable..."
-            chmod +x infra/scripts/*.sh
-
-            echo "==> Executing zero-downtime deployment..."
-            ALLOW_DIRTY=1 ./infra/scripts/deploy-local.sh
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Pinned host key: never trust-on-first-use from a CI runner.
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host origin
+            HostName $HOST
+            User deploy
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking yes
+            BatchMode yes
+            ConnectTimeout 20
+            ServerAliveInterval 30
+            ServerAliveCountMax 6
           EOF
 
-          echo "==> Deployment to Hostinger VPS completed successfully!"
+      - name: Blue/green deploy
+        env:
+          IMAGE: ${{ needs.build.outputs.image }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The short-lived job token goes over stdin (never argv/logs); the
+          # origin uses it once to pull, then discards its credential store.
+          printf '%s\n' "$REGISTRY_TOKEN" | ssh origin "deploy ${GITHUB_SHA} ${IMAGE}"
+
+      - name: Public health check
+        env:
+          URL: ${{ vars.PRODUCTION_URL || 'https://tarangfest.in' }}
+        run: |
+          # The origin already gated the cutover on local readiness; this
+          # confirms the Cloudflare -> nginx -> app path end to end.
+          for i in $(seq 1 10); do
+            code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$URL/api/health/live" || true)"
+            if [ "$code" = "200" ]; then echo "Healthy via $URL ($code)"; exit 0; fi
+            echo "attempt $i: HTTP $code"; sleep 6
+          done
+          echo "::warning::$URL/api/health/live did not return 200 through Cloudflare. The origin passed its local readiness gate — check DNS, the Cloudflare SSL mode / Origin Certificate, and WAF rules."
+
+      - name: Origin status
+        if: always()
+        run: ssh origin status || true
+
+  rollback:
+    name: Roll back to previous image
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'rollback'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL || 'https://tarangfest.in' }}
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.LIGHTSAIL_KNOWN_HOSTS }}
+          HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host origin
+            HostName $HOST
+            User deploy
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking yes
+            BatchMode yes
+            ConnectTimeout 20
+            ServerAliveInterval 30
+          EOF
+
+      - name: Rollback
+        run: ssh origin rollback < /dev/null
+
+      - name: Origin status
+        if: always()
+        run: ssh origin status || true

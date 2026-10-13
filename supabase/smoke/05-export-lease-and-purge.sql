@@ -16,7 +16,7 @@ begin
   return true;
 end $$;
 
-select id as fest_id from festivals where slug='pulse-2026' \gset
+select id as fest_id from festivals where slug='tarang-2026' \gset
 insert into auth.users (id, email) values ('11111111-1111-4111-8111-111111111111','export-owner@example.com')
 on conflict (id) do nothing;
 insert into profiles (user_id, display_name, public_member_code, status)

@@ -8,7 +8,7 @@ import { env } from "@/lib/env";
  */
 
 function prefix(): string {
-  return `pulse:${env().APP_ENV}`;
+  return `tarang:${env().APP_ENV}`;
 }
 
 export const redisKeys = {

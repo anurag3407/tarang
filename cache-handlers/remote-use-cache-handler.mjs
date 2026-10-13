@@ -25,8 +25,8 @@
 
 const APP_ENV = process.env.APP_ENV || "local";
 const DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "dev";
-const KEY_PREFIX = `pulse:${APP_ENV}:use-cache:${DEPLOYMENT_ID}`;
-const TAG_PREFIX = `pulse:${APP_ENV}:use-cache-tags:${DEPLOYMENT_ID}`;
+const KEY_PREFIX = `tarang:${APP_ENV}:use-cache:${DEPLOYMENT_ID}`;
+const TAG_PREFIX = `tarang:${APP_ENV}:use-cache-tags:${DEPLOYMENT_ID}`;
 
 const MAX_REMOTE_BYTES = 512 * 1024;
 const DEFAULT_TTL_SECONDS = 24 * 60 * 60;

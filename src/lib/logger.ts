@@ -17,7 +17,7 @@ export function logger(): pino.Logger {
   instance = pino({
     level: env().LOG_LEVEL,
     base: {
-      app: "pulse",
+      app: "tarang",
       appEnv: env().APP_ENV,
       deploymentId: env().DEPLOYMENT_ID ?? "dev",
     },

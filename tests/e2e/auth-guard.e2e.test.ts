@@ -16,7 +16,7 @@ describe("POST /api/auth/guard (V-08)", () => {
   it("accepts a valid pre-auth gate request", async () => {
     const res = await authGuard(
       post("/api/auth/guard", {
-        body: { purpose: "password_signin", email: "Member@Pulse.Example" },
+        body: { purpose: "password_signin", email: "Member@Tarang.Example" },
       })
     );
     expect(res.status).toBe(200);

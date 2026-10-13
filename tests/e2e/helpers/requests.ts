@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
  * All URLs use the configured APP_BASE_URL so CSRF origin checks pass.
  */
 
-export const BASE_URL = "https://pulse.example.com";
+export const BASE_URL = "https://tarang.example.com";
 
 export type ExtraHeaders = Record<string, string>;
 

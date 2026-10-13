@@ -68,7 +68,7 @@ function seedIssuance(): void {
       state: "ACTIVE",
       festival_id: FESTIVAL_ID,
       expires_at: null,
-      festivals: { slug: "pulse-2026", ends_at: "2027-03-01T00:00:00Z" },
+      festivals: { slug: "tarang-2026", ends_at: "2027-03-01T00:00:00Z" },
     },
     error: null,
   });
@@ -96,7 +96,7 @@ function seedActiveCredentialForSigning(): void {
       expires_at: new Date(Date.now() + 3_600_000).toISOString(),
       delegate_passes: {
         public_pass_code: "PS-E2E-0001",
-        festivals: { slug: "pulse-2026" },
+        festivals: { slug: "tarang-2026" },
       },
     },
     error: null,
@@ -187,7 +187,7 @@ describe("GET /api/me/passes/:passId/qr (plan §14.2.4)", () => {
     expect(verified.valid).toBe(true);
     expect(verified.payload).toMatchObject({
       jti: JTI,
-      fest: "pulse-2026",
+      fest: "tarang-2026",
       pass: "PS-E2E-0001",
       entv: 1,
       class: "BASE",
@@ -292,7 +292,7 @@ describe("QR reissue (service-level, plan §14.2.6)", () => {
         state: "ACTIVE",
         festival_id: FESTIVAL_ID,
         expires_at: null,
-        festivals: { slug: "pulse-2026", ends_at: null },
+        festivals: { slug: "tarang-2026", ends_at: null },
       },
       error: null,
     });

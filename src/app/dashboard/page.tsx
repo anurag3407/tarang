@@ -162,7 +162,7 @@ export default async function DashboardPage() {
               <p className="text-xs font-bold uppercase tracking-widest text-black/60">One pass · every night</p>
               <h3 className="mt-2 text-3xl font-black uppercase">Pronite Pass{passPrice ? ` — ${passPrice}` : ""}</h3>
               <p className="mt-2 max-w-lg text-sm font-bold text-black/70">
-                All five pronites, campus access for the whole fest, and registration for every competition.
+                Both pronites, campus access for the whole fest, and registration for every competition.
               </p>
             </div>
             <ButtonLink href="/pronite-pass">Get your pass</ButtonLink>

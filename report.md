@@ -1,4 +1,4 @@
-# PULSE 2026 — Pre-Deployment Review Report
+# TARANG 2026 — Pre-Deployment Review Report
 
 **Date:** 2026-08-23
 **Scope:** Full code review (app + DB migrations + workers + cache handlers), deploy/infra script audit, load test at 3000 concurrent users.
@@ -71,7 +71,7 @@ GATES (plan §16.3)
   http_req_failed    rate<0.001           ❌ FAILED (95.71%)
 ```
 
-### 2.3 Failure chain (evidence from server log, `/tmp/pulse-server.log`)
+### 2.3 Failure chain (evidence from server log, `/tmp/tarang-server.log`)
 
 1. **Supabase origin saturated.** At roughly 50 req/s aggregate, upstream `fsprybjoqrlgxzlwnhdf.supabase.co` stopped answering; Cloudflare returned **522 "Connection timed out"** error pages from the Supabase edge. 44,167 occurrences of `522` in the server log within the test window.
 2. **No upstream timeout in the app.** Supabase/Razorpay client calls have no fetch timeout and there is no circuit breaker or bounded request queue. Every request hung for the full 60s; sockets and queued requests accumulated without bound.
@@ -113,7 +113,7 @@ Severity legend: 🔴 will break production · 🟡 risk/edge case · ❓ needs 
 
 | Line | Sev | Finding |
 |---|---|---|
-| 60–62 | 🟡 | Dirty-tree state produces only a warning. Currently applicable: the tree IS dirty (sponsors WIP), so `pulse:local-$SHA` would be tagged with a commit hash whose bytes do not match the image — rollback state points at the wrong artifact. |
+| 60–62 | 🟡 | Dirty-tree state produces only a warning. Currently applicable: the tree IS dirty (sponsors WIP), so `tarang:local-$SHA` would be tagged with a commit hash whose bytes do not match the image — rollback state points at the wrong artifact. |
 
 ### infra/scripts/restore-drill.sh
 
@@ -136,11 +136,11 @@ Severity legend: 🔴 will break production · 🟡 risk/edge case · ❓ needs 
 | 49–57 | 🟡 | Without aws CLI the backup is encrypted locally then exits 1 — never uploaded, no alerting hook beyond stderr. |
 | — | 🟡 | No retention/pruning of uploaded backups — Object-Lock bucket grows forever. |
 
-### infra/systemd/pulse-compose.service
+### infra/systemd/tarang-compose.service
 
 | Line | Sev | Finding |
 |---|---|---|
-| 21 | 🟡 | `EnvironmentFile=/opt/pulse/.env` injects all secrets into the unit environment — readable via `systemctl show` and `/proc/<pid>/environ`. |
+| 21 | 🟡 | `EnvironmentFile=/opt/tarang/.env` injects all secrets into the unit environment — readable via `systemctl show` and `/proc/<pid>/environ`. |
 | 25 | 🟡 | ExecStop runs `docker compose down` on every stop/reboot — full teardown instead of stop; slow recovery after reboot. |
 | 18–19,28 | ❓ | `Type=oneshot` + `RemainAfterExit=yes` + `Restart=on-failure`: Restart never fires if the stack dies after a successful start. Intent unclear. |
 
@@ -150,7 +150,7 @@ Severity legend: 🔴 will break production · 🟡 risk/edge case · ❓ needs 
 |---|---|---|
 | 38 | 🟡 | `exports-data` named volume is per-host, but download route reads the local file — export job created on origin A 404s on origin B. Contradicts header comment claiming the file can be copied unchanged to a second origin. |
 
-### infra/nginx/conf.d/pulse-single-domain.conf
+### infra/nginx/conf.d/tarang-single-domain.conf
 
 | Line | Sev | Finding |
 |---|---|---|
@@ -203,8 +203,8 @@ Severity legend: 🔴 will break production · 🟡 risk/edge case · ❓ needs 
 
 | # | Location | Question |
 |---|---|---|
-| Q1 | `infra/systemd/pulse-compose.service:18–28` | Is Restart=on-failure intended to recover a stack that dies after successful start? As written it cannot. |
-| Q2 | `infra/nginx/conf.d/pulse-single-domain.conf:23` | Confirm target host runs nginx ≥ 1.25.1, else every `nginx -t` (and therefore every deploy) fails on `http2 on;`. |
+| Q1 | `infra/systemd/tarang-compose.service:18–28` | Is Restart=on-failure intended to recover a stack that dies after successful start? As written it cannot. |
+| Q2 | `infra/nginx/conf.d/tarang-single-domain.conf:23` | Confirm target host runs nginx ≥ 1.25.1, else every `nginx -t` (and therefore every deploy) fails on `http2 on;`. |
 
 ---
 
@@ -247,7 +247,7 @@ For completeness — areas examined and found sound:
 ## Appendix A — Test Artifacts
 
 - Load script: `load/concurrent-3k.k6.ts` (added by review; mirrors `load/public-burst.k6.ts` profiles/gates with short hold).
-- Server log analyzed: `/tmp/pulse-server.log` (119 MB, deleted post-analysis).
+- Server log analyzed: `/tmp/tarang-server.log` (119 MB, deleted post-analysis).
 - Build: `.next/standalone` from current tree (includes sponsors WIP).
 
 ## Appendix B — Totals

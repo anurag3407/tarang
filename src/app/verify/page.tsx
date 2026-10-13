@@ -40,7 +40,7 @@ export function VerifyPageOriginal() {
       <Marquee
         items={[
           "One ID per person",
-          "Non-transferable after 15 Sep",
+          "Non-transferable after 19 Nov",
           "Carry college ID",
           "QR scanned at every gate",
         ]}

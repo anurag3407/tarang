@@ -3,7 +3,7 @@
 ## Noot — `Noot-Regular.ttf`
 
 The display face of TARANG ’26; the poster lettering (“TARANG”, “MUTE THE MUNDANE”,
-“SEPT 2026”) is set in it.
+“NOV 2026”) is set in it.
 
 - Designer: Amos Jerbi — https://amosjerbi.gumroad.com/l/noot
 - Source of this file: https://www.1001fonts.com/noot-font.html

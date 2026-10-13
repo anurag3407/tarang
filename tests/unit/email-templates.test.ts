@@ -15,8 +15,8 @@ describe("email template rendering", () => {
       teamMembers: ["Aarav Sharma (Captain)", "Priya Patel", "Rohan Gupta"],
       amountPaise: 150000,
       currency: "INR",
-      dashboardUrl: "https://pulse.example.com/dashboard",
-      supportEmail: "support@pulse.example.com",
+      dashboardUrl: "https://tarang.example.com/dashboard",
+      supportEmail: "support@tarang.example.com",
     };
 
     const { subject, element } = renderTemplate("event-registration-confirmation", data);
@@ -48,8 +48,8 @@ describe("email template rendering", () => {
       venue: "Main Auditorium, Campus",
       teamName: "Cyber Knights",
       teamMembers: ["Aarav Sharma (Captain)", "Priya Patel", "Rohan Gupta"],
-      dashboardUrl: "https://pulse.example.com/dashboard",
-      supportEmail: "support@pulse.example.com",
+      dashboardUrl: "https://tarang.example.com/dashboard",
+      supportEmail: "support@tarang.example.com",
     };
 
     const { subject, element } = renderTemplate("team-member-registration", data);
@@ -78,8 +78,8 @@ describe("email template rendering", () => {
       amountPaise: 200000,
       currency: "INR",
       providerReference: "pay_RazorpayRef123",
-      dashboardUrl: "https://pulse.example.com/dashboard",
-      supportEmail: "support@pulse.example.com",
+      dashboardUrl: "https://tarang.example.com/dashboard",
+      supportEmail: "support@tarang.example.com",
     };
 
     const { subject, element } = renderTemplate("delegate-pass-confirmation", data);
