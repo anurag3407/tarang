@@ -1324,3 +1324,121 @@ html.lenis body {
   .kit-portrait-stage:is(:hover, :focus-visible) .kit-portrait-ghost { translate: -50% 0; scale: none; }
 }
 }
+
+/* ------------------------------------------------------------------
+   Hero mute screen — the “Shhh.” the mudra ring closes onto. A dim
+   oxblood spotlight, sound ripples dying out, crimson halftone in the
+   corners and a waveform that flatlines beneath the copy.
+   ------------------------------------------------------------------ */
+
+@layer components {
+.t-mute {
+  background:
+    radial-gradient(48% 42% at 50% 50%, rgba(110, 0, 1, 0.55) 0%, rgba(58, 1, 2, 0.35) 45%, transparent 75%),
+    radial-gradient(120% 90% at 50% 50%, #1d1b16 0%, var(--color-ink) 60%, #0b0a08 100%);
+}
+
+.t-mute-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(196, 24, 18, 0.55) 0 32%, transparent 35%);
+  background-size: 22px 22px;
+  -webkit-mask-image:
+    radial-gradient(40% 45% at 0% 0%, #000 0%, transparent 100%),
+    radial-gradient(45% 50% at 100% 100%, #000 0%, transparent 100%);
+  mask-image:
+    radial-gradient(40% 45% at 0% 0%, #000 0%, transparent 100%),
+    radial-gradient(45% 50% at 100% 100%, #000 0%, transparent 100%);
+  opacity: 0.7;
+}
+
+.t-mute-ripple {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(80vw, 80svh);
+  aspect-ratio: 1;
+  border: 1.5px solid rgba(244, 234, 200, 0.5);
+  border-radius: 50%;
+  translate: -50% -50%;
+  opacity: 0;
+  animation: t-ripple 6.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+@keyframes t-ripple {
+  0% { scale: 0.35; opacity: 0; }
+  12% { opacity: 0.35; }
+  100% { scale: 1.9; opacity: 0; }
+}
+
+.t-mute-wave {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  display: flex;
+  height: min(46svh, 420px);
+  translate: 0 -50%;
+  align-items: center;
+  gap: clamp(2px, 0.45vw, 7px);
+  padding-inline: clamp(12px, 2vw, 32px);
+}
+/* The flatline: a hairline the bars collapse onto. */
+.t-mute-wave::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(244, 234, 200, 0.28) 20%, rgba(244, 234, 200, 0.28) 80%, transparent);
+}
+.t-mute-wave > span {
+  flex: 1;
+  min-width: 1px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgba(255, 59, 31, 0.55), rgba(163, 16, 13, 0.35) 50%, rgba(255, 59, 31, 0.55));
+  transform-origin: center;
+  animation: t-eq 1.4s ease-in-out infinite alternate;
+}
+@keyframes t-eq {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.55); }
+}
+
+/* Narrow screens: the copy outruns the flat zone, so the bars step back. */
+@media (max-width: 640px) {
+  .t-mute-wave {
+    height: 34svh;
+    opacity: 0.5;
+  }
+}
+
+/* An empty level meter — every cell dark but the first. */
+.t-mute-meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 22px;
+}
+.t-mute-meter > span {
+  width: 5px;
+  border: 1px solid rgba(244, 234, 200, 0.3);
+  border-radius: 1px;
+}
+.t-mute-meter > span:nth-child(n) { height: calc(30% + var(--n, 0) * 10%); }
+.t-mute-meter > span:nth-child(1) { --n: 0; background: var(--color-signal); border-color: var(--color-signal); }
+.t-mute-meter > span:nth-child(2) { --n: 1; }
+.t-mute-meter > span:nth-child(3) { --n: 2; }
+.t-mute-meter > span:nth-child(4) { --n: 3; }
+.t-mute-meter > span:nth-child(5) { --n: 4; }
+.t-mute-meter > span:nth-child(6) { --n: 5; }
+.t-mute-meter > span:nth-child(7) { --n: 6; }
+.t-mute-meter > span:nth-child(8) { --n: 7; }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-mute-ripple,
+  .t-mute-wave > span {
+    animation: none;
+  }
+  .t-mute-ripple:nth-of-type(2) { opacity: 0.18; scale: 0.7; }
+  .t-mute-ripple:nth-of-type(3) { opacity: 0.1; scale: 1.15; }
+}
+}

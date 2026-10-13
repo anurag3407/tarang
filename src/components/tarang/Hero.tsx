@@ -7,6 +7,17 @@ import Wordmark from "./Wordmark";
 import { Speaker } from "./Icons";
 import { easeInOutCubic, pinnedProgress, range, useScene, whenIntroDone } from "./motion";
 
+/*
+ * The mute screen's waveform: loud at the edges, decaying to a flat line under
+ * the copy. Deterministic so server and client render the same bars.
+ */
+const WAVE = Array.from({ length: 72 }, (_, i) => {
+  const d = Math.abs(i - 35.5) / 35.5;
+  const env = d < 0.28 ? 0 : ((d - 0.28) / 0.72) ** 1.4;
+  const jitter = 0.45 + 0.55 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.37));
+  return Math.max(2, Math.round((0.04 + env * 0.96) * jitter * 100));
+});
+
 function timecode(ms: number) {
   const f = Math.floor((ms / 1000) * 24);
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -196,14 +207,49 @@ export default function Hero() {
         {/* The mudra ring closes — everything goes quiet */}
         <div
           ref={iris}
-          className="invisible absolute inset-0 z-40 flex items-center justify-center bg-ink"
+          className="t-mute invisible absolute inset-0 z-40 flex items-center justify-center bg-ink"
           style={{ clipPath: "circle(0px at 50% 50%)" }}
         >
-          <div ref={irisCopy} className="px-6 text-center opacity-0">
+          {/* Backdrop: the last of the sound — ripples fading out, a waveform flatlining under the copy. */}
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="t-mute-dots" />
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} className="t-mute-ripple" style={{ animationDelay: `${i * -1.6}s` }} />
+            ))}
+            <div className="t-mute-wave">
+              {WAVE.map((h, i) => (
+                <span key={i} style={{ height: `${h}%`, animationDelay: `${(i % 12) * -0.13}s` }} />
+              ))}
+            </div>
+            <div className="absolute inset-x-6 top-20 flex justify-between md:inset-x-12 md:top-24">
+              <p className="t-label flex items-center gap-3 text-bone/55">
+                <span className="inline-block h-2 w-2 rounded-full border border-signal" />
+                Muted
+              </p>
+              <p className="t-label text-right text-bone/40">
+                Ch. ’26
+                <br />
+                Vol 00 / 11
+              </p>
+            </div>
+            <div className="absolute inset-x-6 bottom-6 flex items-end justify-between md:inset-x-12 md:bottom-10">
+              <p className="t-label text-bone/40">
+                <span className="t-deva mr-2 text-sm normal-case tracking-normal text-bone/60">तरंग</span>
+                a wave, held
+              </p>
+              <span className="t-mute-meter">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <span key={i} />
+                ))}
+              </span>
+            </div>
+          </div>
+
+          <div ref={irisCopy} className="relative px-6 text-center opacity-0">
             <p className="t-label flex items-center justify-center gap-2 text-signal">
               <Speaker muted className="h-4 w-4" /> Volume 00
             </p>
-            <p className="t-display t-cut mt-6 text-[clamp(5rem,19vw,17rem)] leading-[0.85]">Shhh.</p>
+            <p className="t-display t-cut mt-[clamp(1.75rem,3vw,2.75rem)] text-[clamp(5rem,19vw,17rem)] leading-[0.85]">Shhh.</p>
             <p className="mx-auto mt-8 max-w-sm text-base leading-relaxed text-bone/65 md:text-lg">
               Everything ordinary is about to go on mute.
             </p>
