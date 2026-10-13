@@ -4,6 +4,33 @@ import { guardAdminRead } from "@/lib/admin-route";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { env, emailConfigured, emailProvider, EMAIL_PROVIDER_LABEL } from "@/lib/env";
 import { formatPaise } from "@/lib/money";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
+import { fetchAllPages } from "@/lib/supabase/paginate";
+
+type ProductRef = { slug?: string; name?: string; is_base_pass?: boolean };
+type OrderWithProduct = {
+  kind: string;
+  order_lines?:
+    | { pass_products?: ProductRef | ProductRef[] | null }
+    | { pass_products?: ProductRef | ProductRef[] | null }[]
+    | null;
+};
+
+function firstOf<T>(v: T | T[] | null | undefined): T | undefined {
+  return Array.isArray(v) ? v[0] : (v ?? undefined);
+}
+
+/** Pronite Pass order (the only pass on sale); a retired Basic Card is not. */
+function isProniteOrder(o: OrderWithProduct): boolean {
+  if (o.kind !== "BASE_PASS") return false;
+  const prod = firstOf(firstOf(o.order_lines)?.pass_products);
+  return prod == null || isPronitePassProduct(prod);
+}
+
+/** A pass with no product row predates the catalog; treat it as Pronite. */
+function isPronitePass(prod: ProductRef | null | undefined): boolean {
+  return prod == null || isPronitePassProduct(prod);
+}
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +99,8 @@ export async function GET(req: NextRequest) {
         .select(
           `
           id, public_order_code, purchaser_user_id, amount_paise, currency,
-          kind, checkout_state, fulfilled_at, created_at
+          kind, checkout_state, fulfilled_at, created_at,
+          order_lines ( pass_products ( slug, name, is_base_pass ) )
         `,
           { count: "exact" }
         )
@@ -80,10 +108,10 @@ export async function GET(req: NextRequest) {
         .order("created_at", { ascending: false })
         .range((page - 1) * pageSize, page * pageSize - 1);
 
+      // Pass orders are Pronite Pass orders (the Basic Card is retired). The
+      // old price threshold mislabelled any Pronite Pass under ₹500.
       if (filter === "DELEGATE") {
-        query = query.eq("kind", "BASE_PASS").gte("amount_paise", 50000);
-      } else if (filter === "BASIC") {
-        query = query.eq("kind", "BASE_PASS").lt("amount_paise", 50000);
+        query = query.eq("kind", "BASE_PASS");
       } else if (filter === "EVENT") {
         query = query.eq("kind", "EVENT");
       } else if (filter === "REFUNDED") {
@@ -147,12 +175,12 @@ export async function GET(req: NextRequest) {
         const email = emailMap.get(o.purchaser_user_id) || "—";
         const syncState = syncMap.get(o.id) || "NOT_SYNCED";
         const emailJob = emailJobMap.get(`order-confirmation:${o.id}`);
-        const isDelegate = o.kind === "BASE_PASS" && Number(o.amount_paise) >= 50000;
+        const isDelegate = isProniteOrder(o);
         const isBasic = o.kind === "BASE_PASS" && !isDelegate;
 
         let tierLabel = "Event Entry";
-        if (isDelegate) tierLabel = `VIP Delegate Pass (${formatPaise(Number(o.amount_paise))})`;
-        else if (isBasic) tierLabel = `Basic Card (${formatPaise(Number(o.amount_paise))})`;
+        if (isDelegate) tierLabel = `Pronite Pass (${formatPaise(Number(o.amount_paise))})`;
+        else if (isBasic) tierLabel = `Basic Card — retired (${formatPaise(Number(o.amount_paise))})`;
 
         return {
           id: o.id,
@@ -231,12 +259,12 @@ export async function GET(req: NextRequest) {
         const prod = Array.isArray(p.pass_products) ? p.pass_products[0] : p.pass_products;
         const profile = profileMap.get(p.user_id);
         const email = emailMap.get(p.user_id) || "—";
-        const isDelegate = prod?.slug === "vip-delegate-pass" || !prod?.is_base_pass;
+        const isDelegate = isPronitePass(prod);
 
         return {
           id: p.id,
           publicPassCode: p.public_pass_code,
-          productName: prod?.name || (isDelegate ? "VIP Delegate Pass" : "Basic Pass"),
+          productName: prod?.name || (isDelegate ? "Pronite Pass" : "Basic Card"),
           productSlug: prod?.slug || "pass",
           isDelegate,
           state: p.state,
@@ -468,8 +496,26 @@ export async function GET(req: NextRequest) {
       sb.from("orders").select("id", { count: "exact", head: true }).eq("festival_id", ctx.festivalId).eq("checkout_state", "FULFILLED"),
       sb.from("orders").select("id", { count: "exact", head: true }).eq("festival_id", ctx.festivalId).eq("checkout_state", "REFUNDED"),
       sb.from("orders").select("id", { count: "exact", head: true }).eq("festival_id", ctx.festivalId).not("checkout_state", "in", "(\"FULFILLED\",\"REFUNDED\")"),
-      sb.from("orders").select("amount_paise, kind").eq("festival_id", ctx.festivalId).eq("checkout_state", "FULFILLED"),
-      sb.from("delegate_passes").select("id, pass_products ( slug, is_base_pass )").eq("festival_id", ctx.festivalId).eq("state", "ACTIVE"),
+      // Paged: a plain select is capped at PostgREST max_rows (1000), which
+      // silently undercounted revenue and passes past 1000 orders.
+      fetchAllPages<OrderWithProduct & { amount_paise: number | string }>((from, to) =>
+        sb
+          .from("orders")
+          .select("amount_paise, kind, order_lines ( pass_products ( slug, name, is_base_pass ) )")
+          .eq("festival_id", ctx.festivalId)
+          .eq("checkout_state", "FULFILLED")
+          .order("id")
+          .range(from, to)
+      ).then((data) => ({ data })),
+      fetchAllPages<{ id: string; pass_products: ProductRef | ProductRef[] | null }>((from, to) =>
+        sb
+          .from("delegate_passes")
+          .select("id, pass_products ( slug, name, is_base_pass )")
+          .eq("festival_id", ctx.festivalId)
+          .eq("state", "ACTIVE")
+          .order("id")
+          .range(from, to)
+      ).then((data) => ({ data })),
       sb.from("registrations").select("id, events!inner(festival_id)", { count: "exact", head: true }).eq("events.festival_id", ctx.festivalId),
       sb.from("profiles").select("user_id", { count: "exact", head: true }),
       sb.from("scan_attempts").select("id", { count: "exact", head: true }),
@@ -490,7 +536,7 @@ export async function GET(req: NextRequest) {
       const amt = Number(o.amount_paise || 0);
       grossRevenuePaise += amt;
       if (o.kind === "BASE_PASS") {
-        if (amt >= 50000) {
+        if (isProniteOrder(o)) {
           delegatePassRevenuePaise += amt;
         } else {
           basicPassRevenuePaise += amt;
@@ -505,8 +551,7 @@ export async function GET(req: NextRequest) {
     let delegatePassesCount = 0;
     for (const p of allActivePasses ?? []) {
       const prod = Array.isArray(p.pass_products) ? p.pass_products[0] : p.pass_products;
-      const isDelegate = prod?.slug === "vip-delegate-pass" || !prod?.is_base_pass;
-      if (isDelegate) delegatePassesCount++;
+      if (isPronitePass(prod)) delegatePassesCount++;
       else basicPassesCount++;
     }
 
@@ -516,7 +561,8 @@ export async function GET(req: NextRequest) {
       .from("orders")
       .select(`
         id, public_order_code, purchaser_user_id, amount_paise, currency,
-        kind, checkout_state, fulfilled_at, created_at
+        kind, checkout_state, fulfilled_at, created_at,
+        order_lines ( pass_products ( slug, name, is_base_pass ) )
       `)
       .eq("festival_id", ctx.festivalId)
       .order("created_at", { ascending: false })
@@ -602,12 +648,12 @@ export async function GET(req: NextRequest) {
       const email = emailMap.get(o.purchaser_user_id) || "—";
       const syncState = syncMap.get(o.id) || "NOT_SYNCED";
       const emailJob = emailJobMap.get(`order-confirmation:${o.id}`);
-      const isDelegate = o.kind === "BASE_PASS" && Number(o.amount_paise) >= 50000;
+      const isDelegate = isProniteOrder(o);
       const isBasic = o.kind === "BASE_PASS" && !isDelegate;
 
       let tierLabel = "Event Entry";
-      if (isDelegate) tierLabel = `VIP Delegate Pass (${formatPaise(Number(o.amount_paise))})`;
-      else if (isBasic) tierLabel = `Basic Card (${formatPaise(Number(o.amount_paise))})`;
+      if (isDelegate) tierLabel = `Pronite Pass (${formatPaise(Number(o.amount_paise))})`;
+      else if (isBasic) tierLabel = `Basic Card — retired (${formatPaise(Number(o.amount_paise))})`;
 
       return {
         id: o.id,
@@ -638,12 +684,12 @@ export async function GET(req: NextRequest) {
       const prod = Array.isArray(p.pass_products) ? p.pass_products[0] : p.pass_products;
       const profile = profileMap.get(p.user_id);
       const email = emailMap.get(p.user_id) || "—";
-      const isDelegate = prod?.slug === "vip-delegate-pass" || !prod?.is_base_pass;
+      const isDelegate = isPronitePass(prod);
 
       return {
         id: p.id,
         publicPassCode: p.public_pass_code,
-        productName: prod?.name || (isDelegate ? "VIP Delegate Pass" : "Basic Pass"),
+        productName: prod?.name || (isDelegate ? "Pronite Pass" : "Basic Card"),
         productSlug: prod?.slug || "pass",
         isDelegate,
         state: p.state,

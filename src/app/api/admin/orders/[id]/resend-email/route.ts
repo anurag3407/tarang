@@ -28,7 +28,7 @@ export async function POST(
     }
 
     // 1. Ensure email job is enqueued with latest order data
-    await enqueueOrderEmails(orderId, order.kind);
+    await enqueueOrderEmails(orderId, order.kind, { refresh: true });
 
     // 2. Reset email job state to PENDING and give it a fresh idempotency key
     const freshIdempotencyKey = `email:order-confirmation:${orderId}:resend:${Date.now()}`;

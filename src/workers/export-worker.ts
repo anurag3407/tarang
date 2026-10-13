@@ -5,6 +5,7 @@ import path from "node:path";
 import { stringify } from "csv-stringify/sync";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { logger } from "@/lib/logger";
+import { fetchAllPages, fetchProfilesByUserId } from "@/lib/supabase/paginate";
 
 /**
  * Export worker (plan §12.17, §12.18).
@@ -161,30 +162,46 @@ async function buildRows(job: ExportJob): Promise<Record<string, unknown>[]> {
   const festivalId = job.festival_id;
   const eventId = job.filter_snapshot.eventId as string | undefined;
 
+  // Every query below pages past PostgREST's max_rows cap and throws on a
+  // query error, so a failed read fails the job (and retries) instead of
+  // completing with an empty or truncated CSV.
   switch (job.export_type) {
     case "EVENT_REGISTRATIONS": {
       // registrations has no festival_id column — scope through the owning
       // event. `!inner` embed + filter on the embedded column drops rows
       // whose event belongs to another festival (V: export isolation).
-      let query = sb
-        .from("registrations")
-        .select(
-          `public_registration_code, registration_mode, team_name, state, confirmed_at,
-           events!inner ( name, slug ),
-           registration_members ( role, profiles ( display_name, college_name, public_member_code ) )`
-        )
-        .eq("events.festival_id", festivalId)
-        .eq("state", "CONFIRMED")
-        .order("created_at", { ascending: true })
-        .limit(10000);
-      if (eventId) query = query.eq("event_id", eventId);
-      const { data } = await query;
+      type RegRow = {
+        public_registration_code: string;
+        registration_mode: string;
+        team_name: string | null;
+        confirmed_at: string | null;
+        events: { name?: string } | { name?: string }[] | null;
+        registration_members: { role: string; user_id: string }[] | null;
+      };
+      const data = await fetchAllPages<RegRow>((from, to) => {
+        let query = sb
+          .from("registrations")
+          .select(
+            `public_registration_code, registration_mode, team_name, state, confirmed_at,
+             events!inner ( name, slug ),
+             registration_members ( role, user_id )`
+          )
+          .eq("events.festival_id", festivalId)
+          .eq("state", "CONFIRMED");
+        if (eventId) query = query.eq("event_id", eventId);
+        return query.order("created_at", { ascending: true }).order("id").range(from, to);
+      });
+
+      const profiles = await fetchProfilesByUserId(
+        sb,
+        data.flatMap((reg) => (reg.registration_members ?? []).map((m) => m.user_id))
+      );
 
       const rows: Record<string, unknown>[] = [];
-      for (const reg of data ?? []) {
+      for (const reg of data) {
         const event = Array.isArray(reg.events) ? reg.events[0] : reg.events;
         for (const m of reg.registration_members ?? []) {
-          const profile = Array.isArray(m.profiles) ? m.profiles[0] : m.profiles;
+          const profile = profiles.get(m.user_id);
           rows.push({
             registration_code: reg.public_registration_code,
             event: event?.name ?? "",
@@ -202,21 +219,31 @@ async function buildRows(job: ExportJob): Promise<Record<string, unknown>[]> {
     }
 
     case "ROSTER": {
-      const { data } = await sb
-        .from("delegate_passes")
-        .select(
-          `public_pass_code, state, activated_at,
-           profiles ( display_name, college_name, public_member_code )`
-        )
-        .eq("festival_id", festivalId)
-        .eq("state", "ACTIVE")
-        .order("created_at", { ascending: true })
-        .limit(20000);
+      type PassRow = {
+        public_pass_code: string;
+        user_id: string;
+        activated_at: string | null;
+        pass_products: { name?: string } | { name?: string }[] | null;
+      };
+      const data = await fetchAllPages<PassRow>((from, to) =>
+        sb
+          .from("delegate_passes")
+          .select(`public_pass_code, user_id, state, activated_at, pass_products ( name )`)
+          .eq("festival_id", festivalId)
+          .eq("state", "ACTIVE")
+          .order("created_at", { ascending: true })
+          .order("id")
+          .range(from, to)
+      );
 
-      return (data ?? []).map((p) => {
-        const profile = Array.isArray(p.profiles) ? p.profiles[0] : p.profiles;
+      const profiles = await fetchProfilesByUserId(sb, data.map((p) => p.user_id));
+
+      return data.map((p) => {
+        const profile = profiles.get(p.user_id);
+        const product = Array.isArray(p.pass_products) ? p.pass_products[0] : p.pass_products;
         return {
           pass_code: p.public_pass_code,
+          pass_type: product?.name ?? "",
           name: profile?.display_name ?? "",
           college: profile?.college_name ?? "",
           member_code: profile?.public_member_code ?? "",
@@ -231,19 +258,33 @@ async function buildRows(job: ExportJob): Promise<Record<string, unknown>[]> {
       // captured locally (local_order_id NULL, no money moved); every captured
       // payment is linked by apply_captured_payment, so no real money row is
       // dropped by the join.
-      const { data } = await sb
-        .from("payments")
-        .select(
-          `razorpay_payment_id, razorpay_order_id, amount_paise, currency,
-           provider_status, disposition, refunded_paise, provider_created_at,
-           local_order_id,
-           orders!inner ( festival_id )`
-        )
-        .eq("orders.festival_id", festivalId)
-        .order("provider_created_at", { ascending: true })
-        .limit(20000);
+      type PaymentRow = {
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+        amount_paise: number | string;
+        currency: string;
+        provider_status: string;
+        disposition: string | null;
+        refunded_paise: number | string | null;
+        provider_created_at: string | null;
+        local_order_id: string | null;
+      };
+      const data = await fetchAllPages<PaymentRow>((from, to) =>
+        sb
+          .from("payments")
+          .select(
+            `razorpay_payment_id, razorpay_order_id, amount_paise, currency,
+             provider_status, disposition, refunded_paise, provider_created_at,
+             local_order_id,
+             orders!inner ( festival_id )`
+          )
+          .eq("orders.festival_id", festivalId)
+          .order("provider_created_at", { ascending: true })
+          .order("id")
+          .range(from, to)
+      );
 
-      return (data ?? []).map((p) => ({
+      return data.map((p) => ({
         payment_id: p.razorpay_payment_id,
         order_id: p.razorpay_order_id,
         local_order_id: p.local_order_id,
@@ -258,17 +299,28 @@ async function buildRows(job: ExportJob): Promise<Record<string, unknown>[]> {
 
     case "SCAN_HISTORY": {
       // scan_attempts has no festival_id column — scope through the gate.
-      const { data } = await sb
-        .from("scan_attempts")
-        .select(
-          `scan_id, outcome, reason_code, offline_provisional, received_at_server,
-           gates!inner ( name )`
-        )
-        .eq("gates.festival_id", festivalId)
-        .order("received_at_server", { ascending: false })
-        .limit(20000);
+      type ScanRow = {
+        scan_id: string;
+        outcome: string;
+        reason_code: string | null;
+        offline_provisional: boolean;
+        received_at_server: string;
+        gates: { name?: string } | { name?: string }[] | null;
+      };
+      const data = await fetchAllPages<ScanRow>((from, to) =>
+        sb
+          .from("scan_attempts")
+          .select(
+            `scan_id, outcome, reason_code, offline_provisional, received_at_server,
+             gates!inner ( name )`
+          )
+          .eq("gates.festival_id", festivalId)
+          .order("received_at_server", { ascending: false })
+          .order("scan_id")
+          .range(from, to)
+      );
 
-      return (data ?? []).map((s) => {
+      return data.map((s) => {
         const gate = Array.isArray(s.gates) ? s.gates[0] : s.gates;
         return {
           scan_id: s.scan_id,

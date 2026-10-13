@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Star, Tag, History } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { formatPaise } from "@/lib/money";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 
 interface PriceVersion {
   id: string;
@@ -112,17 +113,14 @@ export default function PassPricingManager() {
           Festival Passes &amp; Dynamic Pricing
         </h2>
         <p className="mt-1 text-sm font-bold text-black/70">
-          Manage dynamic pricing with immutable price versioning for the Delegate Pass and Basic Card.
-          Gate entry QR codes are strictly generated for confirmed Delegate Passes.
+          Manage dynamic pricing with immutable price versioning for the Pronite Pass.
+          Gate entry QR codes are generated for confirmed Pronite Passes only.
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         {products.map((p) => {
-          const isDelegate =
-            p.slug === "vip-delegate-pass" ||
-            p.name.toLowerCase().includes("delegate") ||
-            p.name.toLowerCase().includes("all-access");
+          const isDelegate = isPronitePassProduct(p);
 
           return (
             <div
@@ -140,7 +138,7 @@ export default function PassPricingManager() {
                     }`}
                   >
                     {isDelegate ? <Star className="h-3 w-3 fill-black" /> : <Tag className="h-3 w-3" />}
-                    {isDelegate ? "Gate Entry Pass (QR Issued)" : "Participant Card"}
+                    {isDelegate ? "Gate Entry Pass (QR Issued)" : "Retired — not on sale"}
                   </span>
                   <span
                     className={`text-xs font-black uppercase ${

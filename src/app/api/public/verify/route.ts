@@ -8,6 +8,7 @@ import { readJsonBody } from "@/lib/route-utils";
 import { verifyQuerySchema } from "@/lib/validation/schemas";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 
 export const dynamic = "force-dynamic";
 
@@ -207,12 +208,12 @@ export async function POST(req: NextRequest) {
       else if (isExpired) status = "EXPIRED";
 
       const isBasePass = Boolean(prod?.is_base_pass);
-      const isDelegate = prod?.slug === "vip-delegate-pass" || !isBasePass || (prod?.name && prod.name.toLowerCase().includes("delegate"));
+      const isDelegate = prod == null || isPronitePassProduct(prod);
 
       const passTypeLabel = isDelegate
-        ? "VIP All-Access Delegate Pass"
+        ? "Pronite Pass"
         : isBasePass
-        ? "Basic Festival Participant Card"
+        ? "Basic Card (retired)"
         : prod?.name || "Festival Pass";
 
       const accessSummary = isDelegate

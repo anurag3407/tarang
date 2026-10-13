@@ -310,7 +310,7 @@ export default function AdminMissionControl() {
   const [ordersPage, setOrdersPage] = useState(1);
   const [ordersPageSize, setOrdersPageSize] = useState(25);
   const [ordersSearch, setOrdersSearch] = useState("");
-  const [ordersTier, setOrdersTier] = useState<"ALL" | "DELEGATE" | "BASIC" | "EVENT" | "REFUNDED" | "PENDING">("ALL");
+  const [ordersTier, setOrdersTier] = useState<"ALL" | "DELEGATE" | "EVENT" | "REFUNDED" | "PENDING">("ALL");
   const [ordersPagination, setOrdersPagination] = useState<PaginationMeta>({ page: 1, pageSize: 25, total: 0, totalPages: 1 });
 
   // Tab 2: Passes State
@@ -622,7 +622,7 @@ export default function AdminMissionControl() {
       const body = await res.json();
       if (body.ok) {
         const counts = body.data?.recordsSynced;
-        showToast(`✓ Synced: ${counts?.basicPasses ?? 0} Basic, ${counts?.delegatePasses ?? 0} VIP, ${counts?.events ?? 0} Events`);
+        showToast(`✓ Synced: ${counts?.delegatePasses ?? 0} Pronite, ${counts?.events ?? 0} Events, ${counts?.merchandise ?? 0} Merch${counts?.basicPasses ? `, ${counts.basicPasses} Basic` : ""}`);
         void loadData();
       } else {
         showToast(`✕ Sync failed: ${body.message ?? "Error"}`);
@@ -735,10 +735,7 @@ export default function AdminMissionControl() {
           </p>
           <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-black uppercase">
             <span className="border border-black bg-black px-1.5 py-0.5 text-white">
-              VIP: {formatPaise(m?.delegatePassRevenuePaise ?? 0)}
-            </span>
-            <span className="border border-black bg-white px-1.5 py-0.5 text-black">
-              Basic: {formatPaise(m?.basicPassRevenuePaise ?? 0)}
+              Pronite: {formatPaise(m?.delegatePassRevenuePaise ?? 0)}
             </span>
             <span className="border border-black bg-neo-accent px-1.5 py-0.5 text-black">
               Events: {formatPaise(m?.eventsRevenuePaise ?? 0)}
@@ -746,11 +743,11 @@ export default function AdminMissionControl() {
           </div>
         </div>
 
-        {/* VIP Delegate Passes */}
+        {/* Pronite Passes */}
         <div className="border-4 border-black bg-black p-5 text-white shadow-neo">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs font-black uppercase tracking-wider text-neo-secondary">
-              VIP Delegate Passes
+              Pronite Passes
             </span>
             <Sparkles className="h-5 w-5 text-neo-secondary" />
           </div>
@@ -758,15 +755,15 @@ export default function AdminMissionControl() {
             {m?.delegatePassesCount ?? 0}
           </p>
           <p className="mt-1 text-xs font-bold text-white/70">
-            5 Star Night Concerts &amp; VIP Arena QR
+            Active passes with gate entry QR
           </p>
         </div>
 
-        {/* Basic Passes */}
+        {/* Retired Basic Cards (historical orders only) */}
         <div className="border-4 border-black bg-white p-5 shadow-neo">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs font-black uppercase tracking-wider text-black/60">
-              Basic Cards / Passes
+              Basic Cards (retired)
             </span>
             <Ticket className="h-5 w-5 text-black" />
           </div>
@@ -774,7 +771,7 @@ export default function AdminMissionControl() {
             {m?.basicPassesCount ?? 0}
           </p>
           <p className="mt-1 text-xs font-bold text-black/60">
-            5-Day General Campus Entry Access
+            No longer on sale — historical only
           </p>
         </div>
 
@@ -883,7 +880,7 @@ export default function AdminMissionControl() {
 
             {/* Filter Pills */}
             <div className="flex flex-wrap items-center gap-1.5 text-xs font-black uppercase">
-              {(["ALL", "DELEGATE", "BASIC", "EVENT", "REFUNDED", "PENDING"] as const).map((tier) => (
+              {(["ALL", "DELEGATE", "EVENT", "REFUNDED", "PENDING"] as const).map((tier) => (
                 <button
                   key={tier}
                   onClick={() => {
@@ -895,8 +892,7 @@ export default function AdminMissionControl() {
                   }`}
                 >
                   {tier === "ALL" && "All Orders"}
-                  {tier === "DELEGATE" && "VIP Delegate"}
-                  {tier === "BASIC" && "Basic Card"}
+                  {tier === "DELEGATE" && "Pronite Pass"}
                   {tier === "EVENT" && "Events"}
                   {tier === "REFUNDED" && "Refunded"}
                   {tier === "PENDING" && "Pending"}
@@ -969,11 +965,11 @@ export default function AdminMissionControl() {
                       <td className="px-4 py-3">
                         {o.isDelegate ? (
                           <span className="inline-flex items-center gap-1 border-2 border-black bg-black px-2 py-0.5 font-mono text-[10px] font-black uppercase text-neo-secondary">
-                            <Sparkles className="h-3 w-3" /> VIP Delegate
+                            <Sparkles className="h-3 w-3" /> Pronite Pass
                           </span>
                         ) : o.isBasic ? (
                           <span className="inline-flex items-center gap-1 border-2 border-black bg-neo-secondary px-2 py-0.5 font-mono text-[10px] font-black uppercase text-black">
-                            <Ticket className="h-3 w-3" /> Basic Pass
+                            <Ticket className="h-3 w-3" /> Basic (retired)
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 border-2 border-black bg-neo-accent px-2 py-0.5 font-mono text-[10px] font-black uppercase text-black">
@@ -1604,11 +1600,10 @@ export default function AdminMissionControl() {
               {/* Basic Pass Sheet */}
               <div className="border-4 border-black bg-neo-cream p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-xs font-black uppercase text-black">1. Basic Pass Sheet</p>
-                  <span className="border border-black bg-neo-secondary px-1.5 py-0.5 text-[10px] font-black">₹200</span>
+                  <p className="font-mono text-xs font-black uppercase text-black">1. Basic Pass Sheet (retired)</p>
                 </div>
                 <p className="text-xs font-bold text-black/60">
-                  10 columns: Timestamp, Pass Code, Holder, Email, Phone, College, Order, Amount, State, Activated.
+                  Historical Basic Card orders only. New sales all go to the Pronite Pass sheet.
                 </p>
                 {data?.telemetry.googleSheets.basicSpreadsheetId && (
                   <a
@@ -1622,14 +1617,13 @@ export default function AdminMissionControl() {
                 )}
               </div>
 
-              {/* VIP Delegate Pass Sheet */}
+              {/* Pronite Pass Sheet */}
               <div className="border-4 border-black bg-black p-4 text-white space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-xs font-black uppercase text-neo-secondary">2. VIP Delegate Sheet</p>
-                  <span className="border border-neo-secondary bg-neo-secondary px-1.5 py-0.5 text-[10px] font-black text-black">VIP</span>
+                  <p className="font-mono text-xs font-black uppercase text-neo-secondary">2. Pronite Pass Sheet</p>
                 </div>
                 <p className="text-xs font-bold text-white/70">
-                  12 columns: Includes Star Night Concerts entitlement, VIP Front-Row status, and pass activation.
+                  13 columns: holder, contact, order, payment, pass state, pass type and activation time.
                 </p>
                 {data?.telemetry.googleSheets.delegateSpreadsheetId && (
                   <a

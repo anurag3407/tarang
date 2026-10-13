@@ -17,6 +17,9 @@ begin
 end $$;
 
 select id as fest_id from festivals where slug='pulse-2026' \gset
+-- These suites exercise the two-tier (Basic -> VIP) RPC paths. The Basic Card
+-- is retired (archived by 20261013120000), so re-open it in this throwaway DB.
+update pass_products set status = 'PUBLISHED', sales_state = 'OPEN' where slug = 'base-delegate-pass';
 select id as base_pass_id from pass_products where slug='base-delegate-pass' \gset
 
 \echo '=== V09A: late capture on user-cancelled order -> REFUND_REQUIRED + provider-cancel job ==='

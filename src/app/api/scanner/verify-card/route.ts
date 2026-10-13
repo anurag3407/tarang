@@ -90,15 +90,20 @@ export async function POST(req: NextRequest) {
           .from("delegate_passes")
           .select(`
             id, public_pass_code, state, festival_id, activated_at, expires_at,
-            pass_products ( name, slug, is_base_pass ),
-            profiles ( display_name, college_name )
+            user_id,
+            pass_products ( name, slug, is_base_pass )
           `)
           .eq("id", query)
           .maybeSingle();
 
         if (passById) {
           const prod = Array.isArray(passById.pass_products) ? passById.pass_products[0] : passById.pass_products;
-          const profile = Array.isArray(passById.profiles) ? passById.profiles[0] : passById.profiles;
+          // profiles has no FK to delegate_passes, so it cannot be embedded.
+          const { data: profile } = await sb
+            .from("profiles")
+            .select("display_name, college_name")
+            .eq("user_id", passById.user_id)
+            .maybeSingle();
           result = {
             found: true,
             passId: passById.id,
@@ -130,8 +135,13 @@ export async function POST(req: NextRequest) {
     if (result.passId) {
       let { data: creds } = await sb
         .from("qr_credentials")
-        .select("id, jti")
-        .eq("delegate_pass_id", result.passId);
+        .select("id, jti, state")
+        .eq("delegate_pass_id", result.passId)
+        .order("created_at", { ascending: false });
+      // A reissued pass has REPLACED credentials too; the ACTIVE one wins.
+      creds = [...(creds ?? [])].sort(
+        (a, b) => Number(b.state === "ACTIVE") - Number(a.state === "ACTIVE")
+      );
 
       let primaryCredId = creds?.[0]?.id;
       let primaryCredJti = creds?.[0]?.jti;
@@ -169,13 +179,13 @@ export async function POST(req: NextRequest) {
               token_digest: "lookup-scan",
               state: "ACTIVE",
             })
-            .select("id, jti")
+            .select("id, jti, state")
             .maybeSingle();
 
           if (newCred) {
             primaryCredId = newCred.id;
             primaryCredJti = newCred.jti;
-            creds = [{ id: newCred.id, jti: newCred.jti }];
+            creds = [newCred];
           }
         }
       }

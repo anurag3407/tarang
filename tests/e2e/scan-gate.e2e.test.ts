@@ -104,13 +104,12 @@ describe("POST /api/scanner/scan — accepted entry (plan §14.6)", () => {
         jti: nowPayload().jti,
         state: "ACTIVE",
         delegate_pass_id: "pass-row",
-        delegate_passes: {
-          user_id: "u-1",
-          profiles: { display_name: "Aarav Sharma" },
-        },
+        delegate_passes: { user_id: "u-1", state: "ACTIVE" },
       },
       error: null,
     });
+    // profiles has no FK to delegate_passes, so the name is a separate lookup.
+    sb.onTable("profiles", { data: { display_name: "Aarav Sharma" }, error: null });
     sb.onRpc("record_scan", {
       data: {
         outcome: "accepted",

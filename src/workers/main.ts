@@ -91,14 +91,18 @@ export async function startWorkerLoop(): Promise<void> {
       if (stopping || running) return;
       running = true;
       const tickPromise = (async () => {
+        const work = fn();
         try {
-          await withTimeout(fn(), 25_000, name);
+          await withTimeout(work, 25_000, name);
           await heartbeat(name, true);
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           log.error({ err: message, name }, "worker tick failed");
           await heartbeat(name, false, message);
         } finally {
+          // A timeout only stops waiting; the work itself keeps running. Hold
+          // `running` until it settles so the next tick cannot overlap it.
+          await work.catch(() => {});
           running = false;
         }
       })();

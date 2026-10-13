@@ -97,15 +97,8 @@ async function handleJob(job: OutboxJob): Promise<void> {
         );
       }
 
-      // Concurrently / asynchronously mirror order to Google Sheets if enabled
-      if (env().GOOGLE_SHEETS_ENABLED) {
-        try {
-          const { syncOrderToSpreadsheets } = await import("@/services/sheets-service");
-          await syncOrderToSpreadsheets(orderId);
-        } catch (err) {
-          log.warn({ err: err instanceof Error ? err.message : String(err), orderId }, "sheets sync failed");
-        }
-      }
+      // The Sheets mirror is its own SHEETS_SYNC job (enqueued on
+      // fulfillment), so a Sheets outage retries independently of email.
       return;
     }
 
@@ -113,7 +106,10 @@ async function handleJob(job: OutboxJob): Promise<void> {
       const orderId = String(job.payload.orderId ?? job.aggregate_id);
       if (env().GOOGLE_SHEETS_ENABLED) {
         const { syncOrderToSpreadsheets } = await import("@/services/sheets-service");
-        await syncOrderToSpreadsheets(orderId);
+        const res = await syncOrderToSpreadsheets(orderId);
+        // Throwing hands the job to fail_outbox_job: retried with backoff,
+        // dead-lettered after max attempts (then "Sync all" recovers it).
+        if (!res.synced) throw new Error(`sheets sync failed: ${res.error ?? "unknown"}`);
       }
       return;
     }
@@ -159,8 +155,17 @@ async function handleJob(job: OutboxJob): Promise<void> {
   }
 }
 
-/** Create email jobs for a fulfilled order (idempotent by logical_key). */
-export async function enqueueOrderEmails(orderId: string, kind: string): Promise<void> {
+/**
+ * Create email jobs for a fulfilled order (idempotent by logical_key).
+ *
+ * With `refresh`, an existing job's rendered data is rebuilt too — an admin
+ * resend must carry the current pass/QR, not the snapshot from first send.
+ */
+export async function enqueueOrderEmails(
+  orderId: string,
+  kind: string,
+  opts: { refresh?: boolean } = {}
+): Promise<void> {
   const sb = createServiceRoleClient();
 
   const { data: order } = await sb
@@ -252,20 +257,20 @@ export async function enqueueOrderEmails(orderId: string, kind: string): Promise
       return;
     }
 
-    if (pass) {
-      publicPassCode = pass.public_pass_code;
-      productName = prodName;
-
-      // Embed the gate QR in the confirmation email
-      try {
-        const { generatePassQrDataUrl } = await import("@/services/qr-service");
-        const qrRes = await generatePassQrDataUrl(pass.id);
-        qrDataUrl = qrRes.dataUrl;
-      } catch (qrErr) {
-        logger().warn({ err: qrErr, passId: pass.id }, "could not generate QR data URL for email");
-      }
-    } else {
-      productName = prodName;
+    // The pass email exists to deliver the gate QR. Never send it without
+    // one: throwing fails this outbox job, which retries with backoff.
+    if (!pass) {
+      throw new Error(`no active pass found for order ${orderId}; email deferred`);
+    }
+    publicPassCode = pass.public_pass_code;
+    productName = prodName;
+    try {
+      const { generatePassQrDataUrl } = await import("@/services/qr-service");
+      const qrRes = await generatePassQrDataUrl(pass.id);
+      qrDataUrl = qrRes.dataUrl;
+    } catch (qrErr) {
+      const message = qrErr instanceof Error ? qrErr.message : String(qrErr);
+      throw new Error(`could not generate gate QR for pass ${pass.id}: ${message}`);
     }
   } else {
     // 1. Fetch order line and joined event & venue details
@@ -423,7 +428,7 @@ export async function enqueueOrderEmails(orderId: string, kind: string): Promise
     ...(publicRegistrationCode ? { publicRegistrationCode } : {}),
   };
 
-  await sb.from("email_jobs").upsert(
+  const { error: upsertErr } = await sb.from("email_jobs").upsert(
     {
       logical_key: `order-confirmation:${orderId}`,
       recipient_user_id: order.purchaser_user_id,
@@ -436,6 +441,20 @@ export async function enqueueOrderEmails(orderId: string, kind: string): Promise
     },
     { onConflict: "logical_key", ignoreDuplicates: true }
   );
+  if (upsertErr) throw new Error(`email job upsert failed: ${upsertErr.message}`);
+
+  if (opts.refresh) {
+    const { error: refreshErr } = await sb
+      .from("email_jobs")
+      .update({
+        to_email_snapshot: toEmail,
+        template_name: templateName,
+        render_data: renderData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("logical_key", `order-confirmation:${orderId}`);
+    if (refreshErr) throw new Error(`email job refresh failed: ${refreshErr.message}`);
+  }
 }
 
 /**

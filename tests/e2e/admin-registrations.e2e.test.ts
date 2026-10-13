@@ -141,18 +141,28 @@ describe("Admin Registrations and Paginated Overview", () => {
 
       sb.onTable(
         "orders",
-        { count: 3, error: null }, // 1. total count
-        { count: 3, error: null }, // 2. fulfilled count
-        { count: 0, error: null }, // 3. refunded count
-        { count: 0, error: null }, // 4. pending count
+        // The paged revenue scan starts before the count queries resolve, so
+        // it consumes the first queued response.
         {
           data: [
-            { amount_paise: 300000, kind: "BASE_PASS" },
-            { amount_paise: 20000, kind: "BASE_PASS" },
-            { amount_paise: 60000, kind: "EVENT" },
+            {
+              amount_paise: 300000,
+              kind: "BASE_PASS",
+              order_lines: [{ pass_products: { slug: "vip-delegate-pass", name: "Pronite Pass", is_base_pass: false } }],
+            },
+            {
+              amount_paise: 20000,
+              kind: "BASE_PASS",
+              order_lines: [{ pass_products: { slug: "base-delegate-pass", name: "Basic Card", is_base_pass: true } }],
+            },
+            { amount_paise: 60000, kind: "EVENT", order_lines: [{ pass_products: null }] },
           ],
           error: null,
-        }, // 5. all fulfilled orders for revenue calculation
+        }, // all fulfilled orders for revenue, classified by product (not price)
+        { count: 3, error: null }, // total count
+        { count: 3, error: null }, // fulfilled count
+        { count: 0, error: null }, // refunded count
+        { count: 0, error: null }, // pending count
         {
           data: [
             {

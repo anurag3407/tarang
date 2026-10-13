@@ -201,9 +201,9 @@ export default function VerifyChecker() {
                 <div>
                   <span className="inline-block border-2 border-black bg-neo-secondary px-2.5 py-0.5 text-xs font-black uppercase mb-2">
                     {result.data.passType === "DELEGATE"
-                      ? "VIP Concert & All-Access"
+                      ? "Pronite Pass"
                       : result.data.passType === "BASIC"
-                      ? "Basic Festival Card"
+                      ? "Basic Card (retired)"
                       : "Official Fest Entity"}
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">

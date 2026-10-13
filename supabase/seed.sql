@@ -22,15 +22,16 @@ cross join (values
 where f.slug = 'pulse-2026'
 on conflict (festival_id, key) do nothing;
 
--- Base delegate pass product at ₹200 = 20000 paise (plan §2.3, §7.7).
+-- Retired Basic Card (₹200 = 20000 paise). Kept for historical orders only:
+-- the Pronite Pass below is the sole pass on sale, so this stays ARCHIVED.
 insert into pass_products (
   festival_id, slug, name, description, is_base_pass, requires_base_pass,
   sales_state, valid_from, valid_until, status
 )
 select f.id, 'base-delegate-pass', 'Basic Card',
        'Standard 5-day festival entry card. Required before registering for events.',
-       true, false, 'OPEN',
-       '2026-09-01 00:00:00+00', '2026-09-22 00:00:00+00', 'PUBLISHED'
+       true, false, 'CLOSED',
+       '2026-09-01 00:00:00+00', '2026-09-22 00:00:00+00', 'ARCHIVED'
 from festivals f
 where f.slug = 'pulse-2026'
 on conflict (festival_id, slug) do nothing;

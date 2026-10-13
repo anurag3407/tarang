@@ -3,6 +3,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { requireUser } from "@/services/authz";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { fetchProfilesByUserId } from "@/lib/supabase/paginate";
 
 export const dynamic = "force-dynamic";
 
@@ -33,23 +34,26 @@ export async function GET(req: NextRequest) {
         `id, public_registration_code, team_name, registration_mode, state,
          confirmed_at, event_id,
          events ( name, slug, starts_at ),
-         registration_members ( user_id, role, profiles ( display_name ) )`
+         registration_members ( user_id, role )`
       )
       .in("id", regIds)
       .order("created_at", { ascending: false });
     if (error) return apiError(req, "INTERNAL", "Could not load registrations");
 
+    const profiles = await fetchProfilesByUserId(
+      sb,
+      (data ?? []).flatMap((r) =>
+        (r.registration_members ?? []).map((m: { user_id: string }) => m.user_id)
+      )
+    );
+
     const registrations = (data ?? []).map((r) => {
       const event = Array.isArray(r.events) ? r.events[0] : r.events;
       const members = (r.registration_members ?? []).map(
-        (m: {
-          user_id: string;
-          role: string;
-          profiles: { display_name: string | null } | { display_name: string | null }[] | null;
-        }) => {
-          const profile = Array.isArray(m.profiles) ? m.profiles[0] : m.profiles;
-          return { displayName: profile?.display_name ?? null, role: m.role };
-        }
+        (m: { user_id: string; role: string }) => ({
+          displayName: profiles.get(m.user_id)?.display_name ?? null,
+          role: m.role,
+        })
       );
       return {
         id: r.id,

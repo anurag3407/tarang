@@ -50,7 +50,7 @@ export default function CompleteProfilePage() {
           Complete your profile
         </h1>
         <p className="mt-2 text-sm font-bold text-black/70">
-          Required before buying a delegate pass. Used for entry verification.
+          Required before buying a Pronite Pass. Used for entry verification.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">

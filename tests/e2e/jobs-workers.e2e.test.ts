@@ -109,22 +109,76 @@ describe("outbox dispatcher (plan §7.13)", () => {
       error: null,
     });
     sb.onTable("profiles", { data: { display_name: "Aarav Sharma" }, error: null });
+    const pronite = { name: "Pronite Pass", slug: "vip-delegate-pass", is_base_pass: false };
+    sb.onTable(
+      "order_lines",
+      // SEND_EMAIL: the pass line
+      {
+        data: { id: "line-1", pass_product_id: "pp-1", description_snapshot: "Pronite Pass", pass_products: pronite },
+        error: null,
+      },
+      // INVALIDATE_CACHE chain
+      { data: [{ event_id: "evt-1" }, { event_id: null }], error: null }
+    );
+    sb.onTable("delegate_passes", {
+      data: { id: PASS_ID, public_pass_code: "PP-EMAIL00001", pass_products: pronite },
+      error: null,
+    });
+    const credentialRow = {
+      id: "cred-x",
+      jti: "6f1c2a64-9d1e-4c8b-9a51-1f3c2b7d8e90",
+      entitlement_version: 1,
+      not_before: "2026-01-01T00:00:00Z",
+      expires_at: "2099-01-01T00:00:00Z",
+      state: "ACTIVE",
+      festival_id: "fest-1",
+      delegate_passes: { public_pass_code: "PP-EMAIL00001", festivals: { slug: "pulse-2026" } },
+    };
+    sb.onTable(
+      "qr_credentials",
+      { data: { id: "cred-x", jti: credentialRow.jti }, error: null }, // email: issue (reuse)
+      { data: credentialRow, error: null }, // email: build token
+      { data: null, error: null }, // email: persist digest
+      { data: { id: "cred-x", jti: credentialRow.jti }, error: null } // ISSUE_QR: reuse
+    );
     sb.onTable("email_jobs", { data: null, error: null }); // upsert ignoreDuplicates
-    // ISSUE_QR chain (idempotent reuse)
-    sb.onTable("qr_credentials", { data: { id: "cred-x", jti: "jti-existing" }, error: null });
-    // INVALIDATE_CACHE chain
-    sb.onTable("order_lines", { data: [{ event_id: "evt-1" }, { event_id: null }], error: null });
 
     const result = await runOutboxDispatcher({ batchSize: 25 });
     expect(result).toEqual({ processed: 4, failed: 0 });
     expect(sb.callsFor("complete_outbox_job")).toHaveLength(4);
 
     const upsert = sb.callsFor("email_jobs").find((c) => c.action === "upsert")!;
-    expect(upsert.payload as Record<string, unknown>).toMatchObject({
+    const payload = upsert.payload as Record<string, unknown>;
+    expect(payload).toMatchObject({
       logical_key: `order-confirmation:${ORDER_ID}`,
       template_name: "delegate-pass-confirmation",
       state: "PENDING",
     });
+    // The pass email always carries the gate QR.
+    const renderData = payload.render_data as Record<string, unknown>;
+    expect(renderData.publicPassCode).toBe("PP-EMAIL00001");
+    expect(String(renderData.qrDataUrl)).toMatch(/^data:image\/png;base64,/);
+  });
+
+  it("defers (fails + retries) a pass email instead of sending it without a QR", async () => {
+    seedClaim([
+      { id: "j-email", job_type: "SEND_EMAIL", aggregate_type: "order", aggregate_id: ORDER_ID, payload: { orderId: ORDER_ID, kind: "BASE_PASS" }, attempts: 0 },
+    ]);
+    sb.onTable("orders", {
+      data: { id: ORDER_ID, purchaser_user_id: USER_ID, public_order_code: "PO-EML03", amount_paise: "200000", currency: "INR" },
+      error: null,
+    });
+    sb.onTable("profiles", { data: { display_name: "Aarav Sharma" }, error: null });
+    sb.onTable("order_lines", {
+      data: { id: "line-1", pass_product_id: "pp-1", pass_products: { name: "Pronite Pass", slug: "vip-delegate-pass", is_base_pass: false } },
+      error: null,
+    });
+    // No pass row found (by line or by user).
+
+    const result = await runOutboxDispatcher({ batchSize: 25 });
+    expect(result).toEqual({ processed: 0, failed: 1 });
+    expect(sb.rpcParams("fail_outbox_job")).toMatchObject({ p_job_id: "j-email" });
+    expect(sb.callsFor("email_jobs").filter((c) => c.action === "upsert")).toHaveLength(0);
   });
 
   it("routes EVENT-kind orders to the registration template and populates event details", async () => {

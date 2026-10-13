@@ -40,13 +40,14 @@ describe("Google Sheets Mirror Service", () => {
       expect(BASIC_PASS_HEADERS).toContain("Activated At");
     });
 
-    it("defines correct columns for Delegate Card registrations (VIP perks included)", () => {
+    it("defines correct columns for Pronite Pass registrations", () => {
       expect(DELEGATE_PASS_HEADERS).toContain("Pass Code");
       expect(DELEGATE_PASS_HEADERS).toContain("Order Code");
       expect(DELEGATE_PASS_HEADERS).toContain("Payment ID");
-      expect(DELEGATE_PASS_HEADERS).toContain("Concert Pro Shows Included");
-      expect(DELEGATE_PASS_HEADERS).toContain("VIP Front-Row Zone");
+      expect(DELEGATE_PASS_HEADERS).toContain("Pass Type");
+      expect(DELEGATE_PASS_HEADERS).toContain("Pronite Access");
       expect(DELEGATE_PASS_HEADERS).toContain("Amount (INR)");
+      expect(DELEGATE_PASS_HEADERS).toHaveLength(13);
     });
 
     it("defines correct columns for All Events registrations", () => {

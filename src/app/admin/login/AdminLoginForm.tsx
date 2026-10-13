@@ -394,13 +394,13 @@ function AdminLoginForm() {
           Are you a fest participant or attendee?
         </p>
         <p className="mt-1 text-xs font-bold text-black/70">
-          Sign in to purchase base passes, view your QR ticket, or manage event registrations.
+          Sign in to buy the Pronite Pass, view your QR ticket, or manage event registrations.
         </p>
         <Link
           href="/login"
           className="mt-3 inline-block border-2 border-black bg-neo-secondary px-4 py-2 text-xs font-black uppercase tracking-widest text-black shadow-neo-sm transition-transform hover:-translate-y-0.5"
         >
-          Delegate Sign In →
+          Participant Sign In →
         </Link>
       </div>
     </div>

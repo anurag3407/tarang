@@ -67,7 +67,7 @@ export default function ExportsManager() {
       const body = await res.json();
       setMessage(
         body.ok
-          ? `✓ Sheets synced: ${body.data?.recordsSynced?.basicPasses ?? 0} Basic, ${body.data?.recordsSynced?.delegatePasses ?? 0} VIP, ${body.data?.recordsSynced?.events ?? 0} Events`
+          ? `✓ Sheets synced: ${body.data?.recordsSynced?.delegatePasses ?? 0} Pronite, ${body.data?.recordsSynced?.events ?? 0} Events, ${body.data?.recordsSynced?.merchandise ?? 0} Merch`
           : body.message ?? "Sheets sync failed"
       );
     } catch {

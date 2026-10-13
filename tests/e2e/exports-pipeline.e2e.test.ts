@@ -190,15 +190,29 @@ describe("export worker (plan §12.17) — real CSV build", () => {
       data: [
         {
           public_pass_code: "PS-E2E-0001",
+          user_id: "u-roster-1",
           state: "ACTIVE",
           activated_at: "2026-08-20T10:00:00Z",
-          profiles: [{ display_name: "Aarav Sharma", college_name: "Some College", public_member_code: "PM-000001" }],
+          pass_products: { name: "Pronite Pass" },
         },
         {
           public_pass_code: "PS-E2E-0002",
+          user_id: "u-roster-2",
           state: "ACTIVE",
           activated_at: "2026-08-20T11:00:00Z",
-          profiles: [],
+          pass_products: { name: "Pronite Pass" },
+        },
+      ],
+      error: null,
+    });
+    // profiles has no FK to delegate_passes: the worker looks them up separately.
+    sb.onTable("profiles", {
+      data: [
+        {
+          user_id: "u-roster-1",
+          display_name: "Aarav Sharma",
+          college_name: "Some College",
+          public_member_code: "PM-000001",
         },
       ],
       error: null,
@@ -232,8 +246,12 @@ describe("export worker (plan §12.17) — real CSV build", () => {
     const csv = readFileSync(filePath, "utf8");
     const { createHash } = await import("node:crypto");
     expect(createHash("sha256").update(csv).digest("hex")).toBe(checksum);
-    expect(csv).toContain("pass_code,name,college");
-    expect(csv).toContain("PS-E2E-0001,Aarav Sharma,Some College");
+    expect(csv).toContain("pass_code,pass_type,name,college");
+    expect(csv).toContain("PS-E2E-0001,Pronite Pass,Aarav Sharma,Some College");
+    expect(csv).toContain("PS-E2E-0002,Pronite Pass,,");
+    // The roster is paged past PostgREST's 1000-row cap, not .limit()ed.
+    const rosterQuery = sb.callsFor("delegate_passes")[0];
+    expect(rosterQuery.filters.range).toEqual([0, 999]);
 
     // Keep the file for the download-endpoint test below.
     completedFilePaths.push(filePath);
@@ -282,7 +300,7 @@ describe("GET /api/admin/exports/:id/download", () => {
     expect(res.headers.get("content-disposition")).toContain(`roster-${EXPORT_JOB_ID}.csv`);
     expect(res.headers.get("cache-control")).toBe("no-store");
     const text = await res.text();
-    expect(text).toContain("PS-E2E-0001,Aarav Sharma");
+    expect(text).toContain("PS-E2E-0001,Pronite Pass,Aarav Sharma");
   });
 
   it("409s a job that is not COMPLETED yet", async () => {

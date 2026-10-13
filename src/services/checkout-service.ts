@@ -5,6 +5,7 @@ import { AppError } from "@/lib/errors";
 import { env } from "@/lib/env";
 import { getRazorpay, receiptForOrder } from "@/lib/razorpay/client";
 import type { CheckoutResult } from "@/domain/checkout";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 
 /**
  * Checkout service (plan §9.2–§9.4, §12.3, §12.5).
@@ -166,6 +167,19 @@ export async function createBasePassCheckout(
   const sb = createServiceRoleClient();
   const hash = requestHash({ passProductId });
 
+  // The Pronite Pass is the only pass on sale. The retired Basic Card is
+  // unpublished in the DB too; this guards against it being re-opened by
+  // mistake, since it would sell a pass with no gate QR and no email.
+  const { data: product } = await sb
+    .from("pass_products")
+    .select("slug, name, is_base_pass")
+    .eq("id", passProductId)
+    .maybeSingle();
+  // A missing product falls through: the checkout RPC raises NOT_FOUND.
+  if (product && !isPronitePassProduct(product)) {
+    throw new AppError("SALES_CLOSED", "This pass is no longer on sale");
+  }
+
   const { data, error } = await sb.rpc("create_base_pass_checkout", {
     p_user_id: userId,
     p_festival_id: festivalId,
@@ -325,13 +339,9 @@ async function fulfillFreeOrder(localOrderId: string): Promise<void> {
   });
   if (error) throw new AppError("INTERNAL", "Free fulfillment failed");
 
+  // Email, QR and Sheets jobs were enqueued by the fulfillment trigger.
   const { runOutboxDispatcher } = await import("@/workers/outbox-dispatcher");
   void runOutboxDispatcher({ batchSize: 5 }).catch(() => {});
-
-  if (env().GOOGLE_SHEETS_ENABLED) {
-    const { syncOrderToSpreadsheets } = await import("@/services/sheets-service");
-    void syncOrderToSpreadsheets(localOrderId).catch(() => {});
-  }
 }
 
 /** Generate a fresh idempotency key for a user action. */

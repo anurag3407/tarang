@@ -66,6 +66,18 @@ export async function issueQrCredential(
     .select("id, jti, entitlement_version, not_before, expires_at")
     .single();
   if (error) {
+    // Lost a race: the ISSUE_QR job, the confirmation email and the dashboard
+    // can all issue concurrently, and one ACTIVE credential per pass is
+    // enforced by a unique index. Use the winner's credential.
+    if (error.code === "23505") {
+      const { data: winner } = await sb
+        .from("qr_credentials")
+        .select("id, jti")
+        .eq("delegate_pass_id", delegatePassId)
+        .eq("state", "ACTIVE")
+        .maybeSingle();
+      if (winner) return { credentialId: winner.id, jti: winner.jti };
+    }
     throw new AppError("INTERNAL", "Could not create QR credential");
   }
 

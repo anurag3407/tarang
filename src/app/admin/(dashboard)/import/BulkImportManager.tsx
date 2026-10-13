@@ -294,10 +294,10 @@ export default function BulkImportManager() {
               </span>
             </div>
             <h1 className="mt-1 text-2xl sm:text-3xl font-black uppercase tracking-tight text-black">
-              ⚡ Bulk User Seed &amp; Delegate Card Issuance
+              ⚡ Bulk User Seed &amp; Pronite Pass Issuance
             </h1>
             <p className="mt-1 text-sm font-bold text-black/80 max-w-2xl">
-              Connect a Google Sheet, upload a CSV, or paste spreadsheet rows. The platform will automatically create accounts in the database, seed user profiles, issue official VIP Delegate Cards with Gate QR credentials or Event Registrations, and send confirmation emails with QR codes.
+              Connect a Google Sheet, upload a CSV, or paste spreadsheet rows. The platform will automatically create accounts in the database, seed user profiles, issue Pronite Passes with Gate QR credentials or Event Registrations, and send confirmation emails with QR codes.
             </p>
           </div>
           <Button
@@ -334,7 +334,7 @@ export default function BulkImportManager() {
                     : "bg-neo-cream text-black hover:bg-white"
                 }`}
               >
-                🪪 Delegate Card
+                🪪 Pronite Pass
               </button>
               <button
                 type="button"
@@ -350,15 +350,15 @@ export default function BulkImportManager() {
             </div>
           </div>
 
-          {/* Delegate Card Notice */}
+          {/* Pronite Pass Notice */}
           {issuanceType === "PASS" && (
             <div className="border-2 border-black bg-neo-secondary/20 p-3 space-y-1">
               <div className="flex items-center gap-1.5 font-black text-xs uppercase text-black">
                 <span>🪪</span>
-                <span>VIP All-Access Delegate Card</span>
+                <span>Pronite Pass</span>
               </div>
               <p className="text-[11px] font-bold text-black/70">
-                Bulk card issuance automatically grants the official VIP Delegate Card with Gate Entry QR and concert access.
+                Bulk issuance grants the Pronite Pass with a Gate Entry QR.
               </p>
             </div>
           )}
@@ -402,14 +402,14 @@ export default function BulkImportManager() {
               <div className="text-xs font-bold">
                 <span className="block font-black uppercase">Send Confirmation Emails</span>
                 <span className="text-black/70">
-                  Instantly delivers the Gate Entry QR Delegate Card / Event registration confirmation to each recipient by email.
+                  Instantly delivers the Pronite Pass gate QR / Event registration confirmation to each recipient by email.
                 </span>
               </div>
             </label>
           </div>
 
           <div className="border-l-4 border-black bg-neo-cream/50 pl-3 py-1 text-[11px] font-bold text-black/70">
-            💡 <b>Account Creation:</b> If an email does not exist in Supabase Auth, an account is auto-created with confirmed email and populated profile. Existing accounts will receive their new Delegate Card directly.
+            💡 <b>Account Creation:</b> If an email does not exist in Supabase Auth, an account is auto-created with confirmed email and populated profile. Existing accounts will receive their new Pronite Pass directly.
           </div>
         </div>
 

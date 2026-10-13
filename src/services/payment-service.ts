@@ -82,23 +82,10 @@ export async function verifyAndApplyBrowserCallback(
     const res = data as { result: string; orderId?: string };
 
     if (res.result === "FULFILLED") {
+      // Fulfillment enqueued the email, QR and Sheets outbox jobs in the same
+      // transaction; kick the dispatcher so they run now, not on the next tick.
       const { runOutboxDispatcher } = await import("@/workers/outbox-dispatcher");
       void runOutboxDispatcher({ batchSize: 5 }).catch(() => {});
-
-      const { env } = await import("@/lib/env");
-      if (env().GOOGLE_SHEETS_ENABLED) {
-        const { syncOrderToSpreadsheets } = await import("@/services/sheets-service");
-        const { logger } = await import("@/lib/logger");
-        void syncOrderToSpreadsheets(order.id)
-          .then((syncRes) => {
-            if (!syncRes.synced) {
-              logger().error({ orderId: order.id, error: syncRes.error }, "sheets sync failed after browser verify");
-            }
-          })
-          .catch((err) => {
-            logger().error({ orderId: order.id, err: err instanceof Error ? err.message : String(err) }, "exception during browser verify sheets sync");
-          });
-      }
     }
 
     return { result: res.result, orderId: order.id };
@@ -170,21 +157,6 @@ export async function processRazorpayWebhookEvent(webhookEventId: string): Promi
           if (fulfilledRes?.result === "FULFILLED" && fulfilledRes.orderId) {
             const { runOutboxDispatcher } = await import("@/workers/outbox-dispatcher");
             void runOutboxDispatcher({ batchSize: 5 }).catch(() => {});
-
-            const { env } = await import("@/lib/env");
-            if (env().GOOGLE_SHEETS_ENABLED) {
-              const { syncOrderToSpreadsheets } = await import("@/services/sheets-service");
-              const { logger } = await import("@/lib/logger");
-              void syncOrderToSpreadsheets(fulfilledRes.orderId)
-                .then((syncRes) => {
-                  if (!syncRes.synced) {
-                    logger().error({ orderId: fulfilledRes.orderId, error: syncRes.error }, "sheets sync failed after webhook capture");
-                  }
-                })
-                .catch((err) => {
-                  logger().error({ orderId: fulfilledRes.orderId, err: err instanceof Error ? err.message : String(err) }, "exception during webhook sheets sync");
-                });
-            }
           }
         } else {
           // Record non-captured state without downgrading captured.
@@ -241,11 +213,8 @@ export async function processRazorpayWebhookEvent(webhookEventId: string): Promi
 
               const fulfilledRes = applyData as { result?: string; orderId?: string };
               if (fulfilledRes?.result === "FULFILLED" && fulfilledRes.orderId) {
-                const { env } = await import("@/lib/env");
-                if (env().GOOGLE_SHEETS_ENABLED) {
-                  const { syncOrderToSpreadsheets } = await import("@/services/sheets-service");
-                  void syncOrderToSpreadsheets(fulfilledRes.orderId).catch(() => {});
-                }
+                const { runOutboxDispatcher } = await import("@/workers/outbox-dispatcher");
+                void runOutboxDispatcher({ batchSize: 5 }).catch(() => {});
               }
             }
           }

@@ -18,6 +18,8 @@ import { POST as verifyRoute } from "@/app/api/public/verify/route";
 
 const PASS_CODE = "PP-4F8A9C12E7B3";
 const USER_ID = "11111111-1111-4111-8111-111111111111";
+// Relative to now: a fixed date turns these "active pass" cases into expired ones.
+const FUTURE_EXPIRY = new Date(Date.now() + 30 * 86_400_000).toISOString();
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -41,7 +43,7 @@ describe("POST /api/public/verify — Pass Authenticity & Verification", () => {
           state: "ACTIVE",
           activated_at: "2026-08-20T10:00:00.000Z",
           created_at: "2026-08-20T10:00:00.000Z",
-          expires_at: "2026-09-25T23:59:59.000Z",
+          expires_at: FUTURE_EXPIRY,
           user_id: USER_ID,
           pass_products: {
             id: "prod-1",
@@ -142,7 +144,7 @@ describe("POST /api/public/verify — Pass Authenticity & Verification", () => {
           state: "ACTIVE",
           activated_at: "2026-08-21T12:00:00.000Z",
           created_at: "2026-08-21T12:00:00.000Z",
-          expires_at: "2026-09-25T23:59:59.000Z",
+          expires_at: FUTURE_EXPIRY,
           user_id: USER_ID,
           pass_products: {
             name: "Basic Festival Card",

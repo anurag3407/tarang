@@ -86,7 +86,7 @@ export async function performScan(input: ScanInput): Promise<ScanResult> {
     .from("qr_credentials")
     .select(
       `jti, state, delegate_pass_id,
-       delegate_passes ( user_id, state, profiles ( display_name ) )`
+       delegate_passes ( user_id, state )`
     )
     .eq("jti", payload.jti)
     .maybeSingle();
@@ -100,12 +100,15 @@ export async function performScan(input: ScanInput): Promise<ScanResult> {
     if (pass?.state === "REFUNDED") {
       credentialState = "refunded";
     }
-    const profile = pass
-      ? Array.isArray(pass.profiles)
-        ? pass.profiles[0]
-        : pass.profiles
-      : null;
-    maskedName = maskName(profile?.display_name ?? null);
+    // profiles has no FK to delegate_passes, so it cannot be embedded above.
+    if (pass?.user_id) {
+      const { data: profile } = await sb
+        .from("profiles")
+        .select("display_name")
+        .eq("user_id", pass.user_id)
+        .maybeSingle();
+      maskedName = maskName(profile?.display_name ?? null);
+    }
   }
 
   // 3. Atomic scan + admission decision.
