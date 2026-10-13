@@ -15,6 +15,11 @@
 import { loadEnvConfig } from "@next/env";
 import { createClient } from "@supabase/supabase-js";
 import { createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
+import {
+  GetAccountCommand,
+  GetEmailIdentityCommand,
+  SESv2Client,
+} from "@aws-sdk/client-sesv2";
 
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
 
@@ -93,6 +98,7 @@ function checkEnv(): void {
     "RAZORPAY_WEBHOOK_SECRET_CURRENT",
     "RESEND_API_KEY",
     "RESEND_WEBHOOK_SECRET",
+    "AWS_SES_REGION",
     "UPSTASH_REDIS_REST_URL",
     "UPSTASH_REDIS_REST_TOKEN",
     "QSTASH_TOKEN",
@@ -494,8 +500,17 @@ async function checkUpstash(): Promise<void> {
 // --------------------------------------------------------------------------
 // 5. Resend
 // --------------------------------------------------------------------------
+function useSes(): boolean {
+  const v = envVar("USE_SES");
+  return v === "true" || v === "1";
+}
+
 async function checkResend(): Promise<void> {
   setSection("Resend");
+  if (useSes()) {
+    add("SKIP", "Provider", "USE_SES=true — email goes through Amazon SES");
+    return;
+  }
   const key = envVar("RESEND_API_KEY");
   const from = envVar("EMAIL_FROM") ?? "";
   if (!key) {
@@ -574,6 +589,75 @@ async function checkResend(): Promise<void> {
   } else {
     add("PASS", "Webhook secret", "set");
   }
+}
+
+// --------------------------------------------------------------------------
+// 5b. Amazon SES
+// --------------------------------------------------------------------------
+async function checkSes(): Promise<void> {
+  setSection("Amazon SES");
+  if (!useSes()) {
+    add("SKIP", "Provider", "USE_SES unset/false — email goes through Resend");
+    return;
+  }
+  const region = envVar("AWS_SES_REGION");
+  if (!region) {
+    add("FAIL", "AWS_SES_REGION", "unset — no email is sent", "Set the SES region, e.g. ap-south-1.");
+    return;
+  }
+  const accessKeyId = envVar("AWS_SES_ACCESS_KEY_ID");
+  const secretAccessKey = envVar("AWS_SES_SECRET_ACCESS_KEY");
+  const ses = new SESv2Client({
+    region,
+    ...(accessKeyId && secretAccessKey
+      ? { credentials: { accessKeyId, secretAccessKey } }
+      : {}),
+  });
+
+  await safely("Account", async () => {
+    const acct = await ses.send(new GetAccountCommand({}));
+    add("PASS", "Credentials", `valid (${region})`);
+    add(
+      acct.SendingEnabled ? "PASS" : "FAIL",
+      "Sending",
+      acct.SendingEnabled ? "enabled" : "paused for this account/region"
+    );
+    if (!acct.ProductionAccessEnabled) {
+      add(
+        "WARN",
+        "Sandbox",
+        "account is in the SES sandbox",
+        "Sandbox only delivers to verified addresses — request production access before real users."
+      );
+    } else {
+      add("PASS", "Sandbox", "production access");
+    }
+  });
+
+  const from = envVar("EMAIL_FROM") ?? "";
+  const match = from.match(/<([^>]+)>|(\S+@\S+)/);
+  const addr = match ? (match[1] ?? match[2] ?? "") : from;
+  const fromDomain = addr.split("@")[1] ?? "";
+  await safely("EMAIL_FROM", async () => {
+    // A verified address or its verified domain both allow sending.
+    for (const identity of [addr, fromDomain].filter(Boolean)) {
+      try {
+        const id = await ses.send(new GetEmailIdentityCommand({ EmailIdentity: identity }));
+        if (id.VerifiedForSendingStatus) {
+          add("PASS", "EMAIL_FROM", `${from} (identity ${identity} verified)`);
+          return;
+        }
+      } catch (err) {
+        if ((err as { name?: string }).name !== "NotFoundException") throw err;
+      }
+    }
+    add(
+      "FAIL",
+      "EMAIL_FROM",
+      `${from} — neither address nor domain is a verified SES identity in ${region}`,
+      "Sends will be rejected."
+    );
+  });
 }
 
 // --------------------------------------------------------------------------
@@ -675,6 +759,7 @@ async function main(): Promise<void> {
   await checkRazorpay();
   await checkUpstash();
   await checkResend();
+  await checkSes();
   checkQr();
   process.exit(report());
 }

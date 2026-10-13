@@ -402,7 +402,7 @@ export default function BulkImportManager() {
               <div className="text-xs font-bold">
                 <span className="block font-black uppercase">Send Confirmation Emails</span>
                 <span className="text-black/70">
-                  Instantly delivers the Gate Entry QR Delegate Card / Event registration confirmation to each recipient via Resend.
+                  Instantly delivers the Gate Entry QR Delegate Card / Event registration confirmation to each recipient by email.
                 </span>
               </div>
             </label>

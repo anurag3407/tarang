@@ -67,10 +67,23 @@ const schema = z.object({
   RAZORPAY_WEBHOOK_SECRET_CURRENT: z.string().optional(),
   RAZORPAY_WEBHOOK_SECRET_PREVIOUS: z.string().optional(),
 
+  // Email provider: USE_SES=true sends through Amazon SES; unset or false
+  // keeps Resend as the provider.
+  USE_SES: boolFromString,
+
   // Resend
   RESEND_API_KEY: z.string().optional(),
   RESEND_WEBHOOK_SECRET: z.string().optional(),
-  // Set to an address on a domain verified with Resend.
+
+  // Amazon SES (used only when USE_SES=true). The access key pair is
+  // optional: without it the AWS SDK default credential chain is used
+  // (IAM role, AWS_PROFILE, ...).
+  AWS_SES_REGION: z.string().optional(),
+  AWS_SES_ACCESS_KEY_ID: z.string().optional(),
+  AWS_SES_SECRET_ACCESS_KEY: z.string().optional(),
+  AWS_SES_CONFIGURATION_SET: z.string().optional(),
+
+  // Set to an address on a domain verified with the active email provider.
   EMAIL_FROM: z.string().default("TARANG 2026 <no-reply@example.com>"),
   EMAIL_REPLY_TO: z.string().optional(),
   /** Organizer inbox that receives a copy of every group-entry submission. */
@@ -200,4 +213,27 @@ export function razorpayConfigured(): boolean {
 export function resendConfigured(): boolean {
   const e = env();
   return Boolean(e.RESEND_API_KEY);
+}
+
+/** True when Amazon SES has a region to send from. */
+export function sesConfigured(): boolean {
+  const e = env();
+  return Boolean(e.AWS_SES_REGION);
+}
+
+export type EmailProvider = "resend" | "ses";
+
+/** Active email provider: SES when USE_SES=true, otherwise Resend. */
+export function emailProvider(): EmailProvider {
+  return env().USE_SES ? "ses" : "resend";
+}
+
+export const EMAIL_PROVIDER_LABEL: Record<EmailProvider, string> = {
+  resend: "Resend",
+  ses: "Amazon SES",
+};
+
+/** True when the active email provider is configured. */
+export function emailConfigured(): boolean {
+  return emailProvider() === "ses" ? sesConfigured() : resendConfigured();
 }

@@ -3,8 +3,8 @@ import { randomUUID } from "node:crypto";
 import { renderEmailHtml, renderEmailText } from "@/emails/render";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { logger } from "@/lib/logger";
-import { env } from "@/lib/env";
-import { getResend } from "@/lib/resend/client";
+import { env, emailProvider, EMAIL_PROVIDER_LABEL } from "@/lib/env";
+import { getEmailSender } from "@/lib/email/send";
 import { issueQrCredential } from "@/services/qr-service";
 import { isPronitePassProduct } from "@/lib/pronite-pass";
 import { cancelRazorpayOrder } from "@/lib/razorpay/client";
@@ -441,8 +441,9 @@ export async function enqueueOrderEmails(orderId: string, kind: string): Promise
 /**
  * Email dispatcher (plan §13.4).
  *
- * Claims email_jobs leases, renders the template, and submits to Resend with
- * a stable idempotency key (job id + template version). Retry classification:
+ * Claims email_jobs leases, renders the template, and submits to the active
+ * provider (Resend, or Amazon SES when USE_SES=true) — Resend with a stable
+ * idempotency key (job id + template version). Retry classification:
  * network/429/5xx retry with backoff; deterministic 4xx dead-letter.
  * Transient failures retry at most MAX_EMAIL_ATTEMPTS times, then dead-letter
  * too — a permanently failing email must not retry forever and burn credits.
@@ -466,18 +467,19 @@ export async function runEmailDispatcher(opts: { batchSize?: number } = {}): Pro
   }
 
   const e = env();
-  const resend = getResend();
+  const sender = getEmailSender();
+  const providerLabel = EMAIL_PROVIDER_LABEL[sender?.provider ?? emailProvider()];
   let submitted = 0;
   let failed = 0;
   let dead = 0;
 
   for (const job of (jobs ?? []) as EmailJob[]) {
     try {
-      if (!resend) {
+      if (!sender) {
         // No provider configured: park for retry rather than lose the job.
         // Deliberately exempt from the attempts cap — the failure is
         // environmental (missing config), not a property of this email.
-        await setEmailState(job.id, "RETRY_WAIT", "Resend not configured");
+        await setEmailState(job.id, "RETRY_WAIT", `${providerLabel} not configured`);
         failed++;
         continue;
       }
@@ -531,25 +533,25 @@ export async function runEmailDispatcher(opts: { batchSize?: number } = {}): Pro
       const html = `<!DOCTYPE html>${renderEmailHtml(element)}`;
       const text = renderEmailText(html);
 
-      const result = await resend.emails.send(
+      const result = await sender.send(
         {
           from: e.EMAIL_FROM,
           to: job.to_email_snapshot,
           subject,
           html,
           text,
-          ...(e.EMAIL_REPLY_TO ? { reply_to: e.EMAIL_REPLY_TO } : {}),
+          ...(e.EMAIL_REPLY_TO ? { replyTo: e.EMAIL_REPLY_TO } : {}),
           ...(attachments.length > 0 ? { attachments } : {}),
         },
         { idempotencyKey: job.idempotency_key }
       );
 
-      if (result.error) {
-        const status = (result.error as { statusCode?: number }).statusCode;
-        const message = result.error.message ?? "send failed";
+      if (!result.ok) {
+        const status = result.statusCode;
+        const message = result.message;
         log.error(
           { err: message, statusCode: status, to: job.to_email_snapshot, from: e.EMAIL_FROM, jobId: job.id },
-          "Resend rejected email send request"
+          `${providerLabel} rejected email send request`
         );
         // Deterministic client errors (except 429) dead-letter.
         const deterministic =
@@ -566,15 +568,16 @@ export async function runEmailDispatcher(opts: { batchSize?: number } = {}): Pro
       }
 
       log.info(
-        { resendId: result.data?.id, to: job.to_email_snapshot, from: e.EMAIL_FROM, jobId: job.id },
-        "Email accepted by Resend successfully"
+        { provider: sender.provider, messageId: result.id, to: job.to_email_snapshot, from: e.EMAIL_FROM, jobId: job.id },
+        `Email accepted by ${providerLabel} successfully`
       );
 
       await sb
         .from("email_jobs")
         .update({
           state: "SUBMITTED",
-          resend_email_id: result.data?.id ?? null,
+          // Provider message id (column predates SES support).
+          resend_email_id: result.id,
           submitted_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           last_error: null,

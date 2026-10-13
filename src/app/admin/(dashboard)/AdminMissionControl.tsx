@@ -173,6 +173,7 @@ interface OverviewData {
     };
     resendEmail: {
       enabled: boolean;
+      provider: string;
       fromEmail: string;
     };
     festival: {
@@ -597,7 +598,7 @@ export default function AdminMissionControl() {
       });
       const body = await res.json();
       if (body.ok) {
-        showToast(body.data?.message ? `✓ ${body.data.message}` : "✓ Confirmation email dispatched via Resend");
+        showToast(body.data?.message ? `✓ ${body.data.message}` : `✓ Confirmation email dispatched via ${data?.telemetry.resendEmail.provider ?? "email"}`);
         void fetchTabData("orders", ordersPage, ordersPageSize, ordersSearch, ordersTier);
       } else {
         const errorText = body.error?.message || body.message || "Unknown error";
@@ -705,7 +706,7 @@ export default function AdminMissionControl() {
           </span>
         </div>
         <div className="border-2 border-black bg-white p-3 shadow-neo-sm flex items-center justify-between">
-          <span className="text-black/60 uppercase">Resend Mail</span>
+          <span className="text-black/60 uppercase">{data?.telemetry.resendEmail.provider ?? "Email"} Mail</span>
           <span className={`inline-flex items-center gap-1 font-black ${data?.telemetry.resendEmail.enabled ? "text-green-700" : "text-amber-700"}`}>
             <Mail className="h-3.5 w-3.5" />
             {data?.telemetry.resendEmail.enabled ? "READY" : "DISABLED"}

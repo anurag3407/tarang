@@ -5,6 +5,8 @@ import {
   redisConfigured,
   razorpayConfigured,
   resendConfigured,
+  sesConfigured,
+  emailProvider,
 } from "@/lib/env";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { getRedis } from "@/lib/redis/client";
@@ -32,6 +34,7 @@ export async function GET() {
     redis: { configured: redisConfigured(), live: null },
     razorpay: { configured: razorpayConfigured(), live: null },
     resend: { configured: resendConfigured(), live: null },
+    ses: { configured: sesConfigured(), live: null },
     qstash: { configured: Boolean(e.QSTASH_TOKEN), live: null },
   };
 
@@ -52,11 +55,12 @@ export async function GET() {
       deps.redis.live = false;
     }
   }
-  // Razorpay/Resend: configured-only (no free live probe without side effects).
+  // Razorpay/Resend/SES: configured-only (no free live probe without side effects).
 
   return NextResponse.json(
     {
       appEnv: e.APP_ENV,
+      emailProvider: emailProvider(),
       deploymentId: e.DEPLOYMENT_ID ?? null,
       dependencies: deps,
     },

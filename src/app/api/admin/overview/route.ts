@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminRead } from "@/lib/admin-route";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import { env } from "@/lib/env";
+import { env, emailConfigured, emailProvider, EMAIL_PROVIDER_LABEL } from "@/lib/env";
 import { formatPaise } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
@@ -797,7 +797,8 @@ export async function GET(req: NextRequest) {
           groupEntrySpreadsheetId: e.GOOGLE_SHEETS_GROUP_ENTRY_ID || null,
         },
         resendEmail: {
-          enabled: Boolean(e.RESEND_API_KEY),
+          enabled: emailConfigured(),
+          provider: EMAIL_PROVIDER_LABEL[emailProvider()],
           fromEmail: e.EMAIL_FROM,
         },
         festival: {

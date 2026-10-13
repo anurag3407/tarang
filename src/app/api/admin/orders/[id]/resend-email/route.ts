@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation } from "@/lib/admin-route";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { emailProvider, EMAIL_PROVIDER_LABEL } from "@/lib/env";
 import { enqueueOrderEmails, runEmailDispatcher } from "@/workers/outbox-dispatcher";
 
 export const dynamic = "force-dynamic";
@@ -71,7 +72,7 @@ export async function POST(
       return apiError(
         req,
         "UPSTREAM_ERROR",
-        `Resend Error: ${job.last_error} (Recipient: ${job.to_email_snapshot})`
+        `${EMAIL_PROVIDER_LABEL[emailProvider()]} Error: ${job.last_error} (Recipient: ${job.to_email_snapshot})`
       );
     }
 
