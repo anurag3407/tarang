@@ -82,7 +82,7 @@ const REVIEW_MESSAGE =
   "Your payment reached us, but we could not issue the pass automatically. Our team has been alerted and will resolve it — please do not pay again.";
 
 const PERKS = [
-  { title: "Every pronite", body: "Entry to all five headline nights on the main stage." },
+  { title: "Every pronite", body: "Entry to both headline nights on the main stage." },
   { title: "Campus access", body: `In and out of ${FEST.college} across all festival days.` },
   { title: "Every competition", body: "Unlocks registration for solo and team events." },
   { title: "One QR", body: "Your gate QR lives in your dashboard — no paper, no queue." },
@@ -428,7 +428,7 @@ export default function PronitePassClient({
             </span>
           </h1>
           <p className="kit-fade mt-6 max-w-xl text-lg leading-relaxed text-bone/85 md:text-xl" style={{ animationDelay: "500ms" }}>
-            Five nights on the main stage at {FEST.college}, campus access for the whole fest, and every competition — on a
+            Two nights on the main stage at {FEST.college}, campus access for the whole fest, and every competition — on a
             single ticket.
           </p>
         </div>
