@@ -214,6 +214,17 @@ export const NOTICES: Notice[] = [];
 /* Team & Chief Coordinators                                           */
 /* ------------------------------------------------------------------ */
 
+/** Profile links shown under a portrait. The first one present also wraps the photo. */
+export type SocialLinks = {
+  linkedin?: string;
+  instagram?: string;
+  github?: string;
+  website?: string;
+};
+
+/** Backdrop behind a portrait cut-out. */
+export type PortraitTone = "blood" | "crimson" | "ink" | "bone";
+
 export type TeamMember = {
   name: string;
   role: string;
@@ -223,6 +234,13 @@ export type TeamMember = {
   initials: string;
   color: "accent" | "secondary" | "muted" | "white";
   isChief?: boolean;
+  /**
+   * Background-removed portrait (transparent PNG/WebP, roughly 4:5, subject
+   * cropped at the chest) under /public/team, e.g. "/team/jane-doe.webp".
+   * Without one the card shows the member's initials.
+   */
+  image?: string;
+  socials?: SocialLinks;
 };
 
 export type TeamGroup = {
@@ -237,6 +255,42 @@ export type TeamGroup = {
  * the team page shows a “revealing soon” state while this is empty.
  */
 export const TEAM: TeamGroup[] = [];
+
+export type TechMember = {
+  name: string;
+  role: string;
+  initials: string;
+  tone: PortraitTone;
+  bio?: string;
+  /** Same format as TeamMember.image — a background-removed portrait under /public/team. */
+  image?: string;
+  socials: SocialLinks;
+};
+
+/** The developers behind the platform, shown on /tech-team. */
+export const TECH_TEAM: TechMember[] = [
+  {
+    name: "Anurag Mishra",
+    role: "Developer · Tech Geek",
+    initials: "AM",
+    tone: "blood",
+    bio: "Building systems, platforms, and high-performance digital experiences.",
+    socials: {
+      linkedin: "https://www.linkedin.com/in/anurag3407",
+      instagram: "https://www.instagram.com/anuragmishraxo",
+    },
+  },
+  {
+    name: "Mohnish Pamnani",
+    role: "Developer · Tech Geek",
+    initials: "MP",
+    tone: "crimson",
+    bio: "Crafting interfaces, logic, and web experiences.",
+    socials: {
+      linkedin: "https://www.linkedin.com/in/mohnish-pamnani-595a81284",
+    },
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /* FAQs                                                                */

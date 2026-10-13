@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import { Phone, MessageSquare, Copy, Check } from "lucide-react";
-import type { TeamMember } from "@/lib/data";
+import type { PortraitTone, TeamMember } from "@/lib/data";
+import { PortraitCard } from "@/components/cards/PortraitCard";
 
-const COLOR_BG: Record<TeamMember["color"], string> = {
-  accent: "bg-neo-accent",
-  secondary: "bg-neo-secondary",
-  muted: "bg-neo-muted",
-  white: "bg-white",
+const TONE: Record<TeamMember["color"], PortraitTone> = {
+  accent: "crimson",
+  secondary: "blood",
+  muted: "ink",
+  white: "bone",
 };
 
-export function TeamCard({ member }: { member: TeamMember }) {
+export function TeamCard({ member, index }: { member: TeamMember; index?: number }) {
   const [copied, setCopied] = useState(false);
 
   function copyPhone() {
@@ -25,77 +26,44 @@ export function TeamCard({ member }: { member: TeamMember }) {
   const waNumber = rawDigits.startsWith("91") ? rawDigits : `91${rawDigits}`;
 
   return (
-    <article className="kit-rise group relative flex flex-col justify-between border-4 border-black bg-white dark:bg-neo-card text-black dark:text-white p-6 shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg">
-      <div>
-        {/* Avatar & Chief Pin */}
-        <div className="flex items-center justify-between">
-          <div
-            className={`flex h-20 w-20 items-center justify-center rounded-full border-4 border-black text-2xl font-black shadow-neo-sm ${COLOR_BG[member.color]} text-black`}
-            aria-hidden
-          >
-            {member.initials}
-          </div>
-          {member.isChief && (
-            <span className="border-2 border-black bg-neo-accent px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-black shadow-neo-xs">
-              Chief Core
-            </span>
-          )}
-        </div>
-
-        {/* Member Details */}
-        <div className="mt-4">
-          <h3 className="text-xl font-black uppercase leading-tight tracking-tight text-black dark:text-white">
-            {member.name}
-          </h3>
-          <p className="mt-1.5 inline-block border-2 border-black bg-neo-secondary px-2 py-0.5 text-xs font-black uppercase tracking-widest text-black shadow-neo-xs">
-            {member.role}
-          </p>
-          {member.dept && (
-            <p className="mt-2 text-xs font-bold text-black/70 dark:text-zinc-400">{member.dept}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Contact Section */}
+    <PortraitCard
+      name={member.name}
+      role={member.role}
+      initials={member.initials}
+      tone={TONE[member.color]}
+      image={member.image}
+      socials={member.socials}
+      index={index}
+      badge={member.isChief ? "Chief Core" : undefined}
+      detail={member.dept}
+    >
       {member.phone && (
-        <div className="mt-6 border-t-2 border-black/15 dark:border-white/10 pt-4">
-          <div className="flex items-center justify-between text-xs font-black text-black dark:text-white">
-            <span className="font-mono">{member.phone}</span>
+        <div className="mt-5 border-t border-bone/15 pt-4">
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-mono text-sm text-bone/85">{member.phone}</span>
             <button
               type="button"
               onClick={copyPhone}
-              title="Copy Phone Number"
-              className="border border-black bg-neo-cream dark:bg-neo-surface p-1 text-black dark:text-white hover:bg-neo-secondary dark:hover:bg-neo-secondary dark:hover:text-black transition-colors"
+              title="Copy phone number"
+              aria-label="Copy phone number"
+              className="kit-portrait-social h-8 w-8"
             >
-              {copied ? (
-                <Check className="h-3.5 w-3.5 text-green-700 dark:text-green-400" strokeWidth={3} />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
+              {copied ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <Copy className="h-3.5 w-3.5" />}
             </button>
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <a
-              href={`tel:${member.phone.replace(/\s+/g, "")}`}
-              className="flex items-center justify-center gap-1.5 border-2 border-black bg-black py-1.5 px-2 text-[11px] font-black uppercase tracking-wider text-white shadow-neo-xs hover:bg-zinc-800 transition-colors"
-            >
-              <Phone className="h-3 w-3" />
-              <span>Call</span>
+            <a href={`tel:${member.phone.replace(/\s+/g, "")}`} className="kit-portrait-action">
+              <Phone className="h-3.5 w-3.5" />
+              Call
             </a>
-            <a
-              href={`https://wa.me/${waNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 border-2 border-black bg-[#17784a] py-1.5 px-2 text-[11px] font-black uppercase tracking-wider text-black shadow-neo-xs hover:bg-[#1d8f58] transition-colors"
-            >
-              <MessageSquare className="h-3 w-3" />
-              <span>Chat</span>
+            <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="kit-portrait-action">
+              <MessageSquare className="h-3.5 w-3.5" />
+              Chat
             </a>
           </div>
         </div>
       )}
-    </article>
+    </PortraitCard>
   );
 }
-

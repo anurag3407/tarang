@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
-import { Users } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Marquee } from "@/components/ui/Marquee";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TeamCard } from "@/components/cards/TeamCard";
+import { PortraitCard } from "@/components/cards/PortraitCard";
 import { ButtonLink } from "@/components/ui/Button";
-import { TEAM, FEST } from "@/lib/data";
+import { TEAM, FEST, type PortraitTone } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Our Team",
   description: `Meet the students organising TARANG 2026 at ${FEST.collegeFull}.`,
 };
+
+/** Shown while TEAM is empty: three unnamed portraits waiting for their reveal. */
+const TEASERS: { role: string; tone: PortraitTone }[] = [
+  { role: "Core team", tone: "blood" },
+  { role: "Coordinators", tone: "bone" },
+  { role: "Volunteers", tone: "crimson" },
+];
 
 export default function TeamPage() {
   return (
@@ -22,29 +29,35 @@ export default function TeamPage() {
         description={`TARANG is organised by the students of ${FEST.college}. The core team takes the stage here soon.`}
       />
 
-      <section className="py-16 sm:py-20">
+      <section className="kit-field py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {TEAM.length > 0 ? (
             TEAM.map((group) => (
-              <div key={group.id} className="mb-20 last:mb-0">
+              <div key={group.id} className="mb-28 last:mb-0">
                 <SectionHeading kicker={group.name} title={group.name} description={group.blurb} />
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  {group.members.map((member) => (
-                    <TeamCard key={member.name} member={member} />
+                <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {group.members.map((member, i) => (
+                    <TeamCard key={member.name} member={member} index={i + 1} />
                   ))}
                 </div>
               </div>
             ))
           ) : (
-            <div className="kit-rise t-halftone relative overflow-hidden rounded-[6px] border-[3px] border-black p-10 text-center shadow-neo-lg md:p-16">
-              <Users className="mx-auto h-10 w-10 text-bone" strokeWidth={1.75} aria-hidden />
-              <p className="t-label mt-6 text-bone/85">Organising committee · {FEST.year}</p>
-              <h2 className="t-display t-cut mt-4 text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.9]">Revealing soon</h2>
-              <p className="mx-auto mt-6 max-w-xl rounded-[8px] bg-ink/70 px-5 py-3 text-bone/85">
-                The core team, coordinators and their contact lines are announced here closer to the fest. Until then,
-                the help desk is one message away.
-              </p>
-              <div className="mt-10 flex flex-wrap justify-center gap-4">
+            <>
+              <SectionHeading
+                kicker={`Organising committee · ${FEST.year}`}
+                title="Revealing"
+                accent="soon"
+                description="The core team, coordinators and their contact lines are announced here closer to the fest. Until then, the help desk is one message away."
+              />
+              <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+                {TEASERS.map((t, i) => (
+                  <div key={t.role} className={i === 1 ? "lg:mt-16" : undefined}>
+                    <PortraitCard name="Coming soon" role={t.role} initials="?" tone={t.tone} index={i + 1} />
+                  </div>
+                ))}
+              </div>
+              <div className="kit-rise mt-20 flex flex-wrap gap-4">
                 <ButtonLink href="/ask" variant="dark">
                   Ask a question
                 </ButtonLink>
@@ -52,7 +65,7 @@ export default function TeamPage() {
                   Become a campus ambassador
                 </ButtonLink>
               </div>
-            </div>
+            </>
           )}
         </div>
       </section>
