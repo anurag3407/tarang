@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { validateMutationRequest } from "@/lib/csrf";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
+import { getClientIp, hashIdentifier } from "@/lib/request-context";
 import { readJsonBody, requireIdempotencyKey } from "@/lib/route-utils";
 import { basePassCheckoutSchema } from "@/lib/validation/schemas";
 import { requireUser, getFeatureFlag, assertNotMaintenance } from "@/services/authz";
@@ -12,9 +13,9 @@ export const dynamic = "force-dynamic";
 /**
  * POST /api/checkout/base-pass (plan §12.3).
  *
- * Body carries only the pass product id — never amount/currency. The
- * Idempotency-Key header is generated once per user action and reused on
- * retries.
+ * Body carries the pass product id and an optional discount code — never
+ * amount/currency. The Idempotency-Key header is generated once per user
+ * action and reused on retries.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -42,11 +43,22 @@ export async function POST(req: NextRequest) {
       return apiError(req, "VALIDATION_FAILED", "Invalid checkout request");
     }
 
+    const discountCode = parsed.data.discountCode ?? null;
+    if (discountCode) {
+      // Same budget as the preview endpoint, so checkout is not a way around it.
+      await enforceRateLimit("discount", `user:${ctx.userId}`, { failClosed: true });
+      const ip = getClientIp(req);
+      if (ip) {
+        await enforceRateLimit("discount", `ip:${hashIdentifier(ip)}`, { failClosed: true });
+      }
+    }
+
     const result = await createBasePassCheckout(
       ctx.userId,
       ctx.festivalId,
       parsed.data.passProductId,
-      idempotencyKey
+      idempotencyKey,
+      discountCode
     );
     return apiSuccess(req, result, 201);
   } catch (err) {

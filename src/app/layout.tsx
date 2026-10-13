@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     template: "%s | Tarang ’26",
   },
   description:
-    "Tarang ’26 is the cultural festival of NIT Patna — five pronites, every kind of competition and five days on the banks of the Ganga. 17–21 September 2026.",
+    "Tarang ’26 is the cultural festival of NIT Patna — two pronites, every kind of competition and two days on the banks of the Ganga. 21–22 November 2026.",
   keywords: [
     "TARANG",
     "TARANG 2026",
@@ -99,7 +99,7 @@ export const metadata: Metadata = {
     siteName: "Tarang ’26 — NIT Patna",
     title: "Tarang ’26 — Mute the Mundane | NIT Patna",
     description:
-      "The cultural festival of NIT Patna — five pronites and five days of music, dance, theatre and competitions on the banks of the Ganga. 17–21 September 2026.",
+      "The cultural festival of NIT Patna — two pronites and two days of music, dance, theatre and competitions on the banks of the Ganga. 21–22 November 2026.",
     images: [
       {
         url: "/tarang/og.jpg",
@@ -112,7 +112,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Tarang ’26 — Mute the Mundane | NIT Patna",
-    description: "The cultural festival of NIT Patna. Five pronites, one pass. 17–21 September 2026.",
+    description: "The cultural festival of NIT Patna. Two pronites, one pass. 21–22 November 2026.",
     images: ["/tarang/og.jpg"],
   },
   verification: {

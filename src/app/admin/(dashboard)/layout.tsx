@@ -91,6 +91,7 @@ export default async function AdminLayout({
             <AdminLink href="/admin">Mission Control</AdminLink>
             <AdminLink href="/admin/events">Events</AdminLink>
             <AdminLink href="/admin/merchandise">Merchandise</AdminLink>
+            <AdminLink href="/admin/discounts">Discounts</AdminLink>
             <AdminLink href="/admin/schedule">Schedule</AdminLink>
             <AdminLink href="/admin/notices">Notices</AdminLink>
             <AdminLink href="/admin/sponsors">Sponsors</AdminLink>

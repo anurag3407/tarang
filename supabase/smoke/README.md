@@ -16,7 +16,7 @@ for f in supabase/migrations/*.sql; do psql -v ON_ERROR_STOP=1 -q -f "$f"; done
 psql -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
 
 # 3. run the suites in order
-for f in supabase/smoke/0[1-6]-*.sql; do
+for f in supabase/smoke/0[1-7]-*.sql; do
   psql -v ON_ERROR_STOP=1 -f "$f" || exit 1
 done
 ```
@@ -31,6 +31,9 @@ aborts the run (exit non-zero) via `\set ON_ERROR_STOP on`.
 - `05-export-lease-and-purge.sql` — export job leases, backoff, purge, privileges.
 - `06-pronite-launch.sql` — retired Basic Card is unsellable; Pronite Pass fulfillment enqueues
   email + QR + Sheets jobs; one ACTIVE QR credential per pass, reissue allowed.
+- `07-discount-codes.sql` — pass discount codes: server-computed discount, order total =
+  lines − discount, redemption caps under concurrency/cancel, invalid codes create no order,
+  ₹1 floor, client roles locked out of the codes table and functions.
 
 Suites 01 and 04 issue QR credentials that expire at the seeded pass `valid_until`
 (2026-09-22). Run after that date, their scans come back `expired`. Move the seeded

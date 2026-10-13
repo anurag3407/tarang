@@ -25,7 +25,8 @@ type LimitClass =
   | "public"
   | "poll"
   | "me"
-  | "auth";
+  | "auth"
+  | "discount";
 
 const LIMITS: Record<LimitClass, { limit: number; window: string }> = {
   login: { limit: 20, window: "15 m" },
@@ -40,6 +41,8 @@ const LIMITS: Record<LimitClass, { limit: number; window: string }> = {
   poll: { limit: 60, window: "1 m" },
   me: { limit: 120, window: "1 m" },
   auth: { limit: 120, window: "1 m" },
+  // Discount code attempts: low enough that guessing codes is impractical.
+  discount: { limit: 20, window: "10 m" },
 };
 
 const limiters = new Map<LimitClass, Ratelimit>();

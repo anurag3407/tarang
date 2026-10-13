@@ -37,6 +37,10 @@ export type CheckoutResult = {
   status: CheckoutState | "CONFIRMED";
   /** True when the catalog price changed since the browser last saw it. */
   priceChanged?: boolean;
+  /** Discount applied to this order (0 when none). */
+  discountPaise?: number;
+  /** The discount code applied, as stored on the order. */
+  discountCode?: string | null;
 };
 
 export type DelegatePassRead = {

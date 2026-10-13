@@ -37,9 +37,9 @@ export default async function SponsorsPage() {
       : [
           "TARANG 2026",
           "NIT PATNA",
-          "SEPTEMBER 17–21",
+          "NOVEMBER 21–22",
           "MUTE THE MUNDANE",
-          "FIVE PRONITES",
+          "TWO PRONITES",
         ];
 
   return (
@@ -131,7 +131,7 @@ export default async function SponsorsPage() {
                       </a>
                     )}
                     <div className="border-2 border-white/40 bg-zinc-900 px-4 py-2 text-xs font-black uppercase tracking-wider text-neo-secondary">
-                      5-Day Headline Partner · NIT Patna
+                      2-Day Headline Partner · NIT Patna
                     </div>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ export default async function SponsorsPage() {
                 <p className="t-label text-bone/85">Sponsorship desk</p>
                 <h3 className="t-display t-cut mt-4 text-[clamp(2.4rem,6vw,4.8rem)] leading-[0.9]">Partner with Tarang</h3>
                 <p className="mt-5 max-w-2xl rounded-[8px] bg-ink/70 px-5 py-3 text-base text-bone/85">
-                  Five days and five pronites at {FEST.college}, in front of students from colleges across the country.
+                  Two days and two pronites at {FEST.college}, in front of students from colleges across the country.
                   Title, category, stage and stall partnerships are open.
                 </p>
               </div>

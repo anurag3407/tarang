@@ -126,7 +126,7 @@ function Face({ count, edge }: { count: number; edge: "top" | "bottom" }) {
             ))}
           </div>
           <div className="mt-2 flex justify-between">
-            {["17", "18", "19", "20", "21", "SEP"].map((d) => (
+            {["21", "22", "NOV"].map((d) => (
               <span key={d} className="t-label text-[0.6rem] text-bone/60">
                 {d}
               </span>
@@ -143,7 +143,7 @@ function Face({ count, edge }: { count: number; edge: "top" | "bottom" }) {
         <p className="t-label max-w-[12rem] leading-relaxed text-bone/70">
           Loading the loud
           <br />
-          Sept 2026
+          Nov 2026
         </p>
         <p className="t-display t-cut text-[clamp(4.5rem,13vw,11rem)] leading-[0.8] tabular-nums">
           {String(count).padStart(3, "0")}

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight, QrCode } from "lucide-react";
+import { ChevronRight, QrCode, TicketPercent, X } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import PassTicket from "@/components/tarang/PassTicket";
 import { Reveal } from "@/components/tarang/Reveal";
@@ -40,6 +40,16 @@ interface CheckoutData {
   currency: string;
   expiresAt: string | null;
   status: string;
+  discountPaise?: number;
+  discountCode?: string | null;
+}
+
+/** Server quote from POST /api/checkout/discount-preview. Advisory only. */
+interface DiscountQuote {
+  code: string;
+  originalAmountPaise: number;
+  discountPaise: number;
+  finalAmountPaise: number;
 }
 
 declare global {
@@ -106,6 +116,11 @@ export default function PronitePassClient({
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Whether the provider has been seen to hold a payment for this order. */
   const paymentSeenRef = useRef(false);
+  const [discountOpen, setDiscountOpen] = useState(false);
+  const [discountInput, setDiscountInput] = useState("");
+  const [discount, setDiscount] = useState<DiscountQuote | null>(null);
+  const [discountBusy, setDiscountBusy] = useState(false);
+  const [discountError, setDiscountError] = useState("");
 
   // Pick up a pass bought in another tab.
   useEffect(() => {
@@ -192,6 +207,7 @@ export default function PronitePassClient({
             setPhase("error");
             setMessage("Order expired or cancelled. Please try again.");
             idempotencyKeyRef.current = newIdempotencyKey();
+            setCheckout(null);
             return;
           }
         }
@@ -294,13 +310,21 @@ export default function PronitePassClient({
       const res = await fetch("/api/checkout/base-pass", {
         method: "POST",
         headers: { "content-type": "application/json", "idempotency-key": idempotencyKeyRef.current },
-        body: JSON.stringify({ passProductId: product.id }),
+        body: JSON.stringify(
+          discount ? { passProductId: product.id, discountCode: discount.code } : { passProductId: product.id }
+        ),
       });
       const body = await res.json();
       if (!res.ok || !body.ok) {
         if (body.code === "PROFILE_INCOMPLETE") {
           router.push("/complete-profile");
           return;
+        }
+        if (body.code === "DISCOUNT_INVALID") {
+          // The code stopped working between quote and checkout (e.g. used up).
+          setDiscount(null);
+          setDiscountOpen(true);
+          setDiscountError(body.message ?? "This discount code can no longer be used");
         }
         throw new Error(body.message ?? "Checkout failed");
       }
@@ -328,9 +352,57 @@ export default function PronitePassClient({
       setPhase("error");
       setMessage(err instanceof Error ? err.message : "Checkout failed");
     }
-  }, [isLoggedIn, activePass, product, pollOrderStatus, openRazorpay, router]);
+  }, [isLoggedIn, activePass, product, discount, pollOrderStatus, openRazorpay, router]);
+
+  // The code is part of the order: once an order exists, changing it would
+  // need a new order, so it stays locked until that order is known dead.
+  const discountLocked = checkout !== null;
+
+  const applyDiscount = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!isLoggedIn) {
+        router.push("/login?next=/pronite-pass");
+        return;
+      }
+      const code = discountInput.trim().toUpperCase();
+      if (!product || !code || discountLocked) return;
+      setDiscountBusy(true);
+      setDiscountError("");
+      try {
+        const res = await fetch("/api/checkout/discount-preview", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ passProductId: product.id, code }),
+        });
+        const body = await res.json();
+        if (!res.ok || !body.ok) throw new Error(body.message ?? "Could not apply this code");
+        setDiscount(body.data as DiscountQuote);
+        idempotencyKeyRef.current = newIdempotencyKey();
+      } catch (err) {
+        setDiscount(null);
+        setDiscountError(err instanceof Error ? err.message : "Could not apply this code");
+      } finally {
+        setDiscountBusy(false);
+      }
+    },
+    [isLoggedIn, router, discountInput, product, discountLocked]
+  );
+
+  const removeDiscount = useCallback(() => {
+    if (discountLocked) return;
+    setDiscount(null);
+    setDiscountInput("");
+    setDiscountError("");
+    idempotencyKeyRef.current = newIdempotencyKey();
+  }, [discountLocked]);
 
   const price = product ? formatPaise(product.amountPaise) : "—";
+  // What the buyer pays: the server's order amount once an order exists,
+  // otherwise the quoted discount, otherwise the catalog price.
+  const payPaise = checkout?.amountPaise ?? discount?.finalAmountPaise ?? product?.amountPaise ?? null;
+  const payPrice = payPaise === null ? "—" : formatPaise(payPaise);
+  const discounted = product !== null && payPaise !== null && payPaise < product.amountPaise;
   const busy = phase === "creating" || phase === "paying" || phase === "verifying" || phase === "processing";
 
   return (
@@ -396,11 +468,75 @@ export default function PronitePassClient({
                 <p className="t-label text-bone/55">Pronite Pass</p>
                 <p className="t-display mt-2 text-3xl text-bone">All nights</p>
               </div>
-              <p className="t-display text-5xl text-signal">{price}</p>
+              <div className="text-right">
+                {discounted && <p className="t-label text-bone/45 line-through">{price}</p>}
+                <p className="t-display text-5xl text-signal">{payPrice}</p>
+              </div>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-bone/65">
               {FEST.dates} · {FEST.venueShort}
             </p>
+
+            {!activePass && product && phase !== "done" && phase !== "review" && (
+              <div className="mt-5">
+                {discount ? (
+                  <div className="flex items-center justify-between gap-3 rounded-[4px] border-2 border-emerald-400/60 bg-emerald-400/10 p-3 text-sm text-bone">
+                    <span className="flex items-center gap-2">
+                      <TicketPercent className="h-4 w-4 shrink-0" />
+                      <span>
+                        <span className="font-[family-name:var(--font-mono)]">{discount.code}</span> applied —{" "}
+                        {formatPaise(checkout?.discountPaise || discount.discountPaise)} off
+                      </span>
+                    </span>
+                    {!discountLocked && (
+                      <button
+                        type="button"
+                        onClick={removeDiscount}
+                        className="text-bone/60 hover:text-bone"
+                        aria-label="Remove discount code"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                ) : discountOpen && !discountLocked ? (
+                  <form onSubmit={applyDiscount} className="space-y-2">
+                    <label htmlFor="discount-code" className="t-label block text-bone/55">
+                      Discount code
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        id="discount-code"
+                        value={discountInput}
+                        onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                        maxLength={32}
+                        autoComplete="off"
+                        autoCapitalize="characters"
+                        spellCheck={false}
+                        placeholder="ENTER CODE"
+                        className="min-w-0 flex-1 rounded-[4px] border-2 border-bone/30 bg-ink px-3 py-2 font-[family-name:var(--font-mono)] text-sm uppercase tracking-wider text-bone placeholder:text-bone/30 focus:border-bone focus:outline-none"
+                      />
+                      <Button type="submit" variant="outline" className="px-4 py-2" disabled={discountBusy || !discountInput.trim()}>
+                        {discountBusy ? "Checking…" : "Apply"}
+                      </Button>
+                    </div>
+                    {discountError && (
+                      <p role="alert" className="text-xs text-signal">
+                        {discountError}
+                      </p>
+                    )}
+                  </form>
+                ) : !discountLocked ? (
+                  <button
+                    type="button"
+                    onClick={() => setDiscountOpen(true)}
+                    className="t-label flex items-center gap-2 text-bone/60 underline-offset-4 hover:text-bone hover:underline"
+                  >
+                    <TicketPercent className="h-4 w-4" /> Have a discount code?
+                  </button>
+                ) : null}
+              </div>
+            )}
 
             {checkout && phase !== "ready" && (
               <p className="t-label mt-4 text-bone/55">Order {checkout.publicOrderCode}</p>
@@ -460,7 +596,7 @@ export default function PronitePassClient({
                         ? "Verifying payment…"
                         : phase === "processing"
                           ? "Issuing your pass…"
-                          : `Get the Pronite Pass — ${price}`}
+                          : `Get the Pronite Pass — ${payPrice}`}
                 </Button>
               )}
             </div>

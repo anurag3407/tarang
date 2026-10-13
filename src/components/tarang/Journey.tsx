@@ -9,7 +9,7 @@ import { range, useScene } from "./motion";
 const STEPS = [
   {
     title: "Get your pass",
-    body: "One Pronite Pass: all five headline nights, campus access for the whole fest, and every competition.",
+    body: "One Pronite Pass: both headline nights, campus access for the whole fest, and every competition.",
     href: "#passes",
     cta: "Compare passes",
   },
@@ -27,7 +27,7 @@ const STEPS = [
   },
   {
     title: "Ride the wave",
-    body: "Five days on the floor, five nights on the main stage. Show your gate QR and you’re in.",
+    body: "Two days on the floor, two nights on the main stage. Show your gate QR and you’re in.",
     href: "/schedule",
     cta: "Full schedule",
   },

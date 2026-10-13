@@ -133,7 +133,7 @@ export default function Lineup({ artists }: { artists: LineupArtist[] }) {
             {/* Opening panel */}
             <div className="flex h-full w-[min(78vw,560px)] shrink-0 flex-col justify-center">
               <h2 id="lineup-title" className="t-display text-[clamp(3.6rem,9vw,8.5rem)] leading-[0.86]">
-                Five
+                Two
                 <br />
                 <span className="t-cut-red">nights.</span>
                 <br />

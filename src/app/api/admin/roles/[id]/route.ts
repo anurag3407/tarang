@@ -16,6 +16,7 @@ const PROTECTED_PERMISSIONS = new Set([
   "pass.revoke",
   "pass.reissue",
   "feature_flag.write",
+  "discount.manage",
 ]);
 
 const patchRoleSchema = z

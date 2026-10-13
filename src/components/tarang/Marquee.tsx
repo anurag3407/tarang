@@ -5,7 +5,7 @@ import { Ring } from "./Icons";
 import { scrollVelocity, useScene } from "./motion";
 
 const ARTS = ["Music", "Dance", "Theatre", "Literary", "Fine Arts", "Quizzing", "Fashion", "Pro Nights", "Informals"];
-const CHANT = ["Mute the mundane", "Sept 2026", "Five nights", "Turn it up"];
+const CHANT = ["Mute the mundane", "Nov 2026", "Two nights", "Turn it up"];
 
 function Row({ words, tone }: { words: string[]; tone: "red" | "cream" }) {
   return (
@@ -108,7 +108,7 @@ export default function Marquee() {
 
       {/* Studio slug lines in the free corners */}
       <p className="t-label absolute left-1/2 top-6 -translate-x-1/2 text-bone/55 md:top-10">(—) Eight arenas</p>
-      <p className="t-label absolute bottom-6 left-1/2 -translate-x-1/2 text-bone/55 md:bottom-10">Five nights · one wave</p>
+      <p className="t-label absolute bottom-6 left-1/2 -translate-x-1/2 text-bone/55 md:bottom-10">Two nights · one wave</p>
 
       {/* Tape A: top-left corner to bottom-right */}
       <div className={`${tape} bg-crimson`} style={{ transform: "translate(-50%, -50%) rotate(var(--tape-ang, 0.5rad))" }}>

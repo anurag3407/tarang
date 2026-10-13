@@ -178,3 +178,41 @@ WHERE p.provider_status = 'captured'
 -- Open capacity holds expiring soon
 SELECT * FROM capacity_holds WHERE expires_at BETWEEN now() AND now() + interval '15 minutes' ORDER BY expires_at;
 ```
+
+## Discount codes (passes only)
+
+Superadmins issue codes at `/admin/discounts` (permission `discount.manage`, which
+is protected: custom roles can never hold it). A code is a flat amount or a
+percentage, optionally scoped to one pass product, with optional validity window,
+total-use cap and per-person cap. The code and its value are immutable once
+issued; limits, validity and the active flag can change. A code that any order
+has referenced cannot be deleted — deactivate it.
+
+Flow:
+
+```
+POST /api/checkout/discount-preview  { passProductId, code }   → advisory quote
+POST /api/checkout/base-pass         { passProductId, discountCode }
+  └─ create_base_pass_checkout(..., p_discount_code)
+       └─ evaluate_pass_discount(..., p_lock => true)
+```
+
+- The browser never sends an amount. `evaluate_pass_discount` is the only place a
+  discount is computed, inside the checkout transaction.
+- `order_lines` keep the full price; `orders.amount_paise` is the amount charged and
+  `orders.discount_paise` the discount. The deferred total check enforces
+  `amount_paise + discount_paise = sum(line_amount_paise)`.
+- Redemptions are counted from live orders (`PROVISIONING_PROVIDER`,
+  `AWAITING_PAYMENT`, `FULFILLED`, `PAYMENT_REVIEW`). Cancelled/expired orders free
+  their slot automatically. Checkout locks the code row, so concurrent buyers
+  cannot exceed the cap.
+- A partial discount never leaves less than ₹1 (Razorpay's minimum). A 100%
+  discount makes the order free and it takes the zero-price path above.
+- The code is part of the idempotency request hash: retrying a key with a
+  different code is `IDEMPOTENCY_MISMATCH`.
+- Preview and code-bearing checkouts share the `discount` rate limit
+  (20 / 10 min per user and per IP, fail closed). Unknown, inactive, expired and
+  wrong-pass codes return the same `DISCOUNT_INVALID` message.
+- `discount_codes` has RLS on with no policies and no grants for `anon` /
+  `authenticated`; only the service role reads it, after the admin route has
+  checked `discount.manage`. Create/update/delete are written to `audit_logs`.

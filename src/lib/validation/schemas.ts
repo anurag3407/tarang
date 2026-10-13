@@ -59,9 +59,24 @@ export const idempotencyKeySchema = z
   .string()
   .uuid("Idempotency-Key must be a UUID");
 
+/** Discount code: 4–32 letters, digits, "-" or "_"; case-insensitive (stored upper-case). */
+export const discountCodeSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z0-9][A-Z0-9_-]{3,31}$/, "Discount codes are 4–32 letters, digits, - or _");
+
 export const basePassCheckoutSchema = z
   .object({
     passProductId: z.string().uuid(),
+    discountCode: discountCodeSchema.optional(),
+  })
+  .strict();
+
+export const discountPreviewSchema = z
+  .object({
+    passProductId: z.string().uuid(),
+    code: discountCodeSchema,
   })
   .strict();
 
@@ -312,3 +327,44 @@ export const merchandiseCheckoutSchema = z
   })
   .strict();
 
+
+export const discountCodeCreateSchema = z
+  .object({
+    code: discountCodeSchema,
+    description: z.string().trim().max(300).default(""),
+    discountType: z.enum(["FLAT", "PERCENT"]),
+    amountOffRupees: z.number().positive().max(1_000_000).multipleOf(0.01).nullable().default(null),
+    percentOff: z.number().int().min(1).max(100).nullable().default(null),
+    passProductId: z.string().uuid().nullable().default(null),
+    maxRedemptions: z.number().int().min(1).max(1_000_000).nullable().default(null),
+    perUserLimit: z.number().int().min(1).max(100).default(1),
+    validFrom: z.string().datetime({ offset: true }).nullable().default(null),
+    validUntil: z.string().datetime({ offset: true }).nullable().default(null),
+  })
+  .strict()
+  .refine(
+    (v) =>
+      v.discountType === "FLAT"
+        ? v.amountOffRupees !== null && v.percentOff === null
+        : v.percentOff !== null && v.amountOffRupees === null,
+    { message: "Give an amount for a flat discount, or a percentage for a percent discount" }
+  )
+  .refine((v) => !v.validFrom || !v.validUntil || Date.parse(v.validUntil) > Date.parse(v.validFrom), {
+    message: "Valid-until must be after valid-from",
+  });
+
+/**
+ * Discount code edits. The code and its value are immutable once issued —
+ * issue a new code instead — so orders and the audit trail stay unambiguous.
+ */
+export const discountCodeUpdateSchema = z
+  .object({
+    isActive: z.boolean().optional(),
+    description: z.string().trim().max(300).optional(),
+    maxRedemptions: z.number().int().min(1).max(1_000_000).nullable().optional(),
+    perUserLimit: z.number().int().min(1).max(100).optional(),
+    validFrom: z.string().datetime({ offset: true }).nullable().optional(),
+    validUntil: z.string().datetime({ offset: true }).nullable().optional(),
+    version: z.number().int().min(1),
+  })
+  .strict();

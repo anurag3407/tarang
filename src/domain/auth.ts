@@ -69,6 +69,7 @@ export const PERMISSION_CODES = [
   "pass.reissue",
   "audit.read",
   "feature_flag.write",
+  "discount.manage",
 ] as const;
 
 

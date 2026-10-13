@@ -20,6 +20,7 @@ const PROTECTED_PERMISSIONS = new Set([
   "pass.revoke",
   "pass.reissue",
   "feature_flag.write",
+  "discount.manage",
 ]);
 
 /** GET /api/admin/roles — roles with permission codes (plan §11.5). */

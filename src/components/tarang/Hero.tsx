@@ -151,7 +151,7 @@ export default function Hero() {
             <Wordmark letterClassName="will-change-transform" innerClassName="t-enter-letter" />
             <div data-meta>
               <p className="t-enter-wipe t-display t-cut mt-[2.4%] pl-[1.5%] text-[7cqw] leading-none" style={{ transitionDelay: "1120ms" }}>
-                Sept 2026
+                Nov 2026
               </p>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function Hero() {
               <p className="t-label text-right text-bone/70">
                 Ch. ’26
                 <br />
-                <span className="text-bone/45">17—21 · 09</span>
+                <span className="text-bone/45">21—22 · 11</span>
               </p>
             </div>
 
@@ -185,7 +185,7 @@ export default function Hero() {
 
             <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-6 md:inset-x-12 md:bottom-10">
               <p className="hidden max-w-[16rem] text-sm leading-relaxed text-bone/75 md:block">
-                The cultural festival of {FEST.college}. Five days to drown out the dull.
+                The cultural festival of {FEST.college}. Two days to drown out the dull.
               </p>
               <div className="mx-auto flex flex-col items-center gap-3 md:mx-0">
                 <span className="t-label flex items-center gap-2 text-bone/80">
@@ -196,9 +196,9 @@ export default function Hero() {
                 </span>
               </div>
               <p className="t-label hidden text-right text-bone/75 md:block">
-                Sept 2026
+                Nov 2026
                 <br />
-                <span className="text-bone/45">Five nights</span>
+                <span className="text-bone/45">Two nights</span>
               </p>
             </div>
           </div>

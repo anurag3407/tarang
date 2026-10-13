@@ -8,7 +8,7 @@ import { passProgress, range, useScene } from "./motion";
 const DEFINITIONS = [
   "A wave; a ripple travelling through water, air, or a crowd.",
   "A surge — of sound, of feeling, of ten thousand people finding the same beat.",
-  "Five days in September when the campus stops keeping time and starts keeping rhythm.",
+  "Two days in November when the campus stops keeping time and starts keeping rhythm.",
 ];
 
 const STATEMENT =

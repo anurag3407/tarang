@@ -18,7 +18,7 @@ export default function Passes({ price }: { price: string }) {
               One pass. <span className="t-cut-red">Every night.</span>
             </>
           }
-          aside="No tiers, no add-ons. The Pronite Pass gets you into all five pronites, around campus for the whole fest, and into every competition."
+          aside="No tiers, no add-ons. The Pronite Pass gets you into both pronites, around campus for the whole fest, and into every competition."
         />
 
         <Reveal variant="stamp" rotate={-1.5} className="mx-auto mt-20 max-w-6xl md:mt-28">

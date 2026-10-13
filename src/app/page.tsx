@@ -22,11 +22,8 @@ export const dynamic = "force-dynamic";
 
 /** Shown until headline nights are published from the admin panel. */
 const FALLBACK_NIGHTS: LineupArtist[] = [
-  { id: "n1", night: 1, name: "Opening Night", date: "17 Sep", time: "19:00", detail: "Orchestral & Fusion", image: null },
-  { id: "n2", night: 2, name: "Bollywood Night", date: "18 Sep", time: "19:00", detail: "Headliner revealing soon", image: null },
-  { id: "n3", night: 3, name: "Rock Night", date: "19 Sep", time: "19:00", detail: "Headliner revealing soon", image: null },
-  { id: "n4", night: 4, name: "EDM Night", date: "20 Sep", time: "19:00", detail: "Headliner revealing soon", image: null },
-  { id: "n5", night: 5, name: "Closing Night", date: "21 Sep", time: "19:00", detail: "Headliner revealing soon", image: null },
+  { id: "n1", night: 1, name: "Opening Night", date: "21 Nov", time: "19:00", detail: "Orchestral & Fusion", image: null },
+  { id: "n2", night: 2, name: "Closing Night", date: "22 Nov", time: "19:00", detail: "Headliner revealing soon", image: null },
 ];
 
 export default async function Home() {

@@ -23,6 +23,8 @@ function requestHash(body: unknown): string {
 
 function mapRpcError(err: { message?: string; code?: string } | null): never {
   const msg = err?.message ?? "";
+  const discountError = mapDiscountError(msg);
+  if (discountError) throw discountError;
   // Backstop for double registration from a second session: the partial
   // unique index one_live_event_claim_per_participant rejects the second
   // insert with SQLSTATE 23505 (true double-clicks are caught earlier by
@@ -61,6 +63,21 @@ function mapRpcError(err: { message?: string; code?: string } | null): never {
   if (msg.includes("FORBIDDEN") || err?.code === "42501")
     throw new AppError("FORBIDDEN", "You are not authorized to perform this checkout");
   throw new AppError("INTERNAL", "Checkout failed");
+}
+
+/**
+ * Discount failures share one API code. Unknown, inactive, expired and
+ * wrong-pass codes get the same message so the endpoint does not reveal which
+ * codes exist; the usage-limit messages only fire for a real, live code.
+ */
+function mapDiscountError(msg: string): AppError | null {
+  if (msg.includes("DISCOUNT_EXHAUSTED"))
+    return new AppError("DISCOUNT_INVALID", "This discount code has reached its usage limit");
+  if (msg.includes("DISCOUNT_ALREADY_USED"))
+    return new AppError("DISCOUNT_INVALID", "You have already used this discount code");
+  if (msg.includes("DISCOUNT_INVALID"))
+    return new AppError("DISCOUNT_INVALID", "This discount code is invalid or has expired");
+  return null;
 }
 
 async function provisionProviderOrder(
@@ -134,7 +151,9 @@ async function getOrderResult(localOrderId: string): Promise<CheckoutResult> {
   const sb = createServiceRoleClient();
   const { data: order, error } = await sb
     .from("orders")
-    .select("id, public_order_code, checkout_state, amount_paise, currency, hold_expires_at")
+    .select(
+      "id, public_order_code, checkout_state, amount_paise, currency, hold_expires_at, discount_paise, discount_code_snapshot"
+    )
     .eq("id", localOrderId)
     .single();
   if (error || !order) throw new AppError("NOT_FOUND", "Order not found");
@@ -155,17 +174,27 @@ async function getOrderResult(localOrderId: string): Promise<CheckoutResult> {
     currency: order.currency,
     expiresAt: order.hold_expires_at,
     status: order.checkout_state,
+    discountPaise: Number(order.discount_paise ?? 0),
+    discountCode: order.discount_code_snapshot ?? null,
   };
 }
 
+/**
+ * Base pass checkout. `discountCode` must already be normalized (trimmed,
+ * upper-case); the discount amount is computed in the checkout transaction,
+ * never taken from the browser.
+ */
 export async function createBasePassCheckout(
   userId: string,
   festivalId: string,
   passProductId: string,
-  idempotencyKey: string
+  idempotencyKey: string,
+  discountCode: string | null = null
 ): Promise<CheckoutResult> {
   const sb = createServiceRoleClient();
-  const hash = requestHash({ passProductId });
+  // The code is part of the request identity: retrying a key with a different
+  // code is an IDEMPOTENCY_MISMATCH, not a silent replay of the old price.
+  const hash = requestHash(discountCode ? { passProductId, discountCode } : { passProductId });
 
   // The Pronite Pass is the only pass on sale. The retired Basic Card is
   // unpublished in the DB too; this guards against it being re-opened by
@@ -186,6 +215,7 @@ export async function createBasePassCheckout(
     p_pass_product_id: passProductId,
     p_idempotency_key: idempotencyKey,
     p_request_hash: hash,
+    p_discount_code: discountCode,
   });
   if (error) mapRpcError(error);
 
@@ -210,6 +240,42 @@ export async function createBasePassCheckout(
   }
 
   return getOrderResult(orderId);
+}
+
+export interface DiscountQuote {
+  code: string;
+  originalAmountPaise: number;
+  discountPaise: number;
+  finalAmountPaise: number;
+}
+
+/** Read-only price quote for a pass with a discount code applied. */
+export async function previewPassDiscount(
+  userId: string,
+  festivalId: string,
+  passProductId: string,
+  discountCode: string
+): Promise<DiscountQuote> {
+  const sb = createServiceRoleClient();
+  const { data, error } = await sb.rpc("preview_pass_discount", {
+    p_user_id: userId,
+    p_festival_id: festivalId,
+    p_pass_product_id: passProductId,
+    p_code: discountCode,
+  });
+  if (error) mapRpcError(error);
+  const quote = data as {
+    code: string;
+    originalAmountPaise: number | string;
+    discountPaise: number | string;
+    finalAmountPaise: number | string;
+  };
+  return {
+    code: quote.code,
+    originalAmountPaise: Number(quote.originalAmountPaise),
+    discountPaise: Number(quote.discountPaise),
+    finalAmountPaise: Number(quote.finalAmountPaise),
+  };
 }
 
 export async function createEventCheckout(

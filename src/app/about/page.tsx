@@ -8,7 +8,7 @@ import { FEST } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "About Tarang & NIT Patna",
-  description: `TARANG is the cultural festival of ${FEST.collegeFull} — five pronites and five days of music, dance, theatre and competitions on the banks of the Ganga.`,
+  description: `TARANG is the cultural festival of ${FEST.collegeFull} — two pronites and two days of music, dance, theatre and competitions on the banks of the Ganga.`,
 };
 
 /** Institute milestones — from NIT Patna’s public record. */
@@ -21,8 +21,8 @@ const MILESTONES = [
 
 const PILLARS = [
   {
-    title: "Five pronites",
-    body: "Every evening ends on the main stage. One pass — the Pronite Pass — gets you into all five.",
+    title: "Two pronites",
+    body: "Every evening ends on the main stage. One pass — the Pronite Pass — gets you into both.",
   },
   {
     title: "Every stage",
@@ -30,7 +30,7 @@ const PILLARS = [
   },
   {
     title: "One campus",
-    body: "Ashok Rajpath, on the south bank of the Ganga. Five days where the timetable takes a back seat.",
+    body: "Ashok Rajpath, on the south bank of the Ganga. Two days where the timetable takes a back seat.",
   },
 ];
 
@@ -41,7 +41,7 @@ export default function AboutPage() {
         kicker="The festival & the institute"
         title="About"
         accent="Tarang"
-        description={`TARANG is the cultural festival of ${FEST.collegeFull}. ${FEST.tagline} Five days, five pronites, one wave.`}
+        description={`TARANG is the cultural festival of ${FEST.collegeFull}. ${FEST.tagline} Two days, two pronites, one wave.`}
       />
 
       {/* The word */}
@@ -58,7 +58,7 @@ export default function AboutPage() {
             <div className="kit-rise space-y-5 text-lg leading-relaxed text-bone/75">
               <p>
                 A <em>tarang</em> is a wave — a ripple that starts small and carries everyone with it. That is the idea
-                behind the festival: for five days, the routine goes quiet and the campus turns up the volume.
+                behind the festival: for two days, the routine goes quiet and the campus turns up the volume.
               </p>
               <p>
                 Competitions run through the day across eight arenas. Every evening, the main stage takes over for a
@@ -99,7 +99,7 @@ export default function AboutPage() {
                 </p>
                 <p>
                   Today it is an Institute of National Importance with departments across architecture, engineering,
-                  the sciences and the humanities — and every September, it is home to TARANG.
+                  the sciences and the humanities — and every November, it is home to TARANG.
                 </p>
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <Marquee items={["Mute the mundane", "NIT Patna", "Five pronites", "Sept 2026", "One wave"]} variant="accent" />
+      <Marquee items={["Mute the mundane", "NIT Patna", "Two pronites", "Nov 2026", "One wave"]} variant="accent" />
     </>
   );
 }

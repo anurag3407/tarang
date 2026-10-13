@@ -58,7 +58,7 @@ export default function Finale() {
           <Wordmark />
         </div>
         <p aria-hidden className="t-display mt-6 text-[clamp(1.4rem,3.4vw,2.6rem)] text-bone">
-          Unmute <span className="text-ink [-webkit-text-stroke:0.14em_var(--color-bone)] [paint-order:stroke_fill]">September.</span>
+          Unmute <span className="text-ink [-webkit-text-stroke:0.14em_var(--color-bone)] [paint-order:stroke_fill]">November.</span>
         </p>
 
         <div className="mt-12 flex flex-wrap justify-center gap-4">
