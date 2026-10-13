@@ -8,6 +8,7 @@ import {
 } from "./layout";
 import { formatPaise } from "@/lib/money";
 import type { TemplateName } from "@/domain/email";
+import { PronitePassTicket } from "./PronitePassTicket";
 
 /**
  * Transactional email templates (plan §13.3).
@@ -24,6 +25,11 @@ export interface TemplateData {
   publicPassCode?: string;
   productName?: string;
   qrDataUrl?: string;
+  /** Pronite Pass ticket artwork — `cid:` references when attached inline. */
+  ticketArtUrl?: string;
+  ticketPerfUrl?: string;
+  /** Hosted Noot for clients that load web fonts (Apple Mail, iOS). */
+  fontUrl?: string;
   publicRegistrationCode?: string;
   amountPaise?: number;
   currency?: string;
@@ -83,78 +89,25 @@ export function renderTemplate(
 ): { subject: string; element: ReactElement } {
   const d = data;
   switch (name) {
+    // The Pronite Pass (formerly the VIP Delegate pass) — sent as the ticket itself.
     case "delegate-pass-confirmation":
       return {
-        subject: `Your TARANG 2026 Pronite Pass & gate QR are confirmed (${d.publicPassCode ?? d.publicOrderCode ?? ""})`,
+        subject: `Your TARANG ’26 Pronite Pass is here (${d.publicPassCode ?? d.publicOrderCode ?? ""})`,
         element: (
-          <EmailLayout title="Pronite Pass Confirmed">
-            <StatusBanner text="Payment Confirmed — Pronite Pass Active" color={EMAIL_COLORS.secondary} />
-            <Spacer />
-            <p>Hi {d.displayName},</p>
-            <p>
-              Your <b>Pronite Pass</b> for TARANG 2026 is confirmed.
-              Below is your official Gate Entry QR Code. Present this QR at the campus gates for entry.
-            </p>
-            <Spacer height={8} />
-
-            {/* Embedded Gate QR Code */}
-            {d.qrDataUrl && (
-              <div
-                style={{
-                  textAlign: "center",
-                  margin: "16px 0",
-                  padding: "16px",
-                  backgroundColor: "#ffffff",
-                  border: `4px solid ${EMAIL_COLORS.black}`,
-                }}
-              >
-                <p style={{ margin: "0 0 8px 0", fontSize: 13, fontWeight: 900, textTransform: "uppercase" }}>
-                  ★ Official Gate Entry QR Card ★
-                </p>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={d.qrDataUrl}
-                  alt="Gate Entry QR Card"
-                  width={220}
-                  height={220}
-                  style={{
-                    display: "inline-block",
-                    border: `2px solid ${EMAIL_COLORS.black}`,
-                  }}
-                />
-                {d.publicPassCode && (
-                  <p
-                    style={{
-                      margin: "8px 0 0 0",
-                      fontFamily: "monospace",
-                      fontSize: 18,
-                      fontWeight: 900,
-                      letterSpacing: "2px",
-                    }}
-                  >
-                    {d.publicPassCode}
-                  </p>
-                )}
-                <p style={{ margin: "4px 0 0 0", fontSize: 11, fontWeight: "bold", color: "#555555" }}>
-                  Scan at Main Gate &amp; Pro-Show Arena
-                </p>
-              </div>
-            )}
-
-            {d.publicPassCode && <FactRow label="Card Code" value={d.publicPassCode} />}
-            {d.publicOrderCode && <FactRow label="Order" value={d.publicOrderCode} />}
-            {d.amountPaise !== undefined && (
-              <FactRow label="Amount" value={`${formatPaise(d.amountPaise)} ${d.currency ?? "INR"}`} />
-            )}
-            {d.providerReference && <FactRow label="Payment Ref" value={d.providerReference} />}
-            <Spacer />
-            <CtaButton href={d.dashboardUrl} label="View Card on Dashboard" />
-            <Spacer />
-            <p style={{ fontSize: 13, color: "#d32f2f", fontWeight: "bold" }}>
-              ⚠ Anyone with your QR can enter. Do not share or forward this code to others.
-            </p>
-            <Support supportEmail={d.supportEmail} />
-          </EmailLayout>
+          <PronitePassTicket
+            displayName={d.displayName}
+            publicPassCode={d.publicPassCode}
+            publicOrderCode={d.publicOrderCode}
+            amountPaise={d.amountPaise}
+            currency={d.currency}
+            providerReference={d.providerReference}
+            qrSrc={d.qrDataUrl}
+            artSrc={d.ticketArtUrl ?? `${d.dashboardUrl.replace(/\/dashboard$/, "")}/tarang/email/ticket-art.png`}
+            perfSrc={d.ticketPerfUrl ?? `${d.dashboardUrl.replace(/\/dashboard$/, "")}/tarang/email/ticket-perf.png`}
+            fontUrl={d.fontUrl}
+            dashboardUrl={d.dashboardUrl}
+            supportEmail={d.supportEmail}
+          />
         ),
       };
 

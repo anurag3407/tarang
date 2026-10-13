@@ -6,6 +6,7 @@ import { requireUser } from "@/services/authz";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { buildQrToken, issueQrCredential } from "@/services/qr-service";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,13 @@ export async function GET(
       return apiError(req, "CONFLICT", "This pass is not active — QR is unavailable");
     }
 
-    // TARANG sells a single Pronite Pass, so every active pass carries a gate QR.
+    // Gate QR is issued for the Pronite Pass only — a retired basic pass has none.
+    const prod = Array.isArray(pass.pass_products) ? pass.pass_products[0] : pass.pass_products;
+    // A pass with no product row predates the catalog (e.g. bulk issuance) and
+    // has always been treated as the delegate — now Pronite — pass.
+    if (prod != null && !isPronitePassProduct(prod)) {
+      return apiError(req, "FORBIDDEN", "Gate QR codes are issued for the Pronite Pass only.");
+    }
 
     // Ensure a credential exists (normally created by the ISSUE_QR worker;
     // this is a safe idempotent fallback for the dashboard).

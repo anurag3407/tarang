@@ -132,13 +132,13 @@ export async function loadPublicContent(): Promise<PublicContent> {
     sponsors: staticSponsors,
     passProducts: [
       {
-        id: "static-base-delegate-pass",
-        slug: "base-delegate-pass",
+        id: "static-vip-delegate-pass",
+        slug: "vip-delegate-pass",
         name: "Pronite Pass",
         description: "Every pronite, campus access and competition registration.",
-        isBasePass: true,
+        isBasePass: false,
         requiresBasePass: false,
-        amountPaise: 20000,
+        amountPaise: 200000,
         currency: "INR",
         salesState: "OPEN",
         validFrom: "2026-09-01T00:00:00+00:00",

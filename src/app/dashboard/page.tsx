@@ -4,6 +4,7 @@ import { QrCode } from "lucide-react";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { formatPaise } from "@/lib/money";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 import { formatDateTimeIST } from "@/lib/dates";
 import { getCurrentFestivalId, getPublishedPassProducts } from "@/repositories/public-content";
 import { ButtonLink } from "@/components/ui/Button";
@@ -97,10 +98,14 @@ export default async function DashboardPage() {
     });
   }
 
-  // One pass is on sale — the Pronite Pass (the base pass product).
-  const passProduct = products.find((p) => p.isBasePass) ?? products[0];
+  // One pass is on sale — the Pronite Pass (the former VIP Delegate product).
+  const passProduct = products.find(isPronitePassProduct);
   const passPrice = passProduct ? formatPaise(passProduct.amountPaise) : null;
-  const activePass = (passesRes.data ?? []).find((p) => p.state === "ACTIVE");
+  const activePass = (passesRes.data ?? []).find(
+    (p) =>
+      p.state === "ACTIVE" &&
+      isPronitePassProduct(Array.isArray(p.pass_products) ? p.pass_products[0] : p.pass_products)
+  );
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">

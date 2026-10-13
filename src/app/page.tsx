@@ -13,6 +13,7 @@ import SmoothScroll from "@/components/tarang/SmoothScroll";
 import { loadPublicContent } from "@/lib/content-loader";
 import { CATEGORIES } from "@/lib/data";
 import { formatPaise } from "@/lib/money";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 
 // DB-backed sections (events/passes/categories) are mutable content served
 // through unstable_cache; render dynamically so cache revalidation never
@@ -44,8 +45,8 @@ export default async function Home() {
       image: e.imageUrl,
     }));
 
-  // A single pass is on sale: the base pass product, sold as the Pronite Pass.
-  const pass = passProducts.find((p) => p.isBasePass) ?? passProducts[0];
+  // One pass on sale: the Pronite Pass (the former VIP Delegate product).
+  const pass = passProducts.find(isPronitePassProduct);
   const passPrice = pass ? formatPaise(pass.amountPaise) : "—";
 
   const counts = new Map<string, number>();

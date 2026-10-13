@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import { env } from "@/lib/env";
 import { getResend } from "@/lib/resend/client";
 import { issueQrCredential } from "@/services/qr-service";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 import { cancelRazorpayOrder } from "@/lib/razorpay/client";
 import { invalidateAvailability } from "@/lib/redis/availability";
 import { getCurrentFestivalId } from "@/repositories/public-content";
@@ -242,8 +243,15 @@ export async function enqueueOrderEmails(orderId: string, kind: string): Promise
       | null;
 
     const prodName = product?.name ?? p?.name ?? line?.description_snapshot ?? "Pronite Pass";
+    const prodSlug = product?.slug ?? p?.slug ?? "";
+    const isBase = product?.is_base_pass ?? p?.is_base_pass ?? false;
 
-    // TARANG sells a single Pronite Pass — every pass confirmation is sent.
+    // The confirmation email (with the gate QR) is for the Pronite Pass only.
+    if (!isPronitePassProduct({ slug: prodSlug, is_base_pass: isBase, name: prodName })) {
+      logger().info({ orderId, prodName, prodSlug, isBase }, "skipping confirmation email for retired basic pass");
+      return;
+    }
+
     if (pass) {
       publicPassCode = pass.public_pass_code;
       productName = prodName;
@@ -495,9 +503,25 @@ export async function runEmailDispatcher(opts: { batchSize?: number } = {}): Pro
       }
 
       const templateData = buildTemplateData(job);
-      // For email HTML rendering, reference the CID attachment for universal email client compatibility
+      // Inline (CID) images: data: URIs are stripped by Gmail and others, and
+      // CID images still show when a client blocks remote images.
+      const attachments: { content: Buffer; filename: string; contentType: string; contentId: string }[] = [];
       if (qrBuffer) {
+        attachments.push({ content: qrBuffer, filename: "gate-qr.png", contentType: "image/png", contentId: "gate-qr-code" });
         templateData.qrDataUrl = "cid:gate-qr-code";
+      }
+      if (job.template_name === "delegate-pass-confirmation") {
+        for (const [key, file] of [
+          ["ticket-art", "ticket-art.png"],
+          ["ticket-perf", "ticket-perf.png"],
+        ] as const) {
+          const content = await readTicketAsset(file);
+          // Without the file on disk the template falls back to the hosted copy.
+          if (!content) continue;
+          attachments.push({ content, filename: file, contentType: "image/png", contentId: key });
+          if (key === "ticket-art") templateData.ticketArtUrl = `cid:${key}`;
+          else templateData.ticketPerfUrl = `cid:${key}`;
+        }
       }
 
       const { subject, element } = renderTemplate(
@@ -507,21 +531,6 @@ export async function runEmailDispatcher(opts: { batchSize?: number } = {}): Pro
       const html = `<!DOCTYPE html>${renderEmailHtml(element)}`;
       const text = renderEmailText(html);
 
-      const attachments = qrBuffer
-        ? [
-            {
-              content: qrBuffer,
-              filename: "gate-qr-pass.png",
-              contentType: "image/png",
-              content_type: "image/png",
-              contentDisposition: "inline" as const,
-              contentId: "gate-qr-code",
-              content_id: "gate-qr-code",
-              cid: "gate-qr-code",
-            },
-          ]
-        : undefined;
-
       const result = await resend.emails.send(
         {
           from: e.EMAIL_FROM,
@@ -530,7 +539,7 @@ export async function runEmailDispatcher(opts: { batchSize?: number } = {}): Pro
           html,
           text,
           ...(e.EMAIL_REPLY_TO ? { reply_to: e.EMAIL_REPLY_TO } : {}),
-          ...(attachments ? { attachments } : {}),
+          ...(attachments.length > 0 ? { attachments } : {}),
         },
         { idempotencyKey: job.idempotency_key }
       );
@@ -672,6 +681,23 @@ function buildTemplateData(job: EmailJob): TemplateData {
     groupSize: data.groupSize,
     notes: data.notes,
     dashboardUrl,
+    fontUrl: `${base}/fonts/Noot-Regular.ttf`,
     supportEmail: e.EMAIL_REPLY_TO ?? e.EMAIL_FROM.replace(/^.*<|>.*$/g, ""),
   };
+}
+
+/** Pre-rendered ticket artwork (scripts/email-ticket/build.py), cached per process. */
+const ticketAssetCache = new Map<string, Buffer | null>();
+async function readTicketAsset(file: string): Promise<Buffer | null> {
+  if (ticketAssetCache.has(file)) return ticketAssetCache.get(file) ?? null;
+  let content: Buffer | null = null;
+  try {
+    const { readFile } = await import("node:fs/promises");
+    const { join } = await import("node:path");
+    content = await readFile(join(process.cwd(), "public", "tarang", "email", file));
+  } catch (err) {
+    logger().warn({ err: err instanceof Error ? err.message : String(err), file }, "ticket asset missing; using hosted copy");
+  }
+  ticketAssetCache.set(file, content);
+  return content;
 }

@@ -10,6 +10,7 @@ import PassTicket from "@/components/tarang/PassTicket";
 import { Reveal } from "@/components/tarang/Reveal";
 import { FEST } from "@/lib/data";
 import { formatPaise } from "@/lib/money";
+import { isPronitePassProduct } from "@/lib/pronite-pass";
 import { ensureRazorpayLoaded } from "@/lib/razorpay-loader";
 
 interface PassProduct {
@@ -77,6 +78,12 @@ const PERKS = [
   { title: "One QR", body: "Your gate QR lives in your dashboard — no paper, no queue." },
 ];
 
+/** Shape of a row from GET /api/me/passes. */
+type MyPass = ActivePassInfo & { productSlug?: string; isBasePass?: boolean };
+
+const isActivePronitePass = (p: MyPass) =>
+  p.state === "ACTIVE" && isPronitePassProduct({ slug: p.productSlug, isBasePass: p.isBasePass, name: p.productName });
+
 type Phase = "loading" | "ready" | "creating" | "paying" | "verifying" | "processing" | "done" | "review" | "error";
 
 /** The single TARANG pass: the ticket, what it gets you, and checkout. */
@@ -108,8 +115,8 @@ export default function PronitePassClient({
         const res = await fetch("/api/me/passes");
         if (!res.ok) return;
         const body = await res.json();
-        const passes = (body.data?.passes ?? []) as Array<ActivePassInfo>;
-        const active = passes.find((p) => p.state === "ACTIVE");
+        const passes = (body.data?.passes ?? []) as Array<MyPass>;
+        const active = passes.find(isActivePronitePass);
         if (active) setActivePass(active);
       } catch {
         // ignore
@@ -117,7 +124,7 @@ export default function PronitePassClient({
     })();
   }, [isLoggedIn, activePass]);
 
-  // Load the pass product. There is one pass on sale: the base pass product.
+  // Load the pass product: the Pronite Pass (the former VIP Delegate product).
   useEffect(() => {
     (async () => {
       try {
@@ -125,7 +132,7 @@ export default function PronitePassClient({
         const body = await res.json();
         if (!body.ok) throw new Error("Could not load the pass");
         const products = body.data.products as PassProduct[];
-        const pass = products.find((p) => p.isBasePass) ?? products[0];
+        const pass = products.find(isPronitePassProduct) ?? null;
         setProduct(pass ?? null);
         setPhase(pass ? "ready" : "error");
         if (!pass) setMessage("Pronite Pass sales are not open yet.");
@@ -158,7 +165,7 @@ export default function PronitePassClient({
           setMessage("Payment confirmed — your Pronite Pass is live.");
           const passRes = await fetch("/api/me/passes");
           const passBody = await passRes.json();
-          const p = (passBody.data?.passes as ActivePassInfo[] | undefined)?.find((x) => x.state === "ACTIVE");
+          const p = (passBody.data?.passes as MyPass[] | undefined)?.find(isActivePronitePass);
           if (p) setActivePass(p);
           return;
         }
