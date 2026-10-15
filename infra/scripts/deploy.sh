@@ -58,9 +58,14 @@ fi
 # code. Only files not yet recorded in supabase_migrations.schema_migrations
 # are applied. The old slot keeps serving meanwhile, so migrations must stay
 # backwards-compatible (expand first, contract in a later release).
-# SKIP_MIGRATIONS=1 is an operator escape hatch, never set by CI.
+has_db_url() {
+  grep -qE '^[[:space:]]*SUPABASE_DB_(SESSION|DIRECT)_URL=[^[:space:]]+' .env 2>/dev/null
+}
+
 if [ "${SKIP_MIGRATIONS:-0}" = "1" ]; then
   echo "==> Skipping database migrations (SKIP_MIGRATIONS=1)"
+elif ! has_db_url; then
+  echo "==> Skipping database migrations (no SUPABASE_DB_*_URL configured in .env)"
 else
   echo "==> Running database migrations"
   docker compose -f "$COMPOSE_FILE" --profile tools run --rm --no-deps migrate || {
