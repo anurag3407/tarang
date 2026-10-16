@@ -21,11 +21,15 @@ import { logger } from "@/lib/logger";
 
 type LimitClass =
   | "login"
+  | "loginIp"
   | "order"
   | "team"
   | "ask"
+  | "askIp"
   | "verify"
+  | "verifyIp"
   | "admin"
+  | "adminIp"
   | "export"
   | "scanner"
   | "public"
@@ -35,19 +39,32 @@ type LimitClass =
   | "discount"
   | "discountIp";
 
+/**
+ * Per-IP classes are deliberately much looser than their per-user/per-email
+ * twins. Campus Wi-Fi and mobile carrier NAT (Jio/Airtel CGNAT) put hundreds
+ * of students behind one public address, so an IP limit sized for one person
+ * locks out a whole college. The per-identity limit is the real control; the
+ * IP limit only caps a single machine flooding the endpoint.
+ */
 const LIMITS: Record<LimitClass, { limit: number; window: string }> = {
   login: { limit: 20, window: "15 m" },
+  loginIp: { limit: 1000, window: "15 m" },
   order: { limit: 30, window: "1 m" },
   team: { limit: 20, window: "10 m" },
   ask: { limit: 20, window: "1 h" },
+  askIp: { limit: 500, window: "1 h" },
   verify: { limit: 10, window: "1 m" },
+  verifyIp: { limit: 200, window: "1 m" },
   admin: { limit: 60, window: "1 m" },
+  adminIp: { limit: 1000, window: "1 m" },
   export: { limit: 3, window: "1 h" },
   scanner: { limit: 20, window: "1 s" },
-  public: { limit: 300, window: "1 m" },
+  // Content reads are served from cache; this only stops one source hammering.
+  public: { limit: 5000, window: "1 m" },
   poll: { limit: 60, window: "1 m" },
   me: { limit: 120, window: "1 m" },
-  auth: { limit: 120, window: "1 m" },
+  // Auth callback, keyed per IP only (the user is not known yet).
+  auth: { limit: 1000, window: "1 m" },
   // Discount code attempts per user: low enough that guessing codes is impractical.
   discount: { limit: 20, window: "10 m" },
   // Per IP: campus Wi-Fi and mobile carrier NAT put hundreds of buyers behind

@@ -46,6 +46,21 @@ refresh_token_reuse_interval = 10
 enable_signup = true
 enable_anonymous_sign_ins = false
 
+# GoTrue's own limits are per client IP, and the browser talks to Supabase
+# Auth directly. A whole college on campus Wi-Fi (or a carrier's CGNAT) is
+# one IP, so the stock values (~30 sign-ins / 5 min, ~150 token refreshes /
+# 5 min) lock students out at launch. The hosted project does not read this
+# file: set the same numbers in Dashboard → Authentication → Rate Limits (or
+# run `supabase config push`). Values are per 5 minutes per IP, except
+# email_sent, which is per hour and only applies with custom SMTP.
+[auth.rate_limit]
+email_sent = 1000
+sms_sent = 30
+anonymous_users = 30
+token_refresh = 5000
+sign_in_sign_ups = 1500
+token_verifications = 1500
+
 [auth.email]
 enable_signup = true
 double_confirm_changes = true

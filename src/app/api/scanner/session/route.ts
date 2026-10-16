@@ -25,9 +25,11 @@ export async function GET(req: NextRequest) {
     if (!deviceCredential) {
       return apiError(req, "UNAUTHORIZED", "Device credential required");
     }
+    // Keyed per operator too: every volunteer on the shared web-scanner
+    // credential would otherwise draw from one bucket at a gate rush.
     await enforceRateLimit(
       "scanner",
-      `session-hash:${deviceCredentialHash(deviceCredential)}`,
+      `session-hash:${deviceCredentialHash(deviceCredential)}:op:${ctx.userId}`,
       { failClosed: true }
     );
     const sb = createServiceRoleClient();

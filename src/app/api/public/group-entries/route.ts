@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       failClosed: true,
     });
     if (ip) {
-      await enforceRateLimit("ask", `ip:${hashIdentifier(ip)}`, { failClosed: true });
+      await enforceRateLimit("askIp", `ip:${hashIdentifier(ip)}`, { failClosed: true });
     }
 
     const turnstileOk = await verifyTurnstile(input.turnstileToken, ip);

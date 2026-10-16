@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     const ip = getClientIp(req);
     if (ip) {
-      await enforceRateLimit("verify", `ip:${hashIdentifier(ip)}`, {
+      await enforceRateLimit("verifyIp", `ip:${hashIdentifier(ip)}`, {
         failClosed: false,
       });
     }

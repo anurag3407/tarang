@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = getClientIp(req);
-    await enforceRateLimit("login", `ip:${hashIdentifier(ip ?? "unknown")}`);
+    await enforceRateLimit("loginIp", `ip:${hashIdentifier(ip ?? "unknown")}`);
     if (parsed.data.email) {
       await enforceRateLimit("login", `email:${hashIdentifier(parsed.data.email)}`);
     }

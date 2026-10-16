@@ -37,6 +37,22 @@ describe("rate limiting when Redis is unavailable (plan §10.4)", () => {
     });
   });
 
+  it("a whole campus behind one IP is not capped at one person's budget", async () => {
+    // 200 different students signing in from the same college Wi-Fi.
+    for (let i = 0; i < 200; i++) {
+      await enforceRateLimit("loginIp", "ip:college", { failClosed: true });
+      await enforceRateLimit("askIp", "ip:college", { failClosed: true });
+      await enforceRateLimit("verifyIp", "ip:college", { failClosed: true });
+    }
+    // …while one email address is still held to the strict per-identity limit.
+    for (let i = 0; i < 20; i++) {
+      await enforceRateLimit("login", "email:one", { failClosed: true });
+    }
+    await expect(enforceRateLimit("login", "email:one", { failClosed: true })).rejects.toMatchObject({
+      code: "RATE_LIMITED",
+    });
+  });
+
   it("public reads FAIL OPEN (allow) so the site keeps serving", async () => {
     const res = await checkRateLimit("public", "ip:x");
     expect(res.success).toBe(true);

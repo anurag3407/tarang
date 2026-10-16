@@ -38,7 +38,7 @@ export async function guardAdminMutation(
   await enforceRateLimit("admin", `user:${ctx.userId}`, { failClosed: true });
   const ip = getClientIp(req);
   if (ip) {
-    await enforceRateLimit("admin", `ip:${hashIdentifier(ip)}`, {
+    await enforceRateLimit("adminIp", `ip:${hashIdentifier(ip)}`, {
       failClosed: true,
     });
   }

@@ -68,7 +68,7 @@ describe("POST /api/public/questions (ask form, plan §11.9)", () => {
     // Both fail-closed limit keys were checked: email hash and ip.
     const keys = rateLimiter.calls.map((c) => c.identifier.split(":")[0]);
     expect(keys).toEqual(["email", "ip"]);
-    expect(rateLimiter.calls.every((c) => c.cls === "ask")).toBe(true);
+    expect(rateLimiter.calls.every((c) => c.cls === "ask" || c.cls === "askIp")).toBe(true);
   });
 
   it("normalizes the email to lowercase and drops an empty college", async () => {

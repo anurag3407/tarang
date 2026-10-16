@@ -212,3 +212,30 @@ SELECT email, reason, created_at FROM email_suppressions;
    job re-run); fear duplicate side effects only if code broke that promise.
 5. **Env vars at point-of-use, fail closed** — missing key = feature off (503/401), not crash.
    First suspect in any "works locally" situation: production env var.
+
+## "Too many requests" on campus Wi-Fi / mobile data
+
+A whole college on one Wi-Fi network — or thousands of phones behind a carrier's CGNAT
+(Jio, Airtel) — reaches us from **one public IP**. Anything limited per IP is shared by
+all of them.
+
+**In the app** (`src/lib/redis/rate-limits.ts`), every per-IP class (`loginIp`, `askIp`,
+`verifyIp`, `adminIp`, `discountIp`, `auth`, `public`) is sized for a crowd; the strict
+limits are per user / per email (`login`, `ask`, `verify`, `discount`, `order`). Scanner
+limits are per operator, so volunteers sharing the web-scanner credential do not share a
+bucket. If Redis is down or over quota, critical writes fall back to an in-process limiter
+(log line: `rate limiter: Redis unavailable, using in-process fallback`) instead of
+blocking sales.
+
+**Outside the app — set these before ticket launch:**
+
+1. **Supabase → Authentication → Rate Limits.** GoTrue limits per IP and the browser
+   calls it directly. Match `supabase/config.toml` `[auth.rate_limit]`: sign-ins/sign-ups
+   1500, token refreshes 5000, token verifications 1500 (per 5 min).
+2. **Supabase → Authentication → SMTP.** The built-in mailer sends only a few auth emails
+   per hour for the whole project; sign-up confirmations and password resets stall at
+   launch without custom SMTP (use the SES/Resend credentials already configured).
+3. **Cloudflare.** Check that no WAF rate-limiting rule, Bot Fight Mode or
+   "Under Attack" mode keys on IP for `/api/*`, `/login`, `/auth/*` or `/pronite-pass`.
+4. **Upstash.** Confirm the plan's request quota covers launch-day traffic; when it runs
+   out every limiter call errors (see the fallback above).

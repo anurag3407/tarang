@@ -41,7 +41,9 @@ export async function POST(req: NextRequest) {
 
     // Rate limit before the device lookup so unknown/revoked credentials
     // cannot be enumerated at full speed (plan §14.5.2).
-    await enforceRateLimit("scanner", `device-hash:${deviceCredentialHash(deviceCredential)}`, {
+    // Keyed per operator too: every volunteer on the shared web-scanner
+    // credential would otherwise draw from one bucket at a gate rush.
+    await enforceRateLimit("scanner", `device-hash:${deviceCredentialHash(deviceCredential)}:op:${ctx.userId}`, {
       failClosed: true,
     });
 
