@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       await enforceRateLimit("discount", `user:${ctx.userId}`, { failClosed: true });
       const ip = getClientIp(req);
       if (ip) {
-        await enforceRateLimit("discount", `ip:${hashIdentifier(ip)}`, { failClosed: true });
+        await enforceRateLimit("discountIp", `ip:${hashIdentifier(ip)}`, { failClosed: true });
       }
     }
 

@@ -193,8 +193,8 @@ export function MerchandiseCheckoutModal({
           router.push("/complete-profile");
           return;
         }
-        if (created.code === "RATE_LIMITED" || created.code === "RATE_LIMIT_UNAVAILABLE") {
-          throw new Error("High traffic detected. Please wait a few seconds before trying again.");
+        if (created.code === "RATE_LIMITED") {
+          throw new Error("Too many checkout attempts. Please wait a minute before trying again.");
         }
         throw new Error(created.message || "Failed to initiate checkout");
       }
