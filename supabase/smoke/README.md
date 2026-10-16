@@ -40,6 +40,8 @@ aborts the run (exit non-zero) via `\set ON_ERROR_STOP on`.
 - `08-refund-order.sql` — admin refunds: only paid orders are refundable, passes/QR revoked,
   event capacity and the participant claim released, payment marked, acting admin audited,
   idempotent; money/scan RPCs unreachable from client roles; gate lookup matches whole codes only.
+- `09-checkout-replay.sql` — retrying a checkout key whose order expired/was cancelled returns that
+  order (no duplicate-key 409); a fresh key opens a new pass/event order.
 
 CI runs all of this in the `db-check` job (`.github/workflows/ci.yml`), which gates the image
 build. `bootstrap.sql` mirrors hosted Supabase's default grants to `anon`/`authenticated`, so

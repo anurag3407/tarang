@@ -7,7 +7,7 @@ import type { CheckoutResult } from "@/domain/checkout";
  * The idempotency key lives in the caller's ref and is reused on every retry,
  * so a second click resumes the same order instead of opening a new one. The
  * key is renewed only when the replayed order is known dead (EXPIRED /
- * CANCELLED), and a replayed order still waiting for its Razorpay order is
+ * CANCELLED / REFUNDED), and a replayed order still waiting for its Razorpay order is
  * retried a few times — the server re-attempts provisioning on replay.
  *
  * A Razorpay modal must never be opened without an order id: Razorpay would
@@ -18,7 +18,7 @@ export type CheckoutResponse =
   | { ok: true; data: CheckoutResult }
   | { ok: false; code: string; message: string };
 
-const DEAD_STATES = new Set(["EXPIRED", "CANCELLED"]);
+const DEAD_STATES = new Set(["EXPIRED", "CANCELLED", "REFUNDED"]);
 const MAX_ATTEMPTS = 4;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -25,11 +25,9 @@ function mapRpcError(err: { message?: string; code?: string } | null): never {
   const msg = err?.message ?? "";
   const discountError = mapDiscountError(msg);
   if (discountError) throw discountError;
-  // Backstop for double registration from a second session: the partial
-  // unique index one_live_event_claim_per_participant rejects the second
-  // insert with SQLSTATE 23505 (true double-clicks are caught earlier by
-  // idempotency keys).
-  if (msg.includes("one_live_event_claim_per_participant") || err?.code === "23505")
+  // Double registration from a second session: the partial unique index
+  // one_live_event_claim_per_participant rejects the second insert.
+  if (msg.includes("one_live_event_claim_per_participant"))
     throw new AppError("ALREADY_REGISTERED", "You are already registered for this event");
   if (msg.includes("PROFILE_INCOMPLETE"))
     throw new AppError("PROFILE_INCOMPLETE", "Complete your profile before purchasing");
@@ -59,6 +57,10 @@ function mapRpcError(err: { message?: string; code?: string } | null): never {
     throw new AppError("REGISTRATION_WINDOW_CLOSED", "The registration window is closed");
   if (msg.includes("IDEMPOTENCY_MISMATCH"))
     throw new AppError("IDEMPOTENCY_MISMATCH", "Idempotency key reused with a different request");
+  // Remaining unique violations (BASE_PASS_EXISTS shares SQLSTATE 23505, so
+  // the named checks above must run first).
+  if (err?.code === "23505")
+    throw new AppError("CONFLICT", "This purchase already exists — refresh the page to see it");
   if (msg.includes("NOT_FOUND")) throw new AppError("NOT_FOUND", "Not found");
   if (msg.includes("FORBIDDEN") || err?.code === "42501")
     throw new AppError("FORBIDDEN", "You are not authorized to perform this checkout");

@@ -151,6 +151,24 @@ describe("createBasePassCheckout (plan §9.2, §12.3)", () => {
     ).rejects.toMatchObject({ code: "BASE_PASS_EXISTS" });
   });
 
+  it("reports an existing pass as BASE_PASS_EXISTS, not as an event registration", async () => {
+    // The SQL raises BASE_PASS_EXISTS with SQLSTATE 23505.
+    sb.onRpc("create_base_pass_checkout", { data: null, error: { message: "BASE_PASS_EXISTS", code: "23505" } });
+    await expect(
+      createBasePassCheckout(USER_ID, FEST_ID, PRODUCT_ID, newIdempotencyKey())
+    ).rejects.toMatchObject({ code: "BASE_PASS_EXISTS" });
+  });
+
+  it("still maps the one-claim-per-participant index to ALREADY_REGISTERED", async () => {
+    sb.onRpc("create_event_checkout", {
+      data: null,
+      error: { message: 'duplicate key value violates unique constraint "one_live_event_claim_per_participant"', code: "23505" },
+    });
+    await expect(
+      createEventCheckout(USER_ID, FEST_ID, EVENT_ID, "INDIVIDUAL", null, newIdempotencyKey())
+    ).rejects.toMatchObject({ code: "ALREADY_REGISTERED" });
+  });
+
   it("releases the local hold when the provider definitively rejects the order (4xx)", async () => {
     sb.onRpc("create_base_pass_checkout", ok({ orderId: ORDER_ID, replayed: false }));
     sb.onTable("orders", ok({ amount_paise: "20000", currency: "INR" }));
