@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation } from "@/lib/admin-route";
+import { logger } from "@/lib/logger";
+import { readJsonBody } from "@/lib/route-utils";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { getCurrentFestivalId } from "@/repositories/public-content";
 import { issueQrCredential, generatePassQrDataUrl } from "@/services/qr-service";
@@ -46,9 +48,10 @@ export interface BulkImportRowResult {
 
 export async function POST(req: NextRequest) {
   try {
-    await guardAdminMutation(req, "admin.access");
+    // 256 KiB mirrors the nginx cap; 500 rows of name/email/phone/college fit.
+    await guardAdminMutation(req, "pass.reissue", { maxBodyBytes: 256 * 1024 });
 
-    const body = await req.json();
+    const body = await readJsonBody<Record<string, unknown>>(req, 256 * 1024);
     const parsed = BulkImportSchema.safeParse(body);
     if (!parsed.success) {
       return apiError(req, "VALIDATION_FAILED", "Invalid bulk import payload", {
@@ -179,8 +182,8 @@ export async function POST(req: NextRequest) {
           userCreated = true;
         }
 
-        // Normalize phone to E.164 format or valid fallback
-        let phoneE164 = phone;
+        // Normalize phone to E.164 format when one was supplied.
+        let phoneE164: string | null = null;
         if (phone) {
           const digits = phone.replace(/\D/g, "");
           if (digits.length === 10) {
@@ -190,27 +193,37 @@ export async function POST(req: NextRequest) {
           } else if (digits.length > 10) {
             phoneE164 = `+${digits}`;
           }
-        } else {
-          phoneE164 = "+910000000000";
         }
 
-        // 2. Upsert profile — must set phone_e164 and profile_completed_at
-        //    so the orders BEFORE INSERT trigger (enforce_profile_complete_for_order)
-        //    does not block admin-issued ₹0 orders or future purchases by this user.
+        // 2. Profile. The orders BEFORE INSERT trigger
+        //    (enforce_profile_complete_for_order) needs phone_e164 and
+        //    profile_completed_at, so fill whatever is missing — but never
+        //    overwrite what an existing user already entered themselves.
         const now = new Date().toISOString();
-        await sb.from("profiles").upsert(
+        const { data: existingProfile, error: profileReadErr } = await sb
+          .from("profiles")
+          .select("user_id, display_name, phone_e164, college_name, profile_completed_at, consented_at")
+          .eq("user_id", userId)
+          .maybeSingle();
+        if (profileReadErr) {
+          throw new Error(`Profile lookup failed: ${profileReadErr.message}`);
+        }
+        const { error: profileErr } = await sb.from("profiles").upsert(
           {
             user_id: userId,
-            display_name: name,
-            phone_e164: phoneE164,
-            college_name: college || null,
+            display_name: existingProfile?.display_name || name,
+            phone_e164: existingProfile?.phone_e164 || phoneE164 || "+910000000000",
+            college_name: existingProfile?.college_name || college || null,
             consent_version: "v1",
-            consented_at: now,
-            profile_completed_at: now,
+            consented_at: existingProfile?.consented_at || now,
+            profile_completed_at: existingProfile?.profile_completed_at || now,
             updated_at: now,
           },
           { onConflict: "user_id", ignoreDuplicates: false }
         );
+        if (profileErr) {
+          throw new Error(`Profile update failed: ${profileErr.message}`);
+        }
 
         let passCode: string | undefined;
         let registrationCode: string | undefined;
@@ -313,8 +326,8 @@ export async function POST(req: NextRequest) {
             try {
               const qrRes = await generatePassQrDataUrl(passId);
               qrDataUrl = qrRes.dataUrl;
-            } catch (err) {
-              // Log warning if QR image generation fails, but proceed
+            } catch {
+              // The email goes out without an inline QR; the pass page still has it.
             }
           }
 
@@ -452,7 +465,10 @@ export async function POST(req: NextRequest) {
             });
             if (memberErr) {
               // Non-fatal: registration already created, just log
-              console.warn(`Failed to add registration member for ${email}: ${memberErr.message}`);
+              logger().warn(
+                { err: memberErr.message, registrationId: regId },
+                "bulk import: registration member insert failed"
+              );
             }
           }
 
@@ -526,13 +542,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // If emails were queued, trigger dispatcher in background
+    // Kick the email dispatcher without holding the response open; the
+    // worker loop picks up anything this pass does not send.
     if (sendEmail) {
-      try {
-        await runEmailDispatcher({ batchSize: users.length * 2 });
-      } catch (dispErr) {
-        // Dispatcher will retry via cron/worker
-      }
+      void runEmailDispatcher({ batchSize: users.length * 2 }).catch((dispErr) => {
+        logger().warn(
+          { err: dispErr instanceof Error ? dispErr.message : String(dispErr) },
+          "bulk import: email dispatch deferred to worker"
+        );
+      });
     }
 
     const successful = results.filter((r) => r.success).length;

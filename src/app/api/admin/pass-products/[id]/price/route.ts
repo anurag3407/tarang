@@ -3,7 +3,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation } from "@/lib/admin-route";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { rupeesToPaise } from "@/lib/money";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { passPriceSchema } from "@/lib/validation/schemas";
 import { invalidateContentCache } from "@/lib/invalidation";
 
@@ -18,7 +18,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const id = requireUuid((await params).id, "Pass product");
     const auth = await guardAdminMutation(req, "content.event.price.write");
     const body = await readJsonBody<Record<string, unknown>>(req);
     const parsed = passPriceSchema.safeParse(body);

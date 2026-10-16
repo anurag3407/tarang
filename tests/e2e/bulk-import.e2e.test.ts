@@ -62,7 +62,7 @@ describe("POST /api/admin/bulk-import", () => {
     expectErrEnvelope(await json(res), "UNAUTHORIZED");
   });
 
-  it("403s when actor lacks admin.access permission", async () => {
+  it("403s when actor lacks pass.reissue permission", async () => {
     userSb.onRpc("has_permission", { data: false, error: null });
     const res = await bulkImportRoute(
       post("/api/admin/bulk-import", {
@@ -320,4 +320,51 @@ describe("POST /api/admin/fetch-sheet", () => {
     expect(res.status).toBe(422);
     expectErrEnvelope(await json(res), "VALIDATION_FAILED");
   });
+
+  it("never overwrites an existing user's own profile details", async () => {
+    userSb.onRpc("has_permission", { data: true, error: null });
+    sb.onTable("pass_products", {
+      data: {
+        id: PRODUCT_ID,
+        name: "VIP All-Access Delegate Pass",
+        slug: "vip-delegate-pass",
+        valid_until: "2026-09-30T00:00:00Z",
+        current_price_version_id: "pv-1",
+        is_base_pass: false,
+      },
+      error: null,
+    });
+    sb.onRpc("resolve_user_id_by_email", { data: USER_ID, error: null });
+    sb.onTable("profiles", {
+      data: {
+        user_id: USER_ID,
+        display_name: "Real Name",
+        phone_e164: "+919811111111",
+        college_name: "Real College",
+        profile_completed_at: "2026-08-01T00:00:00Z",
+        consented_at: "2026-08-01T00:00:00Z",
+      },
+      error: null,
+    });
+    sb.onTable("profiles", { data: null, error: null });
+    sb.onTable("delegate_passes", { data: { id: "pass-1", public_pass_code: "PP-1", state: "ACTIVE" }, error: null });
+
+    const res = await bulkImportRoute(
+      post("/api/admin/bulk-import", {
+        body: {
+          issuanceType: "PASS",
+          users: [{ name: "Sheet Name", email: "real@example.com" }],
+        },
+      })
+    );
+    expectOkEnvelope(await json(res));
+    const upsert = sb.callsFor("profiles").find((c) => c.action === "upsert");
+    expect(upsert?.payload).toMatchObject({
+      display_name: "Real Name",
+      phone_e164: "+919811111111",
+      college_name: "Real College",
+      profile_completed_at: "2026-08-01T00:00:00Z",
+    });
+  });
 });
+

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetWorld, sb } from "./e2e/helpers/mocks";
-import { post, json, expectOkEnvelope } from "./e2e/helpers/requests";
+import { post, json, expectOkEnvelope, expectErrEnvelope } from "./e2e/helpers/requests";
 
 vi.mock("@/lib/supabase/service-role", async () => {
   const m = await import("./e2e/helpers/mocks");
@@ -169,5 +169,36 @@ describe("POST /api/public/verify — Pass Authenticity & Verification", () => {
     expect(body.data.isReal).toBe(true);
     expect(body.data.valid).toBe(true);
     expect(body.data.passCode).toBe("PP-ABC123DEF456");
+  });
+
+  it("never labels a code counterfeit when the lookup itself fails", async () => {
+    sb.onTable("delegate_passes", { data: null, error: { message: "connection terminated" } });
+    const res = await verifyRoute(post("/api/public/verify", { body: { code: PASS_CODE } }));
+    expect(res.status).toBe(502);
+    expectErrEnvelope(await json(res), "UPSTREAM_ERROR");
+  });
+
+  it("names an event registration by the event's name column", async () => {
+    sb.onTable("delegate_passes", { data: [], error: null });
+    sb.onTable("registrations", {
+      data: [
+        {
+          id: "reg-1",
+          public_registration_code: "PR-ABC123",
+          state: "CONFIRMED",
+          confirmed_at: "2026-09-01T10:00:00.000Z",
+          created_at: "2026-09-01T10:00:00.000Z",
+          owner_user_id: null,
+          team_name: null,
+          events: { id: "ev-1", name: "Battle of Bands", starts_at: null, ends_at: null },
+        },
+      ],
+      error: null,
+    });
+    const res = await verifyRoute(post("/api/public/verify", { body: { code: "PR-ABC123" } }));
+    const body = await json(res);
+    expectOkEnvelope(body);
+    expect(body.data.isReal).toBe(true);
+    expect(body.data.productName).toBe("Battle of Bands");
   });
 });

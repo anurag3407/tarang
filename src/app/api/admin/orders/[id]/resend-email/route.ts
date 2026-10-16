@@ -4,6 +4,7 @@ import { guardAdminMutation } from "@/lib/admin-route";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { emailProvider, EMAIL_PROVIDER_LABEL } from "@/lib/env";
 import { enqueueOrderEmails, runEmailDispatcher } from "@/workers/outbox-dispatcher";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ export async function POST(
 ) {
   try {
     await guardAdminMutation(req, "admin.access");
-    const { id: orderId } = await ctx.params;
+    const orderId = requireUuid((await ctx.params).id, "Order");
 
     const sb = createServiceRoleClient();
     const { data: order } = await sb

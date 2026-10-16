@@ -15,8 +15,11 @@ psql -v ON_ERROR_STOP=1 -f supabase/smoke/bootstrap.sql
 for f in supabase/migrations/*.sql; do psql -v ON_ERROR_STOP=1 -q -f "$f"; done
 psql -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
 
-# 3. run the suites in order
-for f in supabase/smoke/0[1-7]-*.sql; do
+# 3. cross-check the app's queries/RPC calls against the migrated schema
+DATABASE_URL=postgres://… pnpm db:check-refs
+
+# 4. run the suites in order
+for f in supabase/smoke/0[1-9]-*.sql; do
   psql -v ON_ERROR_STOP=1 -f "$f" || exit 1
 done
 ```
@@ -34,7 +37,13 @@ aborts the run (exit non-zero) via `\set ON_ERROR_STOP on`.
 - `07-discount-codes.sql` — pass discount codes: server-computed discount, order total =
   lines − discount, redemption caps under concurrency/cancel, invalid codes create no order,
   ₹1 floor, client roles locked out of the codes table and functions.
+- `08-refund-order.sql` — admin refunds: only paid orders are refundable, passes/QR revoked,
+  event capacity and the participant claim released, payment marked, acting admin audited,
+  idempotent; money/scan RPCs unreachable from client roles; gate lookup matches whole codes only.
 
-Suites 01 and 04 issue QR credentials that expire at the seeded pass `valid_until`
-(2026-09-22). Run after that date, their scans come back `expired`. Move the seeded
-festival and pass dates into the future first (06 does this for itself).
+CI runs all of this in the `db-check` job (`.github/workflows/ci.yml`), which gates the image
+build. `bootstrap.sql` mirrors hosted Supabase's default grants to `anon`/`authenticated`, so
+privilege assertions run against the same exposure as production.
+
+Suites 01, 06 and 08 move the seeded festival and pass dates relative to `now()`, so the
+suites do not date-expire once the seeded festival window has passed.

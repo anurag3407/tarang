@@ -112,6 +112,31 @@ describe("createBasePassCheckout (plan §9.2, §12.3)", () => {
     expect(rzpMock.orders.create).not.toHaveBeenCalled();
   });
 
+  it("retries provisioning on replay when the first attempt never attached a Razorpay order", async () => {
+    sb.onRpc("create_base_pass_checkout", ok({ orderId: ORDER_ID, replayed: true }));
+    const provisioning = {
+      id: ORDER_ID,
+      public_order_code: "PO-ABC123",
+      checkout_state: "PROVISIONING_PROVIDER",
+      amount_paise: "20000",
+      currency: "INR",
+      hold_expires_at: null,
+    };
+    sb.onTable("orders", ok(provisioning));
+    sb.onTable("razorpay_orders", ok(null));
+    rzpMock.orders.create.mockResolvedValueOnce({ id: RZP_ORDER_ID, status: "created" });
+    sb.onRpc("attach_razorpay_order", ok({}));
+    sb.onTable("orders", ok({ ...provisioning, checkout_state: "AWAITING_PAYMENT" }));
+    sb.onTable("razorpay_orders", ok({ razorpay_order_id: RZP_ORDER_ID }));
+
+    const result = await createBasePassCheckout(USER_ID, FEST_ID, PRODUCT_ID, newIdempotencyKey());
+
+    expect(rzpMock.orders.create).toHaveBeenCalledTimes(1);
+    expect(rzpMock.orders.create).toHaveBeenCalledWith(expect.objectContaining({ amount: 20000 }));
+    expect(result.razorpayOrderId).toBe(RZP_ORDER_ID);
+    expect(result.status).toBe("AWAITING_PAYMENT");
+  });
+
   it("maps SOLD_OUT-style RPC errors to typed AppErrors", async () => {
     sb.onRpc("create_base_pass_checkout", fail("BASE_PASS_EXISTS: duplicate"));
     await expect(

@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { sponsorAdminSchema } from "@/lib/validation/schemas";
 import { invalidateContentCache } from "@/lib/invalidation";
 
@@ -15,7 +15,7 @@ type RouteContext = {
 /** PATCH /api/admin/sponsors/:id — update sponsor. */
 export async function PATCH(req: NextRequest, ctx: RouteContext) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Sponsor");
     const auth = await guardAdminMutation(req, "content.sponsor.write");
     const body = await readJsonBody<Record<string, unknown>>(req, 64 * 1024);
     const parsed = sponsorAdminSchema.safeParse(body);
@@ -57,7 +57,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
 /** DELETE /api/admin/sponsors/:id — delete sponsor. */
 export async function DELETE(req: NextRequest, ctx: RouteContext) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Sponsor");
     const auth = await guardAdminMutation(req, "content.sponsor.write");
 
     const sb = await createServerSupabase();

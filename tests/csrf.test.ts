@@ -70,4 +70,24 @@ describe("mutation request validation", () => {
     });
     expect(validateMutationRequest(r)).toBe("BODY_TOO_LARGE");
   });
+
+  it("rejects multipart unless the route opts in, and still bounds its size", () => {
+    const multipart = "multipart/form-data; boundary=----x";
+    expect(validateMutationRequest(req({ contentType: multipart, contentLength: "1000" }))).toBe(
+      "UNSUPPORTED_CONTENT_TYPE"
+    );
+    expect(
+      validateMutationRequest(req({ contentType: multipart, contentLength: "1000" }), { allowMultipart: true })
+    ).toBeNull();
+    expect(
+      validateMutationRequest(req({ contentType: multipart, contentLength: "9999999" }), {
+        allowMultipart: true,
+        maxBodyBytes: 6 * 1024 * 1024,
+      })
+    ).toBe("BODY_TOO_LARGE");
+    expect(
+      validateMutationRequest(req({ contentType: "text/plain", contentLength: "10" }), { allowMultipart: true })
+    ).toBe("UNSUPPORTED_CONTENT_TYPE");
+  });
 });
+

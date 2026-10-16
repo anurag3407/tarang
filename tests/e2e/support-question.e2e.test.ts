@@ -170,7 +170,7 @@ describe("admin support queue (plan §11.9)", () => {
     userSb.onTable("support_questions", {
       data: [
         {
-          id: "q-1",
+          id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0a01",
           public_ticket_code: TICKET_CODE,
           name: "Aarav Sharma",
           email: "aarav@example.com",
@@ -215,14 +215,14 @@ describe("admin support queue (plan §11.9)", () => {
 
   it("resolves a ticket, stamps resolved_at and writes an audit entry", async () => {
     userSb.onRpc("has_permission", { data: true, error: null }); // guardAdminMutation
-    userSb.onTable("support_questions", { data: { id: "q-1", status: "RESOLVED" }, error: null });
+    userSb.onTable("support_questions", { data: { id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0a01", status: "RESOLVED" }, error: null });
     userSb.onRpc("write_audit", { data: null, error: null });
 
     const res = await adminQuestionPatchRoute(
       post("/api/admin/questions/q-1", {
         body: { status: "RESOLVED", resolutionNote: "Pass reissued manually." },
       }),
-      ctx({ id: "q-1" })
+      ctx({ id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0a01" })
     );
     expect(res.status).toBe(200);
     const body = await json(res);
@@ -241,20 +241,20 @@ describe("admin support queue (plan §11.9)", () => {
     expect(audit).toMatchObject({
       p_action: "support.resolve",
       p_target_type: "support_question",
-      p_target_id: "q-1",
+      p_target_id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0a01",
     });
   });
 
   it("keeps a provided resolution note when reopening without resolving", async () => {
     userSb.onRpc("has_permission", { data: true, error: null });
-    userSb.onTable("support_questions", { data: { id: "q-1", status: "IN_PROGRESS" }, error: null });
+    userSb.onTable("support_questions", { data: { id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0a01", status: "IN_PROGRESS" }, error: null });
     userSb.onRpc("write_audit", { data: null, error: null });
 
     const res = await adminQuestionPatchRoute(
       post("/api/admin/questions/q-1", {
         body: { status: "IN_PROGRESS", resolutionNote: "Waiting on payment gateway." },
       }),
-      ctx({ id: "q-1" })
+      ctx({ id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0a01" })
     );
     expect(res.status).toBe(200);
     const update = userSb.callsFor("support_questions").find(
@@ -274,7 +274,7 @@ describe("admin support queue (plan §11.9)", () => {
 
     const res = await adminQuestionPatchRoute(
       post("/api/admin/questions/ghost", { body: { status: "OPEN" } }),
-      ctx({ id: "ghost" })
+      ctx({ id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0aff" })
     );
     expect(res.status).toBe(404);
     expectErrEnvelope(await json(res), "NOT_FOUND");
@@ -285,7 +285,7 @@ describe("admin support queue (plan §11.9)", () => {
 
     const res = await adminQuestionPatchRoute(
       post("/api/admin/questions/q-1", { body: { status: "WONKY" } }),
-      ctx({ id: "q-1" })
+      ctx({ id: "0a0a0a0a-0a0a-4a0a-8a0a-0a0a0a0a0a01" })
     );
     expect(res.status).toBe(422);
     expectErrEnvelope(await json(res), "VALIDATION_FAILED");

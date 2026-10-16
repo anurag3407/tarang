@@ -3,6 +3,8 @@ import { apiError, apiFromError, apiSuccess, AppError } from "@/lib/api";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { requireUser } from "@/services/authz";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
+import { validateMutationRequest } from "@/lib/csrf";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +19,10 @@ export async function POST(
   ctx: { params: Promise<{ orderId: string }> }
 ) {
   try {
-    const { orderId } = await ctx.params;
+    const invalid = validateMutationRequest(req);
+    if (invalid) return apiError(req, "BAD_REQUEST", invalid);
+
+    const orderId = requireUuid((await ctx.params).orderId, "Order");
     const auth = await requireUser();
     await enforceRateLimit("order", `cancel:${auth.userId}`, {
       failClosed: true,

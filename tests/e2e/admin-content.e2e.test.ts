@@ -592,7 +592,7 @@ describe("admin notices (plan §11.8)", () => {
 
   it("PATCHes an existing notice with its id", async () => {
     grantWrite();
-    userSb.onRpc("admin_upsert_notice", { data: { id: "notice-9" }, error: null });
+    userSb.onRpc("admin_upsert_notice", { data: { id: "09090909-0909-4909-8909-090909090909" }, error: null });
 
     const res = await adminPatchNotice(
       post("/api/admin/notices/notice-9", {
@@ -607,10 +607,10 @@ describe("admin notices (plan §11.8)", () => {
           version: 2,
         },
       }),
-      ctx({ id: "notice-9" })
+      ctx({ id: "09090909-0909-4909-8909-090909090909" })
     );
     expect(res.status).toBe(200);
-    expect(userSb.rpcParams("admin_upsert_notice")?.p_notice_id).toBe("notice-9");
+    expect(userSb.rpcParams("admin_upsert_notice")?.p_notice_id).toBe("09090909-0909-4909-8909-090909090909");
   });
 
   it("lists every notice including drafts for editors", async () => {
@@ -753,7 +753,7 @@ describe("GET /api/admin/pass-products (dynamic pricing)", () => {
     userSb.onTable("pass_products", {
       data: [
         {
-          id: "prod-delegate-1",
+          id: "de1e9a7e-de1e-4de1-8de1-de1e9a7ede1e",
           slug: "vip-delegate-pass",
           name: "All-Access Delegate Pass",
           description: "Full concert and VIP pass",
@@ -772,7 +772,7 @@ describe("GET /api/admin/pass-products (dynamic pricing)", () => {
       data: [
         {
           id: "ppv-1",
-          pass_product_id: "prod-delegate-1",
+          pass_product_id: "de1e9a7e-de1e-4de1-8de1-de1e9a7ede1e",
           version: 1,
           unit_amount_paise: 200000,
           change_reason: "initial price ₹2000",
@@ -798,7 +798,7 @@ describe("POST /api/admin/pass-products/:id/price (dynamic pricing update)", () 
     userSb.onRpc("has_permission", { data: true, error: null });
     sb.onTable("pass_products", {
       data: {
-        id: "prod-delegate-1",
+        id: "de1e9a7e-de1e-4de1-8de1-de1e9a7ede1e",
         name: "All-Access Delegate Pass",
         festival_id: FESTIVAL_ID,
         current_price_version_id: "ppv-1",
@@ -828,7 +828,7 @@ describe("POST /api/admin/pass-products/:id/price (dynamic pricing update)", () 
       post("/api/admin/pass-products/prod-delegate-1/price", {
         body: { priceRupees: 2500, reason: "Late registration price bump" },
       }),
-      ctx({ id: "prod-delegate-1" })
+      ctx({ id: "de1e9a7e-de1e-4de1-8de1-de1e9a7ede1e" })
     );
 
     expect(res.status).toBe(200);

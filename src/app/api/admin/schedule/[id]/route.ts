@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { scheduleAdminSchema } from "@/lib/validation/schemas";
 import { invalidateContentCache } from "@/lib/invalidation";
 
@@ -17,7 +17,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/schedule/[id]">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Schedule entry");
     const auth = await guardAdminMutation(req, "content.schedule.write");
     const body = await readJsonBody<Record<string, unknown>>(req);
     const parsed = scheduleAdminSchema.safeParse(body);

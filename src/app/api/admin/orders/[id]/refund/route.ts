@@ -1,36 +1,45 @@
 import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation } from "@/lib/admin-route";
+import { requireUuid } from "@/lib/route-utils";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * POST /api/admin/orders/:id/refund — record a manual organizer refund.
+ *
+ * The money is returned outside the app (Razorpay dashboard); this marks the
+ * order, its passes/registrations and payments REFUNDED in one locked
+ * transaction (refund_order). There is deliberately no fallback: if the
+ * function rejects the refund, the order is left untouched.
+ */
 export async function POST(
   req: NextRequest,
   ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const adminCtx = await guardAdminMutation(req, "admin.access");
-    const { id: orderId } = await ctx.params;
+    const adminCtx = await guardAdminMutation(req, "refund.approve");
+    const orderId = requireUuid((await ctx.params).id, "Order");
 
     const sb = createServiceRoleClient();
 
-    // 1. Verify order exists
     const { data: order, error: orderErr } = await sb
       .from("orders")
-      .select("id, public_order_code, purchaser_user_id, checkout_state, amount_paise")
+      .select("id, public_order_code, festival_id")
       .eq("id", orderId)
       .maybeSingle();
 
     if (orderErr) {
-      return apiError(req, "INTERNAL", orderErr.message);
+      logger().error({ err: orderErr.message, orderId }, "refund order lookup failed");
+      return apiError(req, "INTERNAL", "Could not load the order");
     }
-    if (!order) {
+    // Festival-scoped RBAC: an admin of one festival cannot touch another's orders.
+    if (!order || order.festival_id !== adminCtx.festivalId) {
       return apiError(req, "NOT_FOUND", "Order not found");
     }
 
-    // 2. Execute refund via database RPC if available, with resilient fallback
     const { data: rpcData, error: rpcErr } = await sb.rpc("refund_order", {
       p_order_id: orderId,
       p_actor_user_id: adminCtx.userId,
@@ -38,98 +47,31 @@ export async function POST(
     });
 
     if (rpcErr) {
-      logger().warn(
-        { err: rpcErr.message, orderId },
-        "refund_order RPC failed or not yet applied; falling back to direct service-role mutation"
-      );
-
-      // Resilient direct fallback
-      const nowIso = new Date().toISOString();
-
-      // Update Order
-      await sb
-        .from("orders")
-        .update({
-          checkout_state: "REFUNDED",
-          updated_at: nowIso,
-        })
-        .eq("id", orderId);
-
-      // Find Order Lines
-      const { data: lines } = await sb
-        .from("order_lines")
-        .select("id")
-        .eq("order_id", orderId);
-
-      const lineIds = (lines ?? []).map((l) => l.id);
-
-      if (lineIds.length > 0) {
-        // Find Delegate Passes
-        const { data: passes } = await sb
-          .from("delegate_passes")
-          .select("id")
-          .in("source_order_line_id", lineIds);
-
-        const passIds = (passes ?? []).map((p) => p.id);
-
-        // Update Passes
-        await sb
-          .from("delegate_passes")
-          .update({
-            state: "REFUNDED",
-            revoked_at: nowIso,
-            updated_at: nowIso,
-          })
-          .in("source_order_line_id", lineIds);
-
-        // Revoke QR Credentials
-        if (passIds.length > 0) {
-          await sb
-            .from("qr_credentials")
-            .update({
-              state: "REVOKED",
-              revoked_at: nowIso,
-            })
-            .in("delegate_pass_id", passIds);
-        }
-
-        // Update Registrations
-        await sb
-          .from("registrations")
-          .update({
-            state: "REFUNDED",
-            cancelled_at: nowIso,
-            updated_at: nowIso,
-          })
-          .in("order_line_id", lineIds);
+      const msg = rpcErr.message ?? "";
+      if (msg.includes("NOT_FOUND")) return apiError(req, "NOT_FOUND", "Order not found");
+      if (msg.includes("NOT_REFUNDABLE")) {
+        return apiError(
+          req,
+          "CONFLICT",
+          "This order has no captured payment to refund — cancel it instead"
+        );
       }
-
-      // Update Merchandise Orders
-      await sb
-        .from("merchandise_orders")
-        .update({
-          state: "REFUNDED",
-          updated_at: nowIso,
-        })
-        .eq("order_id", orderId);
-
-      // Update Payments
-      await sb
-        .from("payments")
-        .update({
-          disposition: "REFUNDED",
-          refunded_paise: Number(order.amount_paise || 0),
-          updated_at: nowIso,
-        })
-        .eq("local_order_id", orderId);
+      logger().error({ err: msg, orderId }, "refund_order failed");
+      return apiError(req, "INTERNAL", "Refund could not be recorded");
     }
 
-    // 3. Clear existing sheets sync row so that spreadsheet sync records the REFUNDED status
-    await sb.from("sheets_sync_items").delete().eq("entity_id", orderId);
+    // Clear the sheets sync row so the spreadsheet picks up the REFUNDED state.
+    const { error: syncErr } = await sb
+      .from("sheets_sync_items")
+      .delete()
+      .eq("entity_id", orderId);
+    if (syncErr) {
+      logger().warn({ err: syncErr.message, orderId }, "refund: sheets sync reset failed");
+    }
 
     logger().info(
       { orderId, publicOrderCode: order.public_order_code, adminUserId: adminCtx.userId },
-      "order successfully marked as REFUNDED"
+      "order marked as REFUNDED"
     );
 
     return apiSuccess(req, {

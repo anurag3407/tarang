@@ -147,6 +147,27 @@ async function releaseLocalOrder(localOrderId: string): Promise<void> {
     .eq("checkout_state", "PROVISIONING_PROVIDER");
 }
 
+/**
+ * Idempotent replay. If the first attempt created the local order but never
+ * got a Razorpay order attached (provider timeout, process restart), retry
+ * provisioning now: the reconciler only looks at orders that already have a
+ * provider order, so otherwise the buyer waits out the whole hold with
+ * nothing to pay. Racing retries are safe — attach_razorpay_order keeps the
+ * first mapping and getOrderResult always returns the stored one.
+ */
+async function resumeReplayedOrder(localOrderId: string): Promise<CheckoutResult> {
+  const result = await getOrderResult(localOrderId);
+  if (
+    result.status === "PROVISIONING_PROVIDER" &&
+    !result.razorpayOrderId &&
+    result.amountPaise > 0
+  ) {
+    await provisionProviderOrder(localOrderId, result.amountPaise, result.currency);
+    return getOrderResult(localOrderId);
+  }
+  return result;
+}
+
 async function getOrderResult(localOrderId: string): Promise<CheckoutResult> {
   const sb = createServiceRoleClient();
   const { data: order, error } = await sb
@@ -220,7 +241,7 @@ export async function createBasePassCheckout(
   if (error) mapRpcError(error);
 
   const { orderId, replayed } = data as { orderId: string; replayed: boolean };
-  if (replayed) return getOrderResult(orderId);
+  if (replayed) return resumeReplayedOrder(orderId);
 
   // Provider provisioning outside the transaction (plan §9.4).
   const { data: order } = await sb
@@ -304,7 +325,7 @@ export async function createEventCheckout(
     replayed: boolean;
     amountPaise: number;
   };
-  if (result.replayed) return getOrderResult(result.orderId);
+  if (result.replayed) return resumeReplayedOrder(result.orderId);
 
   if (result.amountPaise === 0) {
     // Zero-price event (plan §12.13): skip Razorpay, fulfill immediately.
@@ -363,7 +384,7 @@ export async function createMerchandiseCheckout(
     replayed: boolean;
     amountPaise: number;
   };
-  if (result.replayed) return getOrderResult(result.orderId);
+  if (result.replayed) return resumeReplayedOrder(result.orderId);
 
   if (result.amountPaise === 0) {
     await fulfillFreeOrder(result.orderId);

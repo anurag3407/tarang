@@ -56,7 +56,12 @@ function detectImageFormat(bytes: Uint8Array): ImageFormat | null {
 
 export async function POST(req: NextRequest) {
   try {
-    await guardAdminMutation(req, "content.sponsor.write");
+    // Multipart with headroom over MAX_FILE_SIZE for the form encoding; the
+    // nginx location for this path carries the matching body cap.
+    await guardAdminMutation(req, "content.sponsor.write", {
+      allowMultipart: true,
+      maxBodyBytes: MAX_FILE_SIZE + 256 * 1024,
+    });
 
     const formData = await req.formData();
     const file = formData.get("file");

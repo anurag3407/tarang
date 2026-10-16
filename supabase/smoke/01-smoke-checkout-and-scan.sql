@@ -20,6 +20,12 @@ select id as fest_id from festivals where slug='tarang-2026' \gset
 -- These suites exercise the two-tier (Basic -> VIP) RPC paths. The Basic Card
 -- is retired (archived by 20261013120000), so re-open it in this throwaway DB.
 update pass_products set status = 'PUBLISHED', sales_state = 'OPEN' where slug = 'base-delegate-pass';
+-- Keep the festival and passes valid relative to now, so 01 and 04 (which
+-- follows on this state) do not date-expire once the seeded window has passed.
+update festivals set starts_at = now() - interval '1 day', ends_at = now() + interval '30 days'
+where slug = 'tarang-2026';
+update pass_products set valid_from = now() - interval '30 days', valid_until = now() + interval '30 days'
+where slug in ('base-delegate-pass', 'vip-delegate-pass');
 select id as base_pass_id from pass_products where slug='base-delegate-pass' \gset
 select id as vip_pass_product_id from pass_products where slug='vip-delegate-pass' \gset
 select id as gate_id from gates where name='Main Gate' \gset

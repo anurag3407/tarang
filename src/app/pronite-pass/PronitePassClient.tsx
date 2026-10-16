@@ -11,6 +11,7 @@ import { Reveal } from "@/components/tarang/Reveal";
 import { FEST } from "@/lib/data";
 import { formatPaise } from "@/lib/money";
 import { isPronitePassProduct } from "@/lib/pronite-pass";
+import { createCheckout, isPayable } from "@/lib/checkout-client";
 import { ensureRazorpayLoaded } from "@/lib/razorpay-loader";
 
 interface PassProduct {
@@ -307,28 +308,25 @@ export default function PronitePassClient({
     setPhase("creating");
     setMessage("");
     try {
-      const res = await fetch("/api/checkout/base-pass", {
-        method: "POST",
-        headers: { "content-type": "application/json", "idempotency-key": idempotencyKeyRef.current },
-        body: JSON.stringify(
-          discount ? { passProductId: product.id, discountCode: discount.code } : { passProductId: product.id }
-        ),
-      });
-      const body = await res.json();
-      if (!res.ok || !body.ok) {
-        if (body.code === "PROFILE_INCOMPLETE") {
+      const created = await createCheckout(
+        "/api/checkout/base-pass",
+        discount ? { passProductId: product.id, discountCode: discount.code } : { passProductId: product.id },
+        idempotencyKeyRef
+      );
+      if (!created.ok) {
+        if (created.code === "PROFILE_INCOMPLETE") {
           router.push("/complete-profile");
           return;
         }
-        if (body.code === "DISCOUNT_INVALID") {
+        if (created.code === "DISCOUNT_INVALID") {
           // The code stopped working between quote and checkout (e.g. used up).
           setDiscount(null);
           setDiscountOpen(true);
-          setDiscountError(body.message ?? "This discount code can no longer be used");
+          setDiscountError(created.message);
         }
-        throw new Error(body.message ?? "Checkout failed");
+        throw new Error(created.message);
       }
-      const data = body.data as CheckoutData;
+      const data: CheckoutData = created.data;
       setCheckout(data);
 
       if (data.status === "FULFILLED") {
@@ -336,16 +334,20 @@ export default function PronitePassClient({
         setMessage("You already hold an active Pronite Pass.");
         return;
       }
+      if (data.status === "PAYMENT_REVIEW") {
+        setPhase("review");
+        setMessage(REVIEW_MESSAGE);
+        return;
+      }
       if (data.amountPaise === 0) {
         pollOrderStatus(data.localOrderId);
         setPhase("processing");
         return;
       }
-      if (!data.razorpayOrderId || !data.razorpayKeyId) {
-        setPhase("processing");
-        setMessage("Preparing payment gateway…");
-        pollOrderStatus(data.localOrderId);
-        return;
+      if (!isPayable(created.data)) {
+        // The key is kept, so the next tap resumes this order and retries
+        // provisioning server-side. Never open Razorpay without an order id.
+        throw new Error("The payment gateway is busy. Please try again in a moment — your order is kept.");
       }
       openRazorpay(data);
     } catch (err) {

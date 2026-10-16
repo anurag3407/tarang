@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { apiError, apiFromError } from "@/lib/api";
 import { requirePermission } from "@/services/authz";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function GET(
   ctx: RouteContext<"/api/admin/exports/[id]/download">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Export");
     const auth = await requirePermission("registration.export");
 
     const sb = createServiceRoleClient();

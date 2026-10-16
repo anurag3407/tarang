@@ -236,8 +236,17 @@ describe("Admin Registrations and Paginated Overview", () => {
       expect(envelope.data.registrationsPagination).toBeDefined();
     });
 
+    it("refuses participant tabs to admins without registration.read", async () => {
+      // admin.access granted, registration.read denied
+      userSb.onRpc("has_permission", { data: true, error: null }, { data: false, error: null });
+      const res = await adminOverviewRoute(get("/api/admin/overview?tab=registrations"));
+      expect(res.status).toBe(403);
+      expect(sb.callsFor("registrations")).toEqual([]);
+    });
+
     it("handles tab querying for ?tab=registrations with pagination", async () => {
-      userSb.onRpc("has_permission", { data: true, error: null });
+      // admin.access, then registration.read
+      userSb.onRpc("has_permission", { data: true, error: null }, { data: true, error: null });
 
       sb.onTable("registrations", {
         data: [

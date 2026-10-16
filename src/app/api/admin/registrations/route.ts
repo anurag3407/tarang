@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(req: NextRequest) {
   try {
-    const ctx = await guardAdminRead(req, "admin.access");
+    const ctx = await guardAdminRead(req, "registration.read");
     const sb = createServiceRoleClient();
 
     const page = Math.max(1, Number(req.nextUrl.searchParams.get("page") ?? "1") || 1);

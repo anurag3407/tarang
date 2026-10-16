@@ -12,12 +12,13 @@ import {
   AlertTriangle,
   ShoppingBag,
   MapPin,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/browser";
+import { createCheckout, isPayable } from "@/lib/checkout-client";
+import { ensureRazorpayLoaded } from "@/lib/razorpay-loader";
 import type { MerchandiseProductRead } from "@/domain/content";
 import type { User } from "@supabase/supabase-js";
 
@@ -25,19 +26,6 @@ interface RazorpayResponse {
   razorpay_payment_id: string;
   razorpay_order_id: string;
   razorpay_signature: string;
-}
-
-interface RazorpayOptions {
-  key: string;
-  amount: number;
-  currency: string;
-  name: string;
-  description: string;
-  order_id: string;
-  prefill?: { name?: string; email?: string; contact?: string };
-  theme?: { color?: string };
-  handler: (response: RazorpayResponse) => void | Promise<void>;
-  modal?: { ondismiss?: () => void };
 }
 
 declare global {
@@ -113,7 +101,14 @@ export function MerchandiseCheckoutModal({
           setPhase("success");
           return;
         }
-        if (status === "EXPIRED" || status === "CANCELLED") {
+        if (body.data.underReview === true) {
+          setPhase("error");
+          setErrorMessage(
+            "We received a payment for this order and it is being reviewed by the organizers. Please do not pay again."
+          );
+          return;
+        }
+        if ((status === "EXPIRED" || status === "CANCELLED") && body.data.paymentObserved !== true) {
           setPhase("error");
           setErrorMessage(
             "This order expired before it could be confirmed. If money was deducted, it will be reconciled automatically — contact support with your payment reference if it does not appear."
@@ -178,14 +173,10 @@ export function MerchandiseCheckoutModal({
     setErrorMessage("");
 
     try {
-      // 1. Create order
-      const res = await fetch("/api/checkout/merchandise", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Idempotency-Key": idempotencyKeyRef.current,
-        },
-        body: JSON.stringify({
+      // 1. Create (or, on a retry with the same key, resume) the order.
+      const created = await createCheckout(
+        "/api/checkout/merchandise",
+        {
           productId: item.id,
           selectedSize,
           quantity,
@@ -194,42 +185,46 @@ export function MerchandiseCheckoutModal({
           recipientEmail: recipientEmail.trim().toLowerCase(),
           deliveryMode: "PICKUP",
           shippingAddress: null,
-        }),
-      });
-
-      const json = await res.json();
-      if (!res.ok || !json.ok) {
-        if (json.code === "PROFILE_INCOMPLETE") {
+        },
+        idempotencyKeyRef
+      );
+      if (!created.ok) {
+        if (created.code === "PROFILE_INCOMPLETE") {
           router.push("/complete-profile");
           return;
         }
-        if (json.code === "RATE_LIMITED" || json.code === "RATE_LIMIT_UNAVAILABLE") {
+        if (created.code === "RATE_LIMITED" || created.code === "RATE_LIMIT_UNAVAILABLE") {
           throw new Error("High traffic detected. Please wait a few seconds before trying again.");
         }
-        throw new Error(json.message || "Failed to initiate checkout");
+        throw new Error(created.message || "Failed to initiate checkout");
       }
 
-      const checkoutData = json.data;
+      const checkoutData = created.data;
 
-      // Free item handling
-      if (checkoutData.amountPaise === 0 || checkoutData.status === "FULFILLED") {
+      if (checkoutData.status === "FULFILLED") {
         setConfirmedOrderCode(checkoutData.publicOrderCode);
         setPhase("success");
         return;
       }
-
-      // 2. Load Razorpay script if needed
-      if (!window.Razorpay) {
-        await new Promise<void>((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://checkout.razorpay.com/v1/checkout.js";
-          script.onload = () => resolve();
-          script.onerror = () => reject(new Error("Failed to load Razorpay SDK"));
-          document.body.appendChild(script);
-        });
+      if (checkoutData.status === "PAYMENT_REVIEW") {
+        setPhase("error");
+        setErrorMessage(
+          "We received a payment for this order and it is being reviewed by the organizers. Please do not pay again."
+        );
+        return;
+      }
+      if (checkoutData.amountPaise === 0) {
+        // Free item: fulfillment runs server-side; confirm before claiming success.
+        setPhase("processing");
+        void pollUntilFulfilled(checkoutData.localOrderId, checkoutData.publicOrderCode);
+        return;
+      }
+      if (!isPayable(checkoutData)) {
+        throw new Error("The payment gateway is busy. Please try again in a moment — your order is kept.");
       }
 
-      if (!window.Razorpay) {
+      // 2. Load Razorpay script if needed
+      if (!(await ensureRazorpayLoaded()) || !window.Razorpay) {
         throw new Error("Payment gateway could not be loaded");
       }
 
@@ -265,8 +260,16 @@ export function MerchandiseCheckoutModal({
             if (!vRes.ok || !vBody.ok) {
               throw new Error(vBody.message || "Payment verification failed");
             }
-            setConfirmedOrderCode(checkoutData.publicOrderCode);
-            setPhase("success");
+            const result = vBody.data?.result as string | undefined;
+            if (result === "FULFILLED" || result === "ALREADY_APPLIED") {
+              setConfirmedOrderCode(checkoutData.publicOrderCode);
+              setPhase("success");
+              return;
+            }
+            // PROCESSING, or a payment that could not be applied: the order
+            // state decides what the buyer is told.
+            setPhase("processing");
+            void pollUntilFulfilled(checkoutData.localOrderId, checkoutData.publicOrderCode);
           } catch {
             // Verify failed but money may have moved — never claim success
             // here. Poll the order; success only on confirmed fulfillment.
@@ -275,18 +278,20 @@ export function MerchandiseCheckoutModal({
           }
         },
         modal: {
+          // Do not cancel the order here: a UPI collect request can already
+          // be with the bank, and cancelling would turn that payment into a
+          // refund case. The hold expires on its own; Pay resumes it.
           ondismiss: () => {
             setPhase("idle");
-            setErrorMessage("Payment window was closed. You can retry whenever you are ready.");
-            void fetch(`/api/checkout/orders/${checkoutData.localOrderId}/cancel`, { method: "POST" });
+            setErrorMessage("Payment window was closed. Tap pay again to resume the same order.");
           },
         },
       });
 
+      // Razorpay keeps the modal open after a failed attempt so the buyer can
+      // try another method on the same order — the order must stay alive.
       rzp.on("payment.failed", () => {
-        setPhase("idle");
-        setErrorMessage("Payment was unsuccessful. No money was deducted.");
-        void fetch(`/api/checkout/orders/${checkoutData.localOrderId}/cancel`, { method: "POST" });
+        setErrorMessage("That payment attempt failed. You can try another method in the payment window.");
       });
 
       rzp.open();

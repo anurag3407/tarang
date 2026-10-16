@@ -4,6 +4,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { requireUser } from "@/services/authz";
 import { toPaise } from "@/lib/money";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,7 @@ export async function GET(
   ctx: RouteContext<"/api/checkout/orders/[orderId]">
 ) {
   try {
-    const { orderId } = await ctx.params;
+    const orderId = requireUuid((await ctx.params).orderId, "Order");
     const auth = await requireUser();
     await enforceRateLimit("poll", `user:${auth.userId}`, { failClosed: false });
 

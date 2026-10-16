@@ -32,6 +32,9 @@ interface ImportRowResult {
   error?: string;
 }
 
+/** Rows per request: small enough to finish well inside the 60s proxy timeout. */
+const IMPORT_BATCH_SIZE = 25;
+
 interface ImportSummary {
   message: string;
   processed: number;
@@ -255,22 +258,37 @@ export default function BulkImportManager() {
           college: r.college || undefined,
         }));
 
-      const res = await fetch("/api/admin/bulk-import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          issuanceType,
-          eventId: issuanceType === "EVENT" ? selectedEventId : undefined,
-          sendEmail,
-          users: usersToImport,
-        }),
-      });
+      // Small batches keep every request well inside the proxy timeout; a
+      // single 500-row request outlives it while the server keeps importing.
+      const merged: ImportSummary = { message: "", processed: 0, successful: 0, failed: 0, results: [] };
+      for (let i = 0; i < usersToImport.length; i += IMPORT_BATCH_SIZE) {
+        const batch = usersToImport.slice(i, i + IMPORT_BATCH_SIZE);
+        const res = await fetch("/api/admin/bulk-import", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            issuanceType,
+            eventId: issuanceType === "EVENT" ? selectedEventId : undefined,
+            sendEmail,
+            users: batch,
+          }),
+        });
 
-      const json = await res.json();
-      if (!json.ok) {
-        setSubmitError(json.error?.message || json.message || "Bulk import failed");
-      } else {
-        setSummary(json.data);
+        const json = await res.json();
+        if (!json.ok) {
+          const done = merged.processed;
+          setSubmitError(
+            `${json.message || "Bulk import failed"}${done > 0 ? ` (stopped after ${done} of ${usersToImport.length} rows — rows already processed are listed below)` : ""}`
+          );
+          break;
+        }
+        const data = json.data as ImportSummary;
+        merged.processed += data.processed;
+        merged.successful += data.successful;
+        merged.failed += data.failed;
+        merged.results.push(...data.results);
+        merged.message = `Bulk import ${merged.processed < usersToImport.length ? "in progress" : "completed"}: ${merged.successful} succeeded, ${merged.failed} failed.`;
+        setSummary({ ...merged, results: [...merged.results] });
       }
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Network error during bulk import");

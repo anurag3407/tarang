@@ -7,6 +7,7 @@ import { enforceRateLimit } from "@/lib/redis/rate-limits";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { buildQrToken, issueQrCredential } from "@/services/qr-service";
 import { isPronitePassProduct } from "@/lib/pronite-pass";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export async function GET(
   ctx: RouteContext<"/api/me/passes/[passId]/qr">
 ) {
   try {
-    const { passId } = await ctx.params;
+    const passId = requireUuid((await ctx.params).passId, "Pass");
     const auth = await requireUser();
     await enforceRateLimit("me", `user:${auth.userId}`, { failClosed: false });
 

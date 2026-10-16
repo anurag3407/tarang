@@ -40,8 +40,8 @@ import { PATCH as staffPatchRoute } from "@/app/api/admin/staff/[assignmentId]/r
 import { GET as rolesListRoute, POST as roleCreateRoute } from "@/app/api/admin/roles/route";
 import { PATCH as rolePatchRoute } from "@/app/api/admin/roles/[id]/route";
 
-const ASSIGNMENT_ID = "a55ignment-a551-4a55-8a55-a55ignmenta5";
-const NEW_ROLE_ID = "new-role-new-r04e-8n3w-newrolenewr0";
+const ASSIGNMENT_ID = "a5519e00-a551-4a55-8a55-a5519e00a551";
+const NEW_ROLE_ID = "0e00001e-0e00-4e00-8e00-0e00001e0e00";
 
 beforeEach(() => {
   resetWorld({ actor: { id: ADMIN_ID, email: "admin@example.com", confirmed: true } });

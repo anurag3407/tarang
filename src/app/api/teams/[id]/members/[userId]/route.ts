@@ -4,6 +4,7 @@ import { isAllowedOrigin } from "@/lib/csrf";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
 import { requireUser } from "@/services/authz";
 import { removeTeamMember } from "@/services/team-service";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,9 @@ export async function DELETE(
   ctx: RouteContext<"/api/teams/[id]/members/[userId]">
 ) {
   try {
-    const { id, userId } = await ctx.params;
+    const params = await ctx.params;
+    const id = requireUuid(params.id, "Team");
+    const userId = requireUuid(params.userId, "Member");
     if (!isAllowedOrigin(req)) {
       return apiError(req, "BAD_REQUEST", "ORIGIN_NOT_ALLOWED");
     }

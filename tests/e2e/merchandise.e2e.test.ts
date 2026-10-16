@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { ADMIN_ID, FESTIVAL_ID, resetWorld, rzp, sb, userSb, USER_ID } from "./helpers/mocks";
+import { ADMIN_ID, FESTIVAL_ID, resetWorld, sb, userSb, USER_ID } from "./helpers/mocks";
 import { get, post, json, expectOkEnvelope, ctx } from "./helpers/requests";
 
 const PRODUCT_ID = "6f9b9a1c-1234-4a5b-8c9d-0e1f2a3b4c5d";
@@ -45,7 +45,7 @@ import { GET as publicMerchList } from "@/app/api/public/merchandise/route";
 import { GET as publicMerchBySlug } from "@/app/api/public/merchandise/[slug]/route";
 import { POST as checkoutMerchRoute } from "@/app/api/checkout/merchandise/route";
 import { GET as adminMerchList, POST as adminCreateMerch } from "@/app/api/admin/merchandise/route";
-import { GET as adminGetMerch, PATCH as adminPatchMerch } from "@/app/api/admin/merchandise/[id]/route";
+import { PATCH as adminPatchMerch } from "@/app/api/admin/merchandise/[id]/route";
 
 function grantRead(permission = true): void {
   sb.onTable("festivals", { data: { id: FESTIVAL_ID }, error: null });

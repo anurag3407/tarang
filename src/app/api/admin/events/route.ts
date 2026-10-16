@@ -7,7 +7,6 @@ import { rupeesToPaise, toPaise } from "@/lib/money";
 import { readJsonBody } from "@/lib/route-utils";
 import { eventAdminSchema } from "@/lib/validation/schemas";
 import { invalidateContentCache } from "@/lib/invalidation";
-import { ensureDefaultCategoriesAndVenues } from "@/services/content-seeder";
 
 export const dynamic = "force-dynamic";
 

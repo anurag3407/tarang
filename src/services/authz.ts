@@ -68,6 +68,21 @@ export async function requirePermission(
   return ctx;
 }
 
+/**
+ * Non-throwing permission probe for an already-authenticated context, for
+ * routes that serve a base payload to every admin and extra data only to
+ * holders of a narrower permission.
+ */
+export async function hasPermission(ctx: AuthContext, code: PermissionCode): Promise<boolean> {
+  const sb = await createServerSupabase();
+  const { data, error } = await sb.rpc("has_permission", {
+    p_permission: code,
+    p_event_id: null,
+    p_festival_id: ctx.festivalId,
+  });
+  return !error && data === true;
+}
+
 /** Read a feature flag: Redis (5s TTL) with Postgres fallback. */
 export async function getFeatureFlag(
   festivalId: string,

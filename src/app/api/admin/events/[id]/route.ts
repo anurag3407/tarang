@@ -3,7 +3,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, guardAdminRead, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { rupeesToPaise, toPaise } from "@/lib/money";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { eventAdminSchema } from "@/lib/validation/schemas";
 import { invalidateAvailability, invalidateContentCache } from "@/lib/invalidation";
 
@@ -15,7 +15,7 @@ export async function GET(
   ctx: RouteContext<"/api/admin/events/[id]">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Event");
     await guardAdminRead(req, "content.event.read");
     const sb = await createServerSupabase();
 
@@ -97,7 +97,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/events/[id]">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Event");
     const auth = await guardAdminMutation(req, "content.event.write", {
       eventId: id,
     });

@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { noticeAdminSchema } from "@/lib/validation/schemas";
 import { invalidateContentCache } from "@/lib/invalidation";
 
@@ -14,7 +14,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/notices/[id]">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Notice");
     const auth = await guardAdminMutation(req, "content.notice.write");
     const body = await readJsonBody<Record<string, unknown>>(req, 64 * 1024);
     const parsed = noticeAdminSchema.safeParse(body);

@@ -4,7 +4,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { discountCodeUpdateSchema } from "@/lib/validation/schemas";
 import { DISCOUNT_CODE_COLUMNS, toDiscountCodeRead, type DiscountCodeRow } from "@/services/discount-admin";
 
@@ -19,7 +19,7 @@ const idSchema = z.string().uuid();
  */
 export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/admin/discount-codes/[id]">) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Discount code");
     const auth = await guardAdminMutation(req, "discount.manage", { maxBodyBytes: 4 * 1024 });
     if (!idSchema.safeParse(id).success) return apiError(req, "NOT_FOUND", "Discount code not found");
 
@@ -92,7 +92,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/admin/disc
  */
 export async function DELETE(req: NextRequest, ctx: RouteContext<"/api/admin/discount-codes/[id]">) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Discount code");
     const auth = await guardAdminMutation(req, "discount.manage");
     if (!idSchema.safeParse(id).success) return apiError(req, "NOT_FOUND", "Discount code not found");
 

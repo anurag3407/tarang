@@ -17,7 +17,9 @@ function extractSheetId(input: string): { sheetId: string; gid?: string } | null
   const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
   const sheetId = match ? match[1] : trimmed.startsWith("http") ? null : trimmed;
 
-  if (!sheetId || sheetId.length < 10) return null;
+  // A bare id is pasted text: keep it to the id alphabet so it cannot add
+  // path segments or a query to the Google URL it is spliced into.
+  if (!sheetId || sheetId.length < 10 || !/^[a-zA-Z0-9-_]+$/.test(sheetId)) return null;
 
   // Extract GID if present
   let gid: string | undefined;
@@ -77,7 +79,7 @@ async function getGoogleAuthToken(): Promise<string | null> {
 
 export async function POST(req: NextRequest) {
   try {
-    await guardAdminMutation(req, "admin.access");
+    await guardAdminMutation(req, "pass.reissue");
 
     const body = await req.json();
     const parsed = FetchSheetSchema.safeParse(body);

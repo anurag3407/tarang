@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { eventCapacitySchema } from "@/lib/validation/schemas";
 import { invalidateAvailability, invalidateContentCache } from "@/lib/invalidation";
 
@@ -18,7 +18,7 @@ export async function POST(
   ctx: RouteContext<"/api/admin/events/[id]/capacity">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Event");
     const auth = await guardAdminMutation(req, "content.event.capacity.write", {
       eventId: id,
     });

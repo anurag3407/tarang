@@ -317,7 +317,9 @@ export default function ScannerApp() {
 
           const scanData = body.data as ScanResult;
           const isGood = GOOD_OUTCOMES.has(scanData.outcome);
-          const isReentry = scanData.outcome === "accepted_reentry" || scanData.outcome === "duplicate";
+          // "duplicate" is a refusal (already admitted at a one-entry gate),
+          // never a cleared re-entry.
+          const isReentry = scanData.outcome === "accepted_reentry";
           const isWarn = !isGood && WARN_OUTCOMES.has(scanData.outcome);
 
           if (isGood) {
@@ -375,6 +377,9 @@ export default function ScannerApp() {
           } else if (scanData.outcome === "accepted") {
             outcomeTitle = "VERIFIED · FIRST ENTRY CLEARED";
             outcomeSubtitle = `First scan of the day recorded at ${currentGate.gateName}.`;
+          } else if (scanData.outcome === "duplicate") {
+            outcomeTitle = "ALREADY ADMITTED · ENTRY DENIED";
+            outcomeSubtitle = "This pass has already been used for entry at this gate. Check the history below.";
           } else if (scanData.outcome === "refunded") {
             outcomeTitle = "PASS REFUNDED · ADMISSION DENIED";
             outcomeSubtitle = "This pass was cancelled and refunded by organizers. Entry is strictly prohibited.";
@@ -396,112 +401,19 @@ export default function ScannerApp() {
             rawToken: rawCode,
           });
         } catch (err) {
-          // Automatic recovery: If cryptographic scan endpoint fails, extract the pass code embedded in the token payload and verify via database lookup
-          try {
-            const parts = rawCode.split(".");
-            if (parts.length === 4) {
-              const b64 = parts[2].replace(/-/g, "+").replace(/_/g, "/");
-              const jsonStr = atob(b64);
-              const payload = JSON.parse(jsonStr);
-              if (payload && payload.pass) {
-                const fallbackRes = await fetch("/api/scanner/verify-card", {
-                  method: "POST",
-                  headers: {
-                    "content-type": "application/json",
-                    "x-scanner-device-credential": deviceCredential,
-                  },
-                  body: JSON.stringify({
-                    query: payload.pass,
-                    gateId: gateIdToSend,
-                  }),
-                });
-                const fallbackBody = await fallbackRes.json();
-                if (fallbackRes.ok && fallbackBody.ok && fallbackBody.data?.found) {
-                  const cardData = fallbackBody.data as CardLookupResult;
-                  const isGood = Boolean(cardData.found && cardData.state === "ACTIVE");
-                  const isReentry = cardData.recentScans && cardData.recentScans.some(s => s.outcome === "accepted" || s.outcome === "accepted_reentry");
-
-                  if (isGood) {
-                    triggerGlow("green");
-                    if (soundEnabled) playScanSuccessSound();
-                    if (navigator.vibrate) navigator.vibrate([150, 60, 150]);
-                  } else {
-                    triggerGlow("red");
-                    if (soundEnabled) playScanErrorSound();
-                  }
-
-                  const existingRecent = (cardData.recentScans || []).filter(
-                    (s: ScanEntry) => Math.abs(new Date(s.at).getTime() - Date.now()) > 3000
-                  );
-
-                  const entryHistory: ScanEntry[] = [
-                    {
-                      gateName: currentGate.gateName,
-                      at: new Date().toISOString(),
-                      outcome: isGood ? (isReentry ? "accepted_reentry" : "accepted") : "rejected",
-                    },
-                    ...existingRecent,
-                  ];
-
-                  const isRefunded = cardData.state === "REFUNDED";
-                  setShiftLog((prev) => [
-                    {
-                      id: generateUUID(),
-                      time: formatTimeIST(new Date()),
-                      code: cardData.publicPassCode || payload.pass,
-                      name: cardData.displayName || "Participant",
-                      product: cardData.productName || "Pronite Pass",
-                      outcome: isGood
-                        ? isReentry
-                          ? "RE-ENTRY CLEARED"
-                          : "ACCEPTED"
-                        : isRefunded
-                          ? "REFUNDED"
-                          : "NOT FOUND",
-                      gateName: currentGate.gateName,
-                      success: isGood,
-                    },
-                    ...prev,
-                  ]);
-
-                  setActiveScanSheet({
-                    open: true,
-                    success: isGood,
-                    outcomeTitle: isGood
-                      ? isReentry
-                        ? "VERIFIED · RE-ENTRY CLEARED"
-                        : "VERIFIED · ENTRY CLEARED"
-                      : isRefunded
-                        ? "PASS REFUNDED · ADMISSION DENIED"
-                        : "NO ACTIVE PASS FOUND",
-                    outcomeSubtitle: isGood
-                      ? `Pronite Pass verified and admission recorded at ${currentGate.gateName}.`
-                      : isRefunded
-                        ? "This pass was cancelled and refunded by organizers. Entry is strictly prohibited."
-                        : cardData.message || "Pass is either expired, inactive, or not found.",
-                    displayName: cardData.displayName || "Participant",
-                    productName: cardData.productName || "Pronite Pass",
-                    passCode: cardData.publicPassCode || payload.pass,
-                    email: cardData.email,
-                    collegeName: cardData.collegeName ?? undefined,
-                    expiresAt: cardData.expiresAt,
-                    entries: entryHistory,
-                  });
-                  return;
-                }
-              }
-            }
-          } catch {}
-
+          // No fallback to a lookup by the pass id in the payload: that payload
+          // is unverified, and admitting through it would bypass the
+          // signature, expiry and revocation checks. Show the error; the
+          // operator rescans once the network/server recovers.
           triggerGlow("red");
           if (soundEnabled) playScanErrorSound();
           setActiveScanSheet({
             open: true,
             success: false,
-            outcomeTitle: "INVALID PASS QR",
-            outcomeSubtitle: err instanceof Error ? err.message : "QR code signature or format is invalid",
+            outcomeTitle: "NOT VERIFIED · RESCAN",
+            outcomeSubtitle: `${err instanceof Error ? err.message : "The scan could not be verified"}. Do not admit until a scan succeeds.`,
             displayName: "Unverified Attendee",
-            productName: "Unrecognized QR Token",
+            productName: "Pass not verified",
             passCode: displayCode,
             entries: [],
           });
@@ -1195,7 +1107,7 @@ export default function ScannerApp() {
                 <div className="border-2 border-black bg-white divide-y-2 divide-black/10 max-h-48 overflow-y-auto">
                   {activeScanSheet.entries.map((entry, idx) => {
                     const isEntryGood = GOOD_OUTCOMES.has(entry.outcome);
-                    const isReentryOutcome = entry.outcome === "accepted_reentry" || entry.outcome === "duplicate";
+                    const isReentryOutcome = entry.outcome === "accepted_reentry";
                     return (
                       <div key={idx} className="p-2.5 flex items-center justify-between text-[11px]">
                         <div className="flex items-center gap-2">
@@ -1222,7 +1134,9 @@ export default function ScannerApp() {
                             ? "RE-ENTRY CLEARED"
                             : entry.outcome === "accepted"
                               ? "FIRST ENTRY"
-                              : entry.outcome.replace(/_/g, " ")}
+                              : entry.outcome === "duplicate"
+                                ? "ALREADY ADMITTED"
+                                : entry.outcome.replace(/_/g, " ")}
                         </span>
                       </div>
                     );

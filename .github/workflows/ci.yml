@@ -72,9 +72,70 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+  # The unit suite mocks Supabase, so SQL defects (a missing column inside a
+  # plpgsql body, a PostgREST select naming a column that does not exist, a
+  # function left executable by anon) pass it untouched. This job applies
+  # every migration to a real Postgres, runs the SQL smoke suites, and
+  # cross-checks the app's queries/RPC calls against the migrated schema.
+  db-check:
+    name: Database (migrations, smoke, schema refs)
+    if: github.event_name != 'workflow_dispatch' || inputs.action == 'deploy'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations + seed
+        run: |
+          psql -v ON_ERROR_STOP=1 -q -f supabase/smoke/bootstrap.sql
+          for f in supabase/migrations/*.sql; do
+            echo "::group::$f"
+            psql -v ON_ERROR_STOP=1 -q -f "$f"
+            echo "::endgroup::"
+          done
+          psql -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
+
+      - name: Schema reference check
+        run: pnpm db:check-refs
+
+      - name: SQL smoke suites
+        run: |
+          for f in supabase/smoke/0[1-9]-*.sql; do
+            echo "::group::$f"
+            psql -v ON_ERROR_STOP=1 -f "$f" | tee /tmp/smoke.out
+            grep -Eq 'ALL .*PASS' /tmp/smoke.out || { echo "::error::$f did not report ALL … PASS"; exit 1; }
+            echo "::endgroup::"
+          done
+
   build:
     name: Build & push image
-    needs: verify
+    needs: [verify, db-check]
     if: >-
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'push' ||

@@ -3,7 +3,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, guardAdminRead, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { rupeesToPaise } from "@/lib/money";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { merchandiseAdminSchema } from "@/lib/validation/schemas";
 import { invalidateContentCache } from "@/lib/invalidation";
 
@@ -16,7 +16,7 @@ type MerchCtx = RouteContext<"/api/admin/merchandise/[id]">;
  */
 export async function GET(req: NextRequest, ctx: MerchCtx) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Product");
     const admin = await guardAdminRead(req, "content.merchandise.read");
     const sb = await createServerSupabase();
 
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest, ctx: MerchCtx) {
  */
 export async function PATCH(req: NextRequest, ctx: MerchCtx) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Product");
     const admin = await guardAdminMutation(req, "content.merchandise.write");
     const body = await readJsonBody<Record<string, unknown>>(req);
     const parsed = merchandiseAdminSchema.safeParse(body);

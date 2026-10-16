@@ -158,6 +158,9 @@ export default function ResetPasswordForm() {
     } catch {
       // ignore
     }
+    // A full page load (not router.push) so no client state from the signed-out
+    // session survives into the login page.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.href = "/login";
   }
 

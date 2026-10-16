@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Users, CheckCircle2, Mail, Phone, Award, Sparkles, Send } from "lucide-react";
+import { CheckCircle2, Mail, Phone, Award, Sparkles, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { FEST, HAS_CONTACT } from "@/lib/data";
 

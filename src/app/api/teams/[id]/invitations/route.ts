@@ -4,6 +4,7 @@ import { validateMutationRequest } from "@/lib/csrf";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
 import { requireUser } from "@/services/authz";
 import { rotateInviteCode } from "@/services/team-service";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,7 @@ export async function POST(
   ctx: RouteContext<"/api/teams/[id]/invitations">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Team");
     const invalid = validateMutationRequest(req);
     if (invalid) return apiError(req, "BAD_REQUEST", invalid);
 

@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
-import { apiError, apiFromError, apiSuccess } from "@/lib/api";
+import { AppError, apiError, apiFromError, apiSuccess } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import {
   deviceCredentialHash,
@@ -76,9 +77,15 @@ export async function POST(req: NextRequest) {
     const { query } = parsed.data;
 
     // Call verify_gate_pass_lookup RPC
-    const { data: rpcResult } = await sb.rpc("verify_gate_pass_lookup", {
+    const { data: rpcResult, error: lookupError } = await sb.rpc("verify_gate_pass_lookup", {
       p_query: query,
     });
+    if (lookupError) {
+      // Never report "not found" for a lookup that did not run: the operator
+      // would turn away a valid attendee.
+      logger().error({ err: lookupError.message }, "verify_gate_pass_lookup failed");
+      throw new AppError("UPSTREAM_ERROR", "Lookup is temporarily unavailable. Please retry.");
+    }
 
     let result = rpcResult;
 
@@ -258,7 +265,10 @@ export async function POST(req: NextRequest) {
           });
 
           if (recordScanError) {
-            console.error("record_scan error during verify-card lookup:", recordScanError);
+            logger().error(
+              { err: recordScanError.message, passId: result.passId },
+              "record_scan failed during verify-card lookup"
+            );
           }
         }
       }

@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { validateMutationRequest } from "@/lib/csrf";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
-import { readJsonBody, requireIdempotencyKey } from "@/lib/route-utils";
+import { readJsonBody, requireIdempotencyKey, requireUuid } from "@/lib/route-utils";
 import { eventCheckoutSchema } from "@/lib/validation/schemas";
 import { requireUser, getFeatureFlag, assertNotMaintenance } from "@/services/authz";
 import { createEventCheckout } from "@/services/checkout-service";
@@ -20,7 +20,7 @@ export async function POST(
   ctx: RouteContext<"/api/checkout/events/[eventId]">
 ) {
   try {
-    const { eventId } = await ctx.params;
+    const eventId = requireUuid((await ctx.params).eventId, "Event");
     const invalid = validateMutationRequest(req);
     if (invalid) return apiError(req, "BAD_REQUEST", invalid);
 

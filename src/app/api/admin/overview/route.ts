@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminRead } from "@/lib/admin-route";
+import { hasPermission } from "@/services/authz";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { env, emailConfigured, emailProvider, EMAIL_PROVIDER_LABEL } from "@/lib/env";
 import { formatPaise } from "@/lib/money";
@@ -44,6 +45,9 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   try {
     const ctx = await guardAdminRead(req, "admin.access");
+    // Metrics are for every admin; participant names, phones and emails only
+    // for staff who may read registrations (not e.g. Auditor / Query Resolver).
+    const canReadParticipants = await hasPermission(ctx, "registration.read");
     const sb = createServiceRoleClient();
     const e = env();
 
@@ -57,6 +61,10 @@ export async function GET(req: NextRequest) {
     const cleanQ = q.replace(/[,()"\\]/g, " ").trim();
     const filter = req.nextUrl.searchParams.get("filter");
     const eventId = req.nextUrl.searchParams.get("eventId");
+
+    if (tab && !canReadParticipants) {
+      return apiError(req, "FORBIDDEN", "Missing permission: registration.read");
+    }
 
     // Helper to resolve profiles & emails concurrently for a list of user IDs
     async function resolveProfilesAndEmails(userIds: string[]) {
@@ -557,6 +565,7 @@ export async function GET(req: NextRequest) {
 
     // 2. Fetch page 1 of Orders
     const initialPageSize = 25;
+    const visibleRows = canReadParticipants ? initialPageSize : 0;
     const { data: rawOrders } = await sb
       .from("orders")
       .select(`
@@ -566,7 +575,7 @@ export async function GET(req: NextRequest) {
       `)
       .eq("festival_id", ctx.festivalId)
       .order("created_at", { ascending: false })
-      .range(0, initialPageSize - 1);
+      .limit(visibleRows);
 
     // 3. Fetch page 1 of Passes
     const { data: rawPasses } = await sb
@@ -577,7 +586,7 @@ export async function GET(req: NextRequest) {
       `)
       .eq("festival_id", ctx.festivalId)
       .order("created_at", { ascending: false })
-      .range(0, initialPageSize - 1);
+      .limit(visibleRows);
 
     // 4. Fetch page 1 of Registrations
     const { data: rawRegs } = await sb
@@ -598,14 +607,14 @@ export async function GET(req: NextRequest) {
       `)
       .eq("events.festival_id", ctx.festivalId)
       .order("created_at", { ascending: false })
-      .range(0, initialPageSize - 1);
+      .limit(visibleRows);
 
     // 5. Fetch page 1 of Group Entries
     const { data: rawGroupEntries } = await sb
       .from("group_entries")
       .select("id, public_entry_code, lead_name, email, phone, college, group_size, notes, created_at")
       .order("created_at", { ascending: false })
-      .range(0, initialPageSize - 1);
+      .limit(visibleRows);
 
     // 6. Gather all user IDs across page 1 results to resolve profiles & emails in one batch
     const allPageUserIds = new Set<string>();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { formatPaise, rupeesToPaise } from "@/lib/money";
+import { formatPaise } from "@/lib/money";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import {
@@ -14,8 +14,6 @@ import {
   AlertTriangle,
   FileSpreadsheet,
   X,
-  ExternalLink,
-  Sparkles,
 } from "lucide-react";
 
 interface AdminMerchandise {
@@ -50,8 +48,6 @@ const CATEGORY_PRESETS = [
   "Drinkware & Bottles",
   "Limited Drop",
 ];
-
-const STANDARD_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"];
 
 const EMPTY_FORM = {
   name: "",

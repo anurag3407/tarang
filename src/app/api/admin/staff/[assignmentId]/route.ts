@@ -4,7 +4,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +26,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/staff/[assignmentId]">
 ) {
   try {
-    const { assignmentId } = await ctx.params;
+    const assignmentId = requireUuid((await ctx.params).assignmentId, "Staff assignment");
     await guardAdminMutation(req, "staff.manage");
 
     const body = await readJsonBody<Record<string, unknown>>(req);

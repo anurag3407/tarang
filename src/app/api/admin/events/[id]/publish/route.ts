@@ -3,6 +3,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { invalidateContentCache } from "@/lib/invalidation";
+import { requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ export async function POST(
   ctx: RouteContext<"/api/admin/events/[id]/publish">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Event");
     const auth = await guardAdminMutation(req, "content.event.publish", {
       eventId: id,
     });

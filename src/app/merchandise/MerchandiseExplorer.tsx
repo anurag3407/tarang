@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, Sparkles, ShoppingBag } from "lucide-react";
+import { Search, ShoppingBag } from "lucide-react";
 import { MerchandiseCard } from "@/components/cards/MerchandiseCard";
 import { MerchandiseCheckoutModal } from "@/components/cards/MerchandiseCheckoutModal";
 import type { MerchandiseProductRead } from "@/domain/content";

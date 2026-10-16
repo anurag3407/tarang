@@ -47,9 +47,7 @@ describe("POST /api/admin/orders/[id]/refund", () => {
       data: {
         id: ORDER_ID,
         public_order_code: "PO-REF01",
-        purchaser_user_id: "u-payer",
-        checkout_state: "FULFILLED",
-        amount_paise: 299900,
+        festival_id: FESTIVAL_ID,
       },
       error: null,
     });
@@ -98,5 +96,55 @@ describe("POST /api/admin/orders/[id]/refund", () => {
     );
     expect(res.status).toBe(404);
     expectErrEnvelope(await json(res), "NOT_FOUND");
+  });
+
+  it("checks the dedicated refund.approve permission", async () => {
+    userSb.onRpc("has_permission", { data: false, error: null });
+    await refundOrderRoute(post(`/api/admin/orders/${ORDER_ID}/refund`, { body: {} }), ctx({ id: ORDER_ID }));
+    expect(userSb.rpcParams("has_permission")).toMatchObject({ p_permission: "refund.approve" });
+  });
+
+  it("does not touch another festival's order", async () => {
+    userSb.onRpc("has_permission", { data: true, error: null });
+    sb.onTable("orders", {
+      data: { id: ORDER_ID, public_order_code: "PO-REF01", festival_id: "99999999-9999-4999-8999-999999999999" },
+      error: null,
+    });
+    const res = await refundOrderRoute(post(`/api/admin/orders/${ORDER_ID}/refund`, { body: {} }), ctx({ id: ORDER_ID }));
+    expect(res.status).toBe(404);
+    expect(sb.callsFor("refund_order")).toEqual([]);
+  });
+
+  it("returns 404 for a malformed order id without querying", async () => {
+    userSb.onRpc("has_permission", { data: true, error: null });
+    const res = await refundOrderRoute(post(`/api/admin/orders/not-a-uuid/refund`, { body: {} }), ctx({ id: "not-a-uuid" }));
+    expect(res.status).toBe(404);
+    expect(sb.callsFor("refund_order")).toEqual([]);
+  });
+
+  it("surfaces NOT_REFUNDABLE as a conflict and never falls back to direct writes", async () => {
+    userSb.onRpc("has_permission", { data: true, error: null });
+    sb.onTable("orders", {
+      data: { id: ORDER_ID, public_order_code: "PO-REF01", festival_id: FESTIVAL_ID },
+      error: null,
+    });
+    sb.onRpc("refund_order", { data: null, error: { message: "NOT_REFUNDABLE" } });
+    const res = await refundOrderRoute(post(`/api/admin/orders/${ORDER_ID}/refund`, { body: {} }), ctx({ id: ORDER_ID }));
+    expect(res.status).toBe(409);
+    expectErrEnvelope(await json(res), "CONFLICT");
+    const writes = sb.calls.filter((c) => ["update", "insert", "upsert"].includes(c.action));
+    expect(writes).toEqual([]);
+  });
+
+  it("fails loudly when the refund function errors", async () => {
+    userSb.onRpc("has_permission", { data: true, error: null });
+    sb.onTable("orders", {
+      data: { id: ORDER_ID, public_order_code: "PO-REF01", festival_id: FESTIVAL_ID },
+      error: null,
+    });
+    sb.onRpc("refund_order", { data: null, error: { message: "deadlock detected" } });
+    const res = await refundOrderRoute(post(`/api/admin/orders/${ORDER_ID}/refund`, { body: {} }), ctx({ id: ORDER_ID }));
+    expect(res.status).toBe(500);
+    expect(sb.calls.filter((c) => c.action === "update")).toEqual([]);
   });
 });

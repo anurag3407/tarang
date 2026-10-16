@@ -43,6 +43,19 @@ export async function readRawBody(req: NextRequest, maxBytes = 1024 * 1024): Pro
   return req.text();
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Validate a UUID path parameter. A malformed id can never match a row, so
+ * answer NOT_FOUND instead of letting Postgres reject the cast as a 500.
+ */
+export function requireUuid(value: string, label = "Resource"): string {
+  if (!UUID_RE.test(value)) {
+    throw new AppError("NOT_FOUND", `${label} not found`);
+  }
+  return value;
+}
+
 /** Extract and validate the Idempotency-Key header (plan §7.9). */
 export function requireIdempotencyKey(req: NextRequest): string {
   const raw = req.headers.get("idempotency-key");
@@ -73,11 +86,16 @@ export async function verifyQstashSignature(req: NextRequest, body: string): Pro
     currentSigningKey: e.QSTASH_CURRENT_SIGNING_KEY,
     nextSigningKey: e.QSTASH_NEXT_SIGNING_KEY ?? undefined,
   });
+  // QStash signs the public URL it delivered to. Behind nginx/Cloudflare,
+  // req.url is the internal http:// URL, so rebuild it from the configured
+  // public base when there is one.
+  const publicBase = (e.HOOKS_BASE_URL ?? e.APP_BASE_URL)?.replace(/\/$/, "");
+  const url = publicBase ? `${publicBase}${req.nextUrl.pathname}${req.nextUrl.search}` : req.url;
   try {
     await receiver.verify({
       signature,
       body,
-      url: req.url,
+      url,
     });
   } catch {
     throw new AppError("UNAUTHORIZED", "Invalid QStash signature");

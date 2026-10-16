@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { formatPaise } from "@/lib/money";
 import { ensureRazorpayLoaded } from "@/lib/razorpay-loader";
+import { createCheckout, isPayable } from "@/lib/checkout-client";
 import type { EventRead } from "@/domain/content";
 
 interface UserPass {
@@ -31,16 +32,6 @@ interface UserPass {
 interface EventRegistrationModalProps {
   event: EventRead | null;
   onClose: () => void;
-}
-
-interface CheckoutData {
-  localOrderId: string;
-  publicOrderCode: string;
-  razorpayOrderId: string | null;
-  razorpayKeyId: string | null;
-  amountPaise: number;
-  currency: string;
-  status: string;
 }
 
 export default function EventRegistrationModal({
@@ -57,6 +48,7 @@ export default function EventRegistrationModal({
   const [message, setMessage] = useState("");
   const [registrationCode, setRegistrationCode] = useState<string | null>(null);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idempotencyKeyRef = useRef<string>("");
 
   // Check auth and passes on open
   useEffect(() => {
@@ -107,8 +99,9 @@ export default function EventRegistrationModal({
   const pollOrderStatus = useCallback(
     async (orderId: string, attempt = 0) => {
       if (attempt > 10) {
-        setPhase("done");
-        setMessage("Your registration is being processed! Check your dashboard shortly.");
+        // Never claim success without a FULFILLED order.
+        setPhase("processing");
+        setMessage("Still confirming your registration. Check your dashboard in a few minutes.");
         return;
       }
       try {
@@ -122,6 +115,18 @@ export default function EventRegistrationModal({
             setMessage("Registration confirmed! You're all set to compete.");
             return;
           }
+          if (body.data.underReview === true) {
+            setPhase("error");
+            setMessage(
+              "We received a payment for this registration and it is being reviewed by the organizers. Please do not pay again."
+            );
+            return;
+          }
+          if ((status === "EXPIRED" || status === "CANCELLED") && body.data.paymentObserved !== true) {
+            setPhase("error");
+            setMessage("This order expired before payment completed. Please register again.");
+            return;
+          }
         }
       } catch {
         // Retry
@@ -131,6 +136,11 @@ export default function EventRegistrationModal({
     },
     []
   );
+
+  // One idempotency key per event: retries resume the same order.
+  useEffect(() => {
+    idempotencyKeyRef.current = crypto.randomUUID();
+  }, [event?.id]);
 
   useEffect(() => {
     pollFnRef.current = pollOrderStatus;
@@ -150,35 +160,44 @@ export default function EventRegistrationModal({
     setMessage("");
 
     try {
-      const idempotencyKey = crypto.randomUUID();
-      const res = await fetch(`/api/checkout/events/${event.id}`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "Idempotency-Key": idempotencyKey,
-        },
-        body: JSON.stringify({
-          registrationMode: event.registrationMode || "INDIVIDUAL",
-        }),
-      });
-
-      const body = await res.json();
-      if (!res.ok || !body.ok) {
-        if (body.code === "PROFILE_INCOMPLETE") {
+      // Same key across retries: a second click resumes this order (see
+      // createCheckout) instead of colliding with its own held claim.
+      const created = await createCheckout(
+        `/api/checkout/events/${event.id}`,
+        { registrationMode: event.registrationMode || "INDIVIDUAL" },
+        idempotencyKeyRef
+      );
+      if (!created.ok) {
+        if (created.code === "PROFILE_INCOMPLETE") {
           router.push("/complete-profile");
           return;
         }
-        throw new Error(body.message || "Checkout creation failed");
+        throw new Error(created.message);
       }
+      const checkoutData = created.data;
 
-      const checkoutData = body.data as CheckoutData;
-
-      // Free event: instant fulfillment
-      if (checkoutData.amountPaise === 0 || checkoutData.status === "FULFILLED") {
+      if (checkoutData.status === "FULFILLED") {
         setPhase("done");
         setRegistrationCode(checkoutData.publicOrderCode);
         setMessage("Registration confirmed! You are registered for this event.");
         return;
+      }
+      if (checkoutData.status === "PAYMENT_REVIEW") {
+        setPhase("error");
+        setMessage(
+          "We received a payment for this registration and it is being reviewed by the organizers. Please do not pay again."
+        );
+        return;
+      }
+      if (checkoutData.amountPaise === 0) {
+        // Free event: fulfillment runs server-side; confirm before claiming success.
+        setPhase("processing");
+        setMessage("Confirming your registration…");
+        pollOrderStatus(checkoutData.localOrderId);
+        return;
+      }
+      if (!isPayable(checkoutData)) {
+        throw new Error("The payment gateway is busy. Please try again in a moment — your order is kept.");
       }
 
       // Paid event: open Razorpay
@@ -227,17 +246,19 @@ export default function EventRegistrationModal({
           }
         },
         modal: {
+          // Do not cancel the order here: a UPI collect request can already
+          // be with the bank, and cancelling would turn that payment into a
+          // refund case. The hold expires on its own; Register resumes it.
           ondismiss: () => {
             setPhase("idle");
-            setMessage("Payment window closed. You can retry whenever you are ready.");
-            void fetch(`/api/checkout/orders/${checkoutData.localOrderId}/cancel`, { method: "POST" });
+            setMessage("Payment window closed. Tap Register to resume the same order.");
           },
         },
       });
+      // Razorpay keeps the modal open after a failed attempt so the user can
+      // try another method on the same order — the order must stay alive.
       rzp.on("payment.failed", () => {
-        setPhase("idle");
-        setMessage("Payment could not be completed. No money was deducted.");
-        void fetch(`/api/checkout/orders/${checkoutData.localOrderId}/cancel`, { method: "POST" });
+        setMessage("That payment attempt failed. You can try another method in the payment window.");
       });
       rzp.open();
     } catch (err) {

@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
-import { apiError, apiFromError, apiSuccess } from "@/lib/api";
+import { AppError, apiError, apiFromError, apiSuccess } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { validateMutationRequest } from "@/lib/csrf";
 import { supabaseConfigured } from "@/lib/env";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
@@ -41,7 +42,6 @@ interface VerifyRow {
   name?: string | null;
   description?: string | null;
   year?: string | null;
-  title?: string | null;
   starts_at?: string | null;
   ends_at?: string | null;
   line_kind?: string | null;
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     ];
 
     let passRecord: VerifyRow | null = null;
-    const { data: passes } = await sb
+    const { data: passes, error: passesErr } = await sb
       .from("delegate_passes")
       .select(`
         id,
@@ -147,11 +147,12 @@ export async function POST(req: NextRequest) {
       .in("public_pass_code", possiblePassCodes)
       .order("created_at", { ascending: false })
       .limit(1);
+    assertLookup(passesErr);
 
     if (passes && passes.length > 0) {
       passRecord = passes[0];
     } else if (isUuid) {
-      const { data: passById } = await sb
+      const { data: passById, error: passByIdErr } = await sb
         .from("delegate_passes")
         .select(`
           id,
@@ -178,6 +179,7 @@ export async function POST(req: NextRequest) {
         `)
         .eq("id", cleanCode)
         .maybeSingle();
+      assertLookup(passByIdErr);
 
       if (passById) passRecord = passById;
     }
@@ -188,11 +190,12 @@ export async function POST(req: NextRequest) {
 
       let profileRecord: VerifyRow | null = null;
       if (passRecord.user_id) {
-        const { data: prof } = await sb
+        const { data: prof, error: profErr } = await sb
           .from("profiles")
           .select("display_name, college_name")
           .eq("user_id", passRecord.user_id)
           .maybeSingle();
+        assertLookup(profErr);
         profileRecord = prof;
       }
 
@@ -257,7 +260,7 @@ export async function POST(req: NextRequest) {
     ];
 
     let regRecord: VerifyRow | null = null;
-    const { data: regs } = await sb
+    const { data: regs, error: regsErr } = await sb
       .from("registrations")
       .select(`
         id,
@@ -269,8 +272,7 @@ export async function POST(req: NextRequest) {
         team_name,
         events (
           id,
-          title,
-          category,
+          name,
           starts_at,
           ends_at
         )
@@ -278,11 +280,12 @@ export async function POST(req: NextRequest) {
       .in("public_registration_code", possibleRegCodes)
       .order("created_at", { ascending: false })
       .limit(1);
+    assertLookup(regsErr);
 
     if (regs && regs.length > 0) {
       regRecord = regs[0];
     } else if (isUuid) {
-      const { data: regById } = await sb
+      const { data: regById, error: regByIdErr } = await sb
         .from("registrations")
         .select(`
           id,
@@ -294,14 +297,14 @@ export async function POST(req: NextRequest) {
           team_name,
           events (
             id,
-            title,
-            category,
+            name,
             starts_at,
             ends_at
           )
         `)
         .eq("id", cleanCode)
         .maybeSingle();
+      assertLookup(regByIdErr);
 
       if (regById) regRecord = regById;
     }
@@ -310,11 +313,12 @@ export async function POST(req: NextRequest) {
       const ev = firstRow(regRecord.events);
       let profileRecord: VerifyRow | null = null;
       if (regRecord.owner_user_id) {
-        const { data: prof } = await sb
+        const { data: prof, error: profErr } = await sb
           .from("profiles")
           .select("display_name, college_name")
           .eq("user_id", regRecord.owner_user_id)
           .maybeSingle();
+        assertLookup(profErr);
         profileRecord = prof;
       }
 
@@ -328,9 +332,9 @@ export async function POST(req: NextRequest) {
         statusLabel: isConfirmed ? "AUTHENTIC REGISTRATION" : "CANCELLED REGISTRATION",
         passCode: regRecord.public_registration_code,
         passType: "EVENT_REGISTRATION",
-        productName: ev?.title || "Event Registration",
-        description: `Official registration for ${ev?.title || "Competition"}`,
-        accessSummary: `Confirmed participation in ${ev?.title || "Event"}${regRecord.team_name ? ` (Team: ${regRecord.team_name})` : ""}`,
+        productName: ev?.name || "Event Registration",
+        description: `Official registration for ${ev?.name || "Competition"}`,
+        accessSummary: `Confirmed participation in ${ev?.name || "Event"}${regRecord.team_name ? ` (Team: ${regRecord.team_name})` : ""}`,
         purchasedAt: purchasedAt ? new Date(purchasedAt).toISOString() : null,
         expiresAt: ev?.ends_at ? new Date(ev.ends_at).toISOString() : null,
         maskedName: maskName(profileRecord?.display_name ?? null),
@@ -351,7 +355,7 @@ export async function POST(req: NextRequest) {
     ];
 
     let orderRecord: VerifyRow | null = null;
-    const { data: orders } = await sb
+    const { data: orders, error: ordersErr } = await sb
       .from("orders")
       .select(`
         id,
@@ -365,17 +369,18 @@ export async function POST(req: NextRequest) {
           line_kind,
           description_snapshot,
           pass_products ( name, slug, is_base_pass ),
-          events ( title )
+          events ( name )
         )
       `)
       .in("public_order_code", possibleOrderCodes)
       .order("created_at", { ascending: false })
       .limit(1);
+    assertLookup(ordersErr);
 
     if (orders && orders.length > 0) {
       orderRecord = orders[0];
     } else if (isUuid) {
-      const { data: orderById } = await sb
+      const { data: orderById, error: orderByIdErr } = await sb
         .from("orders")
         .select(`
           id,
@@ -389,11 +394,12 @@ export async function POST(req: NextRequest) {
             line_kind,
             description_snapshot,
             pass_products ( name, slug, is_base_pass ),
-            events ( title )
+            events ( name )
           )
         `)
         .eq("id", cleanCode)
         .maybeSingle();
+      assertLookup(orderByIdErr);
 
       if (orderById) orderRecord = orderById;
     }
@@ -401,11 +407,12 @@ export async function POST(req: NextRequest) {
     if (orderRecord) {
       let profileRecord: VerifyRow | null = null;
       if (orderRecord.purchaser_user_id) {
-        const { data: prof } = await sb
+        const { data: prof, error: profErr } = await sb
           .from("profiles")
           .select("display_name, college_name")
           .eq("user_id", orderRecord.purchaser_user_id)
           .maybeSingle();
+        assertLookup(profErr);
         profileRecord = prof;
       }
 
@@ -423,7 +430,7 @@ export async function POST(req: NextRequest) {
         productName:
           line?.description_snapshot ||
           firstRow(line?.pass_products)?.name ||
-          firstRow(line?.events)?.title ||
+          firstRow(line?.events)?.name ||
           "Festival Order",
         description: "Official TARANG purchase order",
         accessSummary: isFulfilled
@@ -451,6 +458,20 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     return apiFromError(req, err);
+  }
+}
+
+/**
+ * A failed lookup must never fall through to the "not found" verdict: that
+ * would label a genuine pass as counterfeit whenever the database errors.
+ */
+function assertLookup(error: { message: string } | null): void {
+  if (error) {
+    logger().error({ err: error.message }, "verify lookup failed");
+    throw new AppError(
+      "UPSTREAM_ERROR",
+      "Verification is temporarily unavailable. Please try again later."
+    );
   }
 }
 

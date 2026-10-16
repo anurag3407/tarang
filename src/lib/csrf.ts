@@ -54,17 +54,20 @@ export function isAllowedOrigin(req: NextRequest): boolean {
 /**
  * Validate a mutation request: origin check + JSON content type + bounded
  * body size. Returns an error string or null when the request is acceptable.
+ * File-upload routes opt in to multipart/form-data with `allowMultipart`.
  */
 export function validateMutationRequest(
   req: NextRequest,
-  opts: { maxBodyBytes?: number } = {}
+  opts: { maxBodyBytes?: number; allowMultipart?: boolean } = {}
 ): string | null {
   if (!isAllowedOrigin(req)) return "ORIGIN_NOT_ALLOWED";
   const contentType = req.headers.get("content-type");
   const length = req.headers.get("content-length");
 
   if (contentType) {
-    if (!contentType.toLowerCase().includes("application/json")) {
+    const type = contentType.toLowerCase();
+    const multipartOk = opts.allowMultipart === true && type.startsWith("multipart/form-data");
+    if (!type.includes("application/json") && !multipartOk) {
       return "UNSUPPORTED_CONTENT_TYPE";
     }
   } else if (length && Number(length) > 0) {

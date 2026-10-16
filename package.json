@@ -18,6 +18,7 @@
     "seed:clicks": "tsx scripts/seed-clicks.ts",
     "doctor": "tsx scripts/doctor.ts",
     "db:apply": "tsx scripts/apply-sql.ts",
+    "db:check-refs": "node scripts/check-db-refs.mjs",
     "grant:superadmin": "tsx scripts/grant-superadmin.ts",
     "supabase:lint": "supabase db lint",
     "supabase:reset": "supabase db reset",

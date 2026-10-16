@@ -3,7 +3,7 @@ import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation, mapAdminRpcError } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { rupeesToPaise } from "@/lib/money";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 import { eventPriceSchema } from "@/lib/validation/schemas";
 import { invalidateContentCache } from "@/lib/invalidation";
 
@@ -21,7 +21,7 @@ export async function POST(
   ctx: RouteContext<"/api/admin/events/[id]/price">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Event");
     const auth = await guardAdminMutation(req, "content.event.price.write", {
       eventId: id,
     });

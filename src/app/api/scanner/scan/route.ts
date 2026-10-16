@@ -84,7 +84,9 @@ export async function POST(req: NextRequest) {
       defaultScannerCredentialEnabled() &&
       deviceCredential === DEFAULT_SCANNER_CREDENTIAL
     ) {
-      gateId = await ensureGateAssignment(sb, device.id, ctx.userId, input.gateId);
+      // An unknown/inactive gate yields "": keep the requested id so
+      // record_scan answers wrong_gate instead of failing the uuid cast.
+      gateId = (await ensureGateAssignment(sb, device.id, ctx.userId, input.gateId)) || input.gateId;
     }
 
     const result = await performScan({

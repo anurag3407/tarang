@@ -3,7 +3,7 @@ import { z } from "zod";
 import { apiError, apiFromError, apiSuccess } from "@/lib/api";
 import { guardAdminMutation } from "@/lib/admin-route";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { readJsonBody } from "@/lib/route-utils";
+import { readJsonBody, requireUuid } from "@/lib/route-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/questions/[id]">
 ) {
   try {
-    const { id } = await ctx.params;
+    const id = requireUuid((await ctx.params).id, "Question");
     await guardAdminMutation(req, "support.resolve");
     const body = await readJsonBody<Record<string, unknown>>(req);
     const parsed = patchSchema.safeParse(body);

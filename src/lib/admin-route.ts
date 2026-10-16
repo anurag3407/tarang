@@ -26,10 +26,11 @@ export async function guardAdminRead(
 export async function guardAdminMutation(
   req: NextRequest,
   permission: PermissionCode,
-  opts: { eventId?: string; maxBodyBytes?: number } = {}
+  opts: { eventId?: string; maxBodyBytes?: number; allowMultipart?: boolean } = {}
 ): Promise<AuthContext> {
   const invalid = validateMutationRequest(req, {
     maxBodyBytes: opts.maxBodyBytes,
+    allowMultipart: opts.allowMultipart,
   });
   if (invalid) throw new AppError("BAD_REQUEST", invalid);
 
