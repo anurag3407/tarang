@@ -1,7 +1,8 @@
 import type { NextRequest } from "next/server";
 import QRCode from "qrcode";
 import { NextResponse } from "next/server";
-import { apiError, apiFromError, apiSuccess } from "@/lib/api";
+import { AppError, apiError, apiFromError, apiSuccess } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { requireUser } from "@/services/authz";
 import { enforceRateLimit } from "@/lib/redis/rate-limits";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
@@ -52,7 +53,23 @@ export async function GET(
     // Ensure a credential exists (normally created by the ISSUE_QR worker;
     // this is a safe idempotent fallback for the dashboard).
     await issueQrCredential(passId);
-    const { token, expiresAt } = await buildQrToken(passId);
+    let token: string;
+    let expiresAt: string;
+    try {
+      ({ token, expiresAt } = await buildQrToken(passId));
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      // Signing failed (key configuration). The pass itself is fine — say so,
+      // and log the real cause for the operators.
+      logger().error(
+        { passId, err: err instanceof Error ? err.message : String(err) },
+        "gate QR signing failed"
+      );
+      throw new AppError(
+        "MAINTENANCE",
+        "Your pass is confirmed, but its gate QR cannot be generated right now. Please try again shortly."
+      );
+    }
 
     if (req.nextUrl.searchParams.get("format") === "png") {
       const png = await QRCode.toBuffer(token, {

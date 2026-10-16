@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 // Generate a throwaway Ed25519 keypair for the test process. The env vars
 // hold DER bytes (PKCS8/SPKI) base64-encoded, matching how production stores
-// them (pemFromRaw wraps DER into PEM for jose).
+// them (the documented format; see tests/qr-key-formats.test.ts for the rest).
 const { publicKey, privateKey } = generateKeyPairSync("ed25519");
 process.env.QR_ED25519_PRIVATE_KEY_BASE64 = privateKey
   .export({ type: "pkcs8", format: "der" })

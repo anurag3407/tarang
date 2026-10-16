@@ -2,6 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getRequestId } from "./request-context";
+import { logger } from "./logger";
 import type { ApiErrorCode } from "./errors";
 import { AppError } from "./errors";
 
@@ -87,10 +88,29 @@ export function apiError(
   return NextResponse.json(body, { status: STATUS[code] ?? 500 });
 }
 
-/** Map a thrown AppError to a response. */
+/**
+ * Map a thrown error to a response. Anything that is not a deliberate client
+ * error is logged with the request id, so a 500 is always traceable in the
+ * server logs (the response body never carries internals).
+ */
 export function apiFromError(req: NextRequest, err: unknown) {
   if (err instanceof AppError) {
+    if (err.code === "INTERNAL" || err.code === "UPSTREAM_ERROR") {
+      logger().error(
+        { requestId: getRequestId(req), path: req.nextUrl?.pathname, code: err.code, err: err.message },
+        "request failed"
+      );
+    }
     return apiError(req, err.code, err.message, err.details);
   }
+  logger().error(
+    {
+      requestId: getRequestId(req),
+      path: req.nextUrl?.pathname,
+      err: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack?.split("\n").slice(0, 6).join("\n") : undefined,
+    },
+    "unhandled error in route"
+  );
   return apiError(req, "INTERNAL", "Unexpected server error");
 }

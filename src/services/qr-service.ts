@@ -2,6 +2,7 @@ import "server-only";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { AppError } from "@/lib/errors";
 import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
 import { signQrToken, payloadDigest } from "@/lib/qr/credential";
 import type { QrPayload } from "@/domain/scanning";
 
@@ -78,6 +79,10 @@ export async function issueQrCredential(
         .maybeSingle();
       if (winner) return { credentialId: winner.id, jti: winner.jti };
     }
+    logger().error(
+      { delegatePassId, err: error.message, code: error.code },
+      "qr credential insert failed"
+    );
     throw new AppError("INTERNAL", "Could not create QR credential");
   }
 

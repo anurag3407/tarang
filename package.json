@@ -17,6 +17,7 @@
     "seed:content": "tsx scripts/seed-content.ts",
     "seed:clicks": "tsx scripts/seed-clicks.ts",
     "doctor": "tsx scripts/doctor.ts",
+    "qr:keygen": "node scripts/generate-qr-keys.mjs",
     "db:apply": "tsx scripts/apply-sql.ts",
     "db:check-refs": "node scripts/check-db-refs.mjs",
     "grant:superadmin": "tsx scripts/grant-superadmin.ts",

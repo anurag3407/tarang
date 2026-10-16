@@ -674,7 +674,7 @@ function checkQr(): void {
       "FAIL",
       "Keypair",
       "missing — passes cannot be signed and scanning fails closed",
-      "Generate an Ed25519 keypair and set both base64 values."
+      "Run `pnpm qr:keygen` and paste the three lines into .env (passes get no QR and no confirmation email until then)."
     );
     return;
   }

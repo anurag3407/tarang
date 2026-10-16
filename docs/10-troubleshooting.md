@@ -239,3 +239,36 @@ blocking sales.
    "Under Attack" mode keys on IP for `/api/*`, `/login`, `/auth/*` or `/pronite-pass`.
 4. **Upstash.** Confirm the plan's request quota covers launch-day traffic; when it runs
    out every limiter call errors (see the fallback above).
+
+## Paid, but no gate QR and no confirmation email
+
+They share one cause more often than not: the pass email **waits for its gate QR**
+(`enqueueOrderEmails` refuses to send a pass email without one), and both are signed
+with the Ed25519 key in `QR_ED25519_PRIVATE_KEY_BASE64`. Symptoms: the pass page
+shows "gate QR cannot be generated right now" (HTTP 503 from `/api/me/passes/:id/qr`)
+and the email never arrives.
+
+1. **Find the cause** — `docker compose logs web worker | grep -E "gate QR|qr credential|outbox job failed"`,
+   or in Supabase SQL:
+   ```sql
+   select job_type, state, attempts, last_error from outbox_jobs
+   where job_type in ('ISSUE_QR', 'SEND_EMAIL') order by created_at desc limit 20;
+   select state, attempts, last_error, to_email_snapshot from email_jobs
+   order by created_at desc limit 20;
+   ```
+   `QR_ED25519_… is not configured / could not be read / does not match` → step 2.
+   `email_jobs.last_error` like "Resend not configured" / a provider error → fix
+   `RESEND_API_KEY` (or `USE_SES` + SES keys) and the verified `EMAIL_FROM` domain.
+2. **Keys** — `pnpm qr:keygen`, paste the three lines into `/opt/tarang/.env`, redeploy
+   (or `docker compose up -d` to reload env). Raw 32-byte keys and PEM also work, and the
+   public key may be left empty. Keep the key stable: changing it invalidates QRs already
+   shown/emailed under the same `QR_SIGNING_KEY_ID`.
+3. **Re-drive what failed meanwhile** — jobs that exhausted their retries are `DEAD`:
+   ```sql
+   update outbox_jobs
+   set state = 'PENDING', attempts = 0, run_at = now(), last_error = null,
+       lease_owner = null, lease_expires_at = null, updated_at = now()
+   where job_type in ('ISSUE_QR', 'SEND_EMAIL') and state in ('DEAD', 'RETRY_WAIT');
+   ```
+   The worker picks them up within a minute. For a single order, Admin → Orders → Resend
+   email does the same.
