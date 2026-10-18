@@ -222,7 +222,9 @@ export async function getPublishedEvents(
       teamSizeLabel: teamSizeLabel(e.registration_mode, e.min_team_size, e.max_team_size),
       amountPaise: prices.get(e.current_price_version_id) ?? 0,
       currency: "INR",
-      prizePoolText: e.prize_pool_text,
+      // Award amounts are held back from the public site until the committee
+      // announces them; admin screens still read the stored text directly.
+      prizePoolText: e.prize_pool_text ? "Revealing soon" : "",
       featured: e.featured,
       imageUrl: e.image_url ?? null,
       salesState: e.sales_state,
