@@ -94,6 +94,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.5,
     },
+    ...["/contact", "/terms", "/privacy", "/refund-policy", "/shipping-policy"].map((path) => ({
+      url: `${baseUrl}${path}`,
+      lastModified: currentDate,
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    })),
   ];
 
   return routes;

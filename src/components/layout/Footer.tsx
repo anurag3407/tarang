@@ -2,6 +2,7 @@ import Link from "next/link";
 import Wordmark from "@/components/tarang/Wordmark";
 import { FEST, HAS_CONTACT } from "@/lib/data";
 import { ClickTracker } from "@/components/analytics/ClickTracker";
+import { POLICY_LINKS } from "@/components/layout/LegalPage";
 
 const EXPLORE = [
   { href: "/events", label: "All Events" },
@@ -20,6 +21,7 @@ const HELP = [
   { href: "/ask", label: "Ask a Question" },
   { href: "/campus-ambassador", label: "Campus Ambassador" },
   { href: "/reach", label: "How to Reach" },
+  { href: "/contact", label: "Contact Us" },
 ];
 
 const STAFF_LINKS = [
@@ -75,6 +77,7 @@ export default function Footer() {
             <Column title="Explore" links={EXPLORE} />
             <div className="space-y-12">
               <Column title="Help desk" links={HELP} />
+              <Column title="Policies" links={POLICY_LINKS.filter((l) => l.href !== "/contact")} />
             </div>
             <div className="col-span-2 space-y-12 sm:col-span-1">
               <div>
