@@ -94,7 +94,9 @@ function chainTable(node) {
   while (cur) {
     if (ts.isCallExpression(cur) && ts.isPropertyAccessExpression(cur.expression)) {
       if (cur.expression.name.text === "from") {
-        return cur.expression.expression.getText().includes("storage") ? null : strLit(cur.arguments[0]);
+        const expr = cur.expression.expression.getText();
+        if (expr === "Buffer" || expr === "Array" || expr.includes("storage")) return null;
+        return strLit(cur.arguments[0]);
       }
       cur = cur.expression.expression;
     } else if (ts.isPropertyAccessExpression(cur)) {
@@ -177,9 +179,12 @@ for (const file of walk(join(ROOT, "src"))) {
       }
 
       if (method === "from") {
-        const t = strLit(n.arguments[0]);
-        if (t && !cols.has(t) && !n.expression.expression.getText().includes("storage")) {
-          issues.push(`${loc(n)}  from("${t}"): no such table or view`);
+        const expr = n.expression.expression.getText();
+        if (expr !== "Buffer" && expr !== "Array" && !expr.includes("storage")) {
+          const t = strLit(n.arguments[0]);
+          if (t && !cols.has(t)) {
+            issues.push(`${loc(n)}  from("${t}"): no such table or view`);
+          }
         }
       }
 
