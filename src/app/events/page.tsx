@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "All events at TARANG 2026 — entry fees, prize pools, timings, venues and team sizes for every competition across 8 categories.",
+    "All events at TARANG 2026 — schedule, categories, venues, team sizes and delegate registration details across 8 cultural categories.",
 };
 
 export default async function EventsPage() {
@@ -23,7 +23,7 @@ export default async function EventsPage() {
         kicker={events.length > 0 ? `${events.length} competitions` : "All competitions"}
         title="All"
         accent="events"
-        description="Entry fees, prize pools, timings and team sizes — everything you need before you register."
+        description="Schedule, categories, and delegate registration details — everything you need before you register."
       />
       <Suspense
         fallback={

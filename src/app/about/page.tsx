@@ -8,7 +8,7 @@ import { FEST } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "About Tarang & NIT Patna",
-  description: `TARANG is the cultural festival of ${FEST.collegeFull} — two pronites and two days of music, dance, theatre and competitions on the banks of the Ganga.`,
+  description: FEST.summary,
 };
 
 /** Institute milestones — from NIT Patna’s public record. */
@@ -41,7 +41,7 @@ export default function AboutPage() {
         kicker="The festival & the institute"
         title="About"
         accent="Tarang"
-        description={`TARANG is the cultural festival of ${FEST.collegeFull}. ${FEST.tagline} Two days, two pronites, one wave.`}
+        description={`${FEST.summary} ${FEST.tagline}`}
       />
 
       {/* The word */}

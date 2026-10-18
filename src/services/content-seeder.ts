@@ -18,7 +18,7 @@ export const DEFAULT_CATEGORIES = [
   { slug: "literary", name: "Literary", tagline: "Debate, quiz, poetry & creative writing", icon_key: "Brain", color_key: "accent", sort_order: 5 },
   { slug: "sports", name: "Sports", tagline: "Cricket, football, badminton, athletics & gaming", icon_key: "Dumbbell", color_key: "secondary", sort_order: 6 },
   { slug: "medsci", name: "Tech & Quiz", tagline: "Quizzing, robotics, hackathons & tech showcases", icon_key: "Brain", color_key: "muted", sort_order: 7 },
-  { slug: "informal", name: "Informals", tagline: "Fun games, scavenger hunts & casual contests", icon_key: "Gamepad2", color_key: "white", sort_order: 8 },
+  { slug: "informal", name: "Informals", tagline: "Fun games, scavenger hunts & open-floor activities", icon_key: "Gamepad2", color_key: "white", sort_order: 8 },
 ];
 
 /**

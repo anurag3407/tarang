@@ -19,6 +19,9 @@ export const FEST = {
   collegeShort: "NIT Patna",
   collegeFull: "National Institute of Technology Patna",
   tagline: "Mute the mundane.",
+  /** Plain-language description of the fest — used wherever the site explains what it is. */
+  summary:
+    "TARANG 2026 is the annual college cultural festival of the National Institute of Technology Patna, organised by its students. Registrations give delegates access to cultural performances, workshops, student showcases and the pronites.",
   dates: "21 – 22 November 2026",
   datesShort: "21–22 NOV '26",
   /** Printed on the Pronite Pass, set in Noot. */
@@ -32,14 +35,13 @@ export const FEST = {
   geo: { lat: 25.61056, lng: 85.14167 },
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=National+Institute+of+Technology+Patna",
   /**
-   * Official contact channels. Left empty until the organising committee
-   * confirms them — every place that shows contact details hides itself
-   * while these are blank.
+   * Official contact channels. Every place that shows contact details hides
+   * a channel while it is blank.
    */
   instagram: "" as string,
-  email: "" as string,
-  phone: "" as string,
-  phones: [] as string[],
+  email: "tarang.nitp@gmail.com" as string,
+  phone: "+91 70616 33407" as string,
+  phones: ["+91 70616 33407"] as string[],
   stats: [
     { value: "2", label: "Days" },
     { value: "2", label: "Pronites" },
@@ -126,7 +128,7 @@ export const CATEGORIES: Category[] = [
   {
     id: "informal",
     name: "Informals",
-    tagline: "Fun games, scavenger hunts & casual contests",
+    tagline: "Fun games, scavenger hunts & open-floor activities",
     icon: "sparkles",
     color: "white",
   },

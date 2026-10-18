@@ -19,7 +19,7 @@ export function FestivalEventJsonLd({ baseUrl }: { baseUrl: string }) {
     "@type": "Festival",
     "name": `${FEST.name} ${FEST.year} — ${FEST.college} Cultural Fest`,
     "alternateName": ["TARANG NIT Patna", "Tarang 2026", "Tarang ’26"],
-    "description": `TARANG is the cultural festival of ${FEST.collegeFull} — two pronites and two days of music, dance, theatre and competitions. ${FEST.tagline}`,
+    "description": FEST.summary,
     "startDate": "2026-11-21T09:00:00+05:30",
     "endDate": "2026-11-22T23:59:59+05:30",
     "eventStatus": "https://schema.org/EventScheduled",

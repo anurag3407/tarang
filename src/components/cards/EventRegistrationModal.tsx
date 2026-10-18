@@ -409,7 +409,7 @@ export default function EventRegistrationModal({
             <div className="border-4 border-black bg-white p-3 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-black/60">
-                  Competition Entry Fee
+                  Registration Fee
                 </span>
                 <p className="text-2xl font-black">
                   {event.amountPaise === 0 ? "FREE" : formatPaise(event.amountPaise)}
@@ -418,7 +418,7 @@ export default function EventRegistrationModal({
               {event.prizePoolText && (
                 <div className="text-right">
                   <span className="text-[10px] font-black uppercase tracking-widest text-black/60 flex items-center gap-1 justify-end">
-                    <Trophy className="h-3 w-3" /> Prize Pool
+                    <Trophy className="h-3 w-3" /> Awards &amp; Recognition
                   </span>
                   <p className="text-sm font-black text-neo-accent">{event.prizePoolText}</p>
                 </div>

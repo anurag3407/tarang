@@ -60,7 +60,7 @@ export default function Footer() {
               <span className="t-cut-red">mundane.</span>
             </p>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-bone/55">
-              The annual cultural festival of {FEST.college}. {FEST.dates}.
+              {FEST.summary} {FEST.dates}.
             </p>
             {FEST.instagram ? (
               <a href={FEST.instagram} target="_blank" rel="noopener noreferrer" className="t-btn t-btn-ghost mt-8">

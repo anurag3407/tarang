@@ -18,7 +18,8 @@ export default function RefundPolicyPage() {
       <PolicySection title="1. Passes and registrations are non-refundable">
         <p>
           Pronite Passes, event registrations and all other passes are{" "}
-          <strong className="text-bone">non-refundable once purchased</strong>. This includes cases where you cannot
+          <strong className="text-bone">non-refundable once confirmed</strong>, except when the event is postponed or
+          cancelled (see section 3). This includes cases where you cannot
           attend, are refused entry or removed under our{" "}
           <Link href="/terms" className="t-link text-bone">Terms &amp; Conditions</Link>, or where an artist, timing or
           venue changes.
@@ -31,7 +32,12 @@ export default function RefundPolicyPage() {
         </p>
       </PolicySection>
 
-      <PolicySection title="3. If the festival is cancelled">
+      <PolicySection title="3. If the festival is postponed or cancelled">
+        <p>
+          If {FEST.name} {FEST.year} is postponed, your pass stays valid for the new dates. If you cannot attend on the
+          new dates, write to <SupportEmail /> within 7 days of the announcement and we will refund you in full within{" "}
+          <strong className="text-bone">5–7 working days</strong>.
+        </p>
         <p>
           If {FEST.name} {FEST.year} is cancelled by the organisers, every buyer will receive a full refund of the amount
           paid. Refunds will be credited to the original payment method within{" "}

@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     template: "%s | Tarang ’26",
   },
   description:
-    "Tarang ’26 is the cultural festival of NIT Patna — two pronites, every kind of competition and two days on the banks of the Ganga. 21–22 November 2026.",
+    "Tarang ’26 is the annual college cultural festival of NIT Patna, organised by its students — cultural performances, workshops, student showcases and two pronites. 21–22 November 2026.",
   keywords: [
     "TARANG",
     "TARANG 2026",
@@ -99,7 +99,7 @@ export const metadata: Metadata = {
     siteName: "Tarang ’26 — NIT Patna",
     title: "Tarang ’26 — Mute the Mundane | NIT Patna",
     description:
-      "The cultural festival of NIT Patna — two pronites and two days of music, dance, theatre and competitions on the banks of the Ganga. 21–22 November 2026.",
+      "The annual college cultural festival of NIT Patna, organised by its students — music, dance, theatre, workshops and two pronites. 21–22 November 2026.",
     images: [
       {
         url: "/tarang/og.jpg",

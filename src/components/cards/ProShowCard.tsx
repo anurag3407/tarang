@@ -16,7 +16,7 @@ export function ProShowCard({ event }: { event: EventRead }) {
   const feeLabel =
     event.amountPaise === 0
       ? "Free with fest pass"
-      : `${formatPaise(event.amountPaise)} entry fee`;
+      : `${formatPaise(event.amountPaise)} registration`;
 
   return (
     <article className="kit-rise relative flex h-full flex-col border-4 border-black bg-black text-white shadow-neo transition-all duration-200 hover:-translate-y-2 hover:shadow-neo-lg">
@@ -57,7 +57,7 @@ export function ProShowCard({ event }: { event: EventRead }) {
           {event.prizePoolText && (
             <li className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 shrink-0 text-neo-accent" strokeWidth={3} />
-              Prize pool: {event.prizePoolText}
+              Awards: {event.prizePoolText}
             </li>
           )}
         </ul>

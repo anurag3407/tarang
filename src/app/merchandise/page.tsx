@@ -44,7 +44,7 @@ export default async function MerchandisePage() {
           "Official Festival Drop",
           "Heavyweight Cotton Fleece",
           "Limited Edition",
-          "Pan-India Delivery & Campus Pickup",
+          "Campus Pickup at the Fest",
           "Zero Restocks Once Sold Out",
         ]}
         variant="secondary"

@@ -134,7 +134,7 @@ export function EventCard({
           {event.prizePoolText && (
             <li className="flex items-center gap-2">
               <Trophy className="h-4 w-4 shrink-0" strokeWidth={3} />
-              Prize: {event.prizePoolText}
+              Awards: {event.prizePoolText}
             </li>
           )}
         </ul>
